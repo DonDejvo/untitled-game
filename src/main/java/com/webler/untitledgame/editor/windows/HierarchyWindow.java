@@ -4,10 +4,7 @@ import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.editor.controllers.EditorController;
-import com.webler.untitledgame.level.levelmap.Entity;
-import com.webler.untitledgame.level.levelmap.Light;
-import com.webler.untitledgame.level.levelmap.Platform;
-import com.webler.untitledgame.level.levelmap.Serializable;
+import com.webler.untitledgame.level.levelmap.*;
 import imgui.ImGui;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -54,6 +51,13 @@ public class HierarchyWindow {
                 List<GameObject> entityGameObjects = scene.getEntitiesByTag(Entity.TAG);
                 for(GameObject entityGameObject : entityGameObjects) {
                     imguiLevelObjectNode(entityGameObject, i++);
+                }
+                ImGui.treePop();
+            }
+            if(ImGui.treeNode("Doors")) {
+                List<GameObject> doorGameObjects = scene.getEntitiesByTag(Door.TAG);
+                for(GameObject doorGameObject : doorGameObjects) {
+                    imguiLevelObjectNode(doorGameObject, i++);
                 }
                 ImGui.treePop();
             }

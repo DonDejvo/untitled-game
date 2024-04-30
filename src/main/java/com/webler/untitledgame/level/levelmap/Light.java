@@ -19,12 +19,6 @@ public class Light implements Serializable {
     }
 
     public Light() {
-        x = 0;
-        y = 0;
-        top = 0;
-        radiusMin = 5;
-        radiusMax = 10;
-        color = Color.WHITE;
     }
 
     @Override

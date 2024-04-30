@@ -37,11 +37,11 @@ public class LevelGeometry extends Geometry {
         LevelMap levelMap = level.getLevelMap();
 
         List<Platform> platforms = levelMap.getPlatforms();
-        int ceiling = levelMap.ceiling;
+        int globalCeiling = levelMap.ceiling;
 
         quads = new ArrayList<>();
 
-        addCeiling(levelMap.getWidth(), levelMap.getHeight(), ceiling);
+        //addCeiling(levelMap.getWidth(), levelMap.getHeight(), globalCeiling);
 
         for(Platform platform : platforms) {
             float x1 = (platform.x - levelMap.minX);
@@ -49,36 +49,42 @@ public class LevelGeometry extends Geometry {
             float y1 = (platform.y - levelMap.minY);
             float y2 = (platform.y - levelMap.minY + platform.height);
             float top = (float) platform.top;
+            float ceiling = (float) platform.ceiling;
 
-            if(top < ceiling) {
+            if(top < globalCeiling) {
                 addGround(x1, y1, x2, y2, top);
+                addCeiling(x1, y1, x2, y2, ceiling);
             }
             if(top > 0) {
-                addWall(x1, y1, x2, y1, top);
-                addWall(x2, y1, x2, y2, top);
-                addWall(x2, y2, x1, y2, top);
-                addWall(x1, y2, x1, y1, top);
+                addWall(x1, y1, x1, y2, 0, top);
+                addWall(x1, y2, x2, y2, 0, top);
+                addWall(x2, y2, x2, y1, 0, top);
+                addWall(x2, y1, x1, y1, 0, top);
+            }
+            if(ceiling < globalCeiling) {
+                addWall(x1, y1, x1, y2, ceiling, globalCeiling);
+                addWall(x1, y2, x2, y2, ceiling, globalCeiling);
+                addWall(x2, y2, x2, y1, ceiling, globalCeiling);
+                addWall(x2, y1, x1, y1, ceiling, globalCeiling);
             }
         }
 
-        int[][] grid = level.getGrid();
-
         for (int y = 0; y < levelMap.getHeight(); y++) {
             for (int x = 0; x < levelMap.getWidth(); x++) {
-                if(grid[y][x] < 0) {
+                if(level.getBlockTop(x,y) < 0) {
                     continue;
                 }
-                if(y == 0 || grid[y - 1][x] < 0) {
-                    addWall(x, y, (x + 1), y, ceiling);
+                if(y == 0 || level.getBlockTop(x,y - 1) < 0) {
+                    addWall(x, y, (x + 1), y, 0, globalCeiling);
                 }
-                if(y == levelMap.getHeight() - 1 || grid[y + 1][x] < 0) {
-                    addWall((x + 1), (y + 1), x, (y + 1), ceiling);
+                if(y == levelMap.getHeight() - 1 || level.getBlockTop(x,y + 1) < 0) {
+                    addWall((x + 1), (y + 1), x, (y + 1), 0, globalCeiling);
                 }
-                if(x == 0 || grid[y][x - 1] < 0) {
-                    addWall(x, (y + 1), x, y, ceiling);
+                if(x == 0 || level.getBlockTop(x - 1,y) < 0) {
+                    addWall(x, (y + 1), x, y, 0, globalCeiling);
                 }
-                if(x == levelMap.getWidth() - 1 || grid[y][x + 1] < 0) {
-                    addWall((x + 1), y, (x + 1), (y + 1), ceiling);
+                if(x == levelMap.getWidth() - 1 || level.getBlockTop(x + 1,y) < 0) {
+                    addWall((x + 1), y, (x + 1), (y + 1), 0, globalCeiling);
                 }
             }
         }
@@ -144,14 +150,24 @@ public class LevelGeometry extends Geometry {
         quads.add(new LevelGeometryQuad(positions, groundTexId, Math.abs(x2 - x1), Math.abs(y2 - y1)));
     }
 
-    private void addWall(float x1, float y1, float x2, float y2, float top) {
+    private void addWall(float x1, float y1, float x2, float y2, float bottom, float top) {
         float[] positions = new float[]{
                 x1, top, y1,
                 x2, top, y2,
-                x2, 0, y2,
-                x1, 0, y1
+                x2, bottom, y2,
+                x1, bottom, y1
         };
-        quads.add(new LevelGeometryQuad(positions, wallTexId, Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)), top));
+        quads.add(new LevelGeometryQuad(positions, wallTexId, Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)), Math.max(top - bottom, 0)));
+    }
+
+    private void addCeiling(float x1, float y1, float x2, float y2, float top) {
+        float[] positions = new float[]{
+                x1, top, y2,
+                x2, top, y2,
+                x2, top, y1,
+                x1, top, y1
+        };
+        quads.add(new LevelGeometryQuad(positions, ceilingTexId, Math.abs(x2 - x1), Math.abs(y2 - y1)));
     }
 
     private void addCeiling(float width, float height, float top) {

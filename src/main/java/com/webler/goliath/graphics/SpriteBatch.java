@@ -102,14 +102,7 @@ public class SpriteBatch {
 
         if(spriteRenderers.isEmpty()) return;
 
-        Camera camera = spriteRenderers.get(0).getEntity().getScene().getCamera();
-        Vector3d cameraPos = camera.getEntity().transform.position;
-        Rect viewport = camera.getViewport();
-        viewport.x += cameraPos.x - viewport.width / 2;
-        viewport.y += cameraPos.y - viewport.height / 2;
-
         ArrayList<SpriteRenderer> visibleRenderers = spriteRenderers.stream()
-                .filter(e -> e.getBoundingRect().intersects(viewport))
                 .sorted(Comparator.comparingInt(a -> a.getSprite().getTexture().getTexId()))
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -132,7 +125,7 @@ public class SpriteBatch {
                 System.arraycopy(color, 0, vertices, (i * 4 + j) * VERT_SIZE + COLOR_OFFSET, COLOR_SIZE);
             }
 
-            if(i == visibleRenderers.size() - 1 || sprite.getTexture().equals(visibleRenderers.get(i + 1).getSprite().getTexture())) {
+            if(i == visibleRenderers.size() - 1 || !sprite.getTexture().equals(visibleRenderers.get(i + 1).getSprite().getTexture())) {
                 if(drawCalls.isEmpty()) {
                     drawCalls.add(new DrawCall(0, (i + 1) * 6, sprite.getTexture().getTexId()));
                 } else {

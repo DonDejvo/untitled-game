@@ -25,6 +25,7 @@ public class MeshRenderer extends Component {
     @Override
     public void update(double dt) {
         mesh.getModelMatrix().set(gameObject.transform.getMatrix());
+        mesh.getModelMatrix().translate(offset);
         mesh.getColor().set(color.r, color.g, color.b, color.a);
     }
 

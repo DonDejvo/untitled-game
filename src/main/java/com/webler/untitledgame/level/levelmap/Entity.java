@@ -15,9 +15,6 @@ public class Entity implements Serializable{
     }
 
     public Entity() {
-        name = "";
-        x = 0;
-        y = 0;
     }
 
     @Override

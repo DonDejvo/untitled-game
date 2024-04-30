@@ -2,6 +2,7 @@ package com.webler.goliath.graphics.widgets;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
+import imgui.type.ImInt;
 import imgui.type.ImString;
 
 public class Controls {
@@ -57,6 +58,17 @@ public class Controls {
         ImGui.nextColumn();
         ImGui.pushID(label);
         ImGui.inputText("##" + label, value);
+        ImGui.popID();
+        ImGui.columns(1);
+    }
+
+    public static void comboBox(String label, ImInt value, String[] items) {
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, COL_WIDTH);
+        ImGui.text(label);
+        ImGui.nextColumn();
+        ImGui.pushID(label);
+        ImGui.combo("##" + label, value, items);
         ImGui.popID();
         ImGui.columns(1);
     }

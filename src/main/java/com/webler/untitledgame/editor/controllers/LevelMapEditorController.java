@@ -36,12 +36,12 @@ public class LevelMapEditorController extends EditorController {
     }
 
     @Override
-    public void move(Transform transform, Vector2d vector) {
+    public void move(Transform transform, Vector2d start, Vector2d vector) {
 
     }
 
     @Override
-    public void scale(Transform transform, Vector2d vector) {
+    public void scale(Transform transform, Vector2d start, Vector2d vector) {
 
     }
 

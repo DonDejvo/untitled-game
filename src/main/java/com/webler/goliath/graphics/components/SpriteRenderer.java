@@ -10,13 +10,11 @@ public class SpriteRenderer extends Component {
     private Sprite sprite;
     private int zIndex;
     private Color color;
-    public final Vector3d offset;
 
     public SpriteRenderer(Sprite sprite, int zIndex) {
         this.sprite = sprite;
         this.color = Color.WHITE;
         this.zIndex = zIndex;
-        this.offset = new Vector3d(0,0,0);
     }
 
     @Override
@@ -69,9 +67,5 @@ public class SpriteRenderer extends Component {
         return new Rect(offsetPosition.x - width / 2, offsetPosition.y - height / 2, width, height);
     }
 
-    public Vector3d getOffsetPosition() {
-        return new Vector3d(gameObject.transform.position).add(new Vector3d(offset)
-                .rotate(gameObject.transform.rotation)
-                .mul(gameObject.transform.scale));
-    }
+
 }

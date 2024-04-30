@@ -36,8 +36,12 @@ public class PlatformEditorController extends EditorController {
         platform.height = height[0];
 
         int[] top = {platform.top};
-        Controls.intControl("top", top, 0.1f, 0, 100);
+        Controls.intControl("top", top, 0.1f, 0, 50);
         platform.top = top[0];
+
+        int[] ceiling = {platform.ceiling};
+        Controls.intControl("ceiling", ceiling, 0.1f, platform.top + 1, 100);
+        platform.ceiling = ceiling[0];
     }
 
     @Override
@@ -57,14 +61,14 @@ public class PlatformEditorController extends EditorController {
     }
 
     @Override
-    public void move(Transform transform, Vector2d vector) {
+    public void move(Transform transform, Vector2d start, Vector2d vector) {
         SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
         platform.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / renderer.getSprite().getWidth()));
         platform.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / renderer.getSprite().getHeight()));
     }
 
     @Override
-    public void scale(Transform transform, Vector2d vector) {
+    public void scale(Transform transform, Vector2d start, Vector2d vector) {
         SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
         platform.width = Math.max((int)(transform.scale.x + Math.floor(0.5 + vector.x / renderer.getSprite().getWidth())), 1);
         platform.height = Math.max((int)(transform.scale.y + Math.floor(0.5 + vector.y / renderer.getSprite().getHeight())), 1);

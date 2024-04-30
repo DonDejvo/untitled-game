@@ -24,33 +24,25 @@ public class LevelMap implements Serializable {
     private List<Platform> platforms;
     private List<Light> lights;
     private List<Entity> entities;
-
-    public LevelMap(int minX, int minY, int maxX, int maxY, int ceiling) {
-        this.minX = minX;
-        this.minY = minY;
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.ceiling = ceiling;
-        platforms = new ArrayList<>();
-        lights = new ArrayList<>();
-        entities = new ArrayList<>();
-    }
+    private List<Door> doors;
 
     public LevelMap() {
         minX = 0;
         minY = 0;
         maxX = 0;
         maxY = 0;
-        ceiling = 5;
+        ceiling = 1;
         platforms = new ArrayList<>();
         lights = new ArrayList<>();
         entities = new ArrayList<>();
+        doors = new ArrayList<>();
     }
 
     public void clear() {
         platforms.clear();
         lights.clear();
         entities.clear();
+        doors.clear();
     }
 
     public void addPlatform(Platform platform) {
@@ -67,6 +59,10 @@ public class LevelMap implements Serializable {
 
     public void addEntity(Entity entity) {
         entities.add(entity);
+    }
+
+    public void addDoor(Door door) {
+        doors.add(door);
     }
 
     public void load(String fileName) throws ParserConfigurationException, IOException, SAXException {
@@ -107,7 +103,7 @@ public class LevelMap implements Serializable {
         element.setAttribute("min-y", Integer.toString(minY));
         element.setAttribute("max-x", Integer.toString(maxX));
         element.setAttribute("max-y", Integer.toString(maxY));
-        element.setAttribute("top", Integer.toString(ceiling));
+        element.setAttribute("ceiling", Integer.toString(ceiling));
 
         for (Platform platform : platforms) {
             Element platformElement = element.getOwnerDocument().createElement(Platform.TAG);
@@ -126,6 +122,12 @@ public class LevelMap implements Serializable {
             entity.serialize(entityElement);
             element.appendChild(entityElement);
         }
+
+        for (Door door : doors) {
+            Element doorElement = element.getOwnerDocument().createElement(Door.TAG);
+            door.serialize(doorElement);
+            element.appendChild(doorElement);
+        }
     }
 
     @Override
@@ -134,13 +136,13 @@ public class LevelMap implements Serializable {
         int minY = Integer.parseInt(levelMapElement.getAttribute("min-y"));
         int maxX = Integer.parseInt(levelMapElement.getAttribute("max-x"));
         int maxY = Integer.parseInt(levelMapElement.getAttribute("max-y"));
-        int top = Integer.parseInt(levelMapElement.getAttribute("top"));
+        int ceiling = Integer.parseInt(levelMapElement.getAttribute("ceiling"));
 
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
-        this.ceiling = top;
+        this.ceiling = ceiling;
 
         NodeList platformNodeList = levelMapElement.getElementsByTagName(Platform.TAG);
         for(int i = 0; i < platformNodeList.getLength(); ++i) {
@@ -165,6 +167,14 @@ public class LevelMap implements Serializable {
             entity.deserialize((Element) entityNode);
             addEntity(entity);
         }
+
+        NodeList doorNodeList = levelMapElement.getElementsByTagName(Door.TAG);
+        for(int i = 0; i < doorNodeList.getLength(); ++i) {
+            Node doorNode = doorNodeList.item(i);
+            Door door = new Door();
+            door.deserialize((Element) doorNode);
+            addDoor(door);
+        }
     }
 
     public List<Platform> getPlatforms() {
@@ -177,6 +187,10 @@ public class LevelMap implements Serializable {
 
     public List<Entity> getEntities() {
         return entities;
+    }
+
+    public List<Door> getDoors() {
+        return doors;
     }
 
     public int getWidth() {

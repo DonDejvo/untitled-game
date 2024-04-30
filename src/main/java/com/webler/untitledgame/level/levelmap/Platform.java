@@ -9,6 +9,19 @@ public class Platform implements Serializable {
     public int width;
     public int height;
     public int top;
+    public int ceiling;
+
+    public Platform(int x, int y, int width, int height, int top, int ceiling) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.top = top;
+        this.ceiling = ceiling;
+    }
+
+    public Platform() {
+    }
 
     @Override
     public void deserialize(Element platformElement) {
@@ -17,12 +30,14 @@ public class Platform implements Serializable {
         int top = Integer.parseInt(platformElement.getAttribute("top"));
         int x = Integer.parseInt(platformElement.getAttribute("x"));
         int y = Integer.parseInt(platformElement.getAttribute("y"));
+        int ceiling = Integer.parseInt(platformElement.getAttribute("ceiling"));
 
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.top = top;
+        this.ceiling = ceiling;
     }
 
     @Override
@@ -32,21 +47,6 @@ public class Platform implements Serializable {
         platformElement.setAttribute("top", Integer.toString(top));
         platformElement.setAttribute("x", Integer.toString(x));
         platformElement.setAttribute("y", Integer.toString(y));
-    }
-
-    public Platform(int x, int y, int width, int height, int top) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.top = top;
-    }
-
-    public Platform() {
-        x = 0;
-        y = 0;
-        width = 1;
-        height = 1;
-        top = 0;
+        platformElement.setAttribute("ceiling", Integer.toString(ceiling));
     }
 }

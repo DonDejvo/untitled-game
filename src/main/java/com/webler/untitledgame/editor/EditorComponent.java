@@ -16,9 +16,8 @@ import com.webler.untitledgame.editor.controllers.EditorController;
 import com.webler.untitledgame.editor.windows.HierarchyWindow;
 import com.webler.untitledgame.editor.windows.InspectorWindow;
 import com.webler.untitledgame.editor.windows.LevelWindow;
-import com.webler.untitledgame.level.levelmap.Entity;
-import com.webler.untitledgame.level.levelmap.Platform;
-import com.webler.untitledgame.level.levelmap.Light;
+import com.webler.untitledgame.level.levelmap.*;
+import com.webler.untitledgame.prefabs.editor.DoorPrefab;
 import com.webler.untitledgame.prefabs.editor.EntityPrefab;
 import com.webler.untitledgame.prefabs.editor.PlatformPrefab;
 import com.webler.untitledgame.prefabs.editor.LightPrefab;
@@ -131,7 +130,7 @@ public class EditorComponent extends Component {
     public void handlePlay() {
         if(currentPath != null) {
             saveLevel();
-            getEntity().getGame().playScene("Test", new TestParams(currentPath));
+            getEntity().getGame().playScene("LevelScene", new TestParams(currentPath));
         }
     }
 
@@ -163,7 +162,7 @@ public class EditorComponent extends Component {
         Scene scene = getEntity().getScene();
         int x = (int)(scene.getCamera().getEntity().transform.position.x / config.gridWidth());
         int y = (int)(scene.getCamera().getEntity().transform.position.y / config.gridHeight());
-        GameObject platformGameObject = new PlatformPrefab(new Platform(x, y, 1, 1, 0),
+        GameObject platformGameObject = new PlatformPrefab(new Platform(x, y, 1, 1, 0, level.getLevelMap().ceiling),
                 config.gridWidth(), config.gridHeight()).create(scene);
         scene.add(platformGameObject);
     }
@@ -172,7 +171,7 @@ public class EditorComponent extends Component {
         Scene scene = getEntity().getScene();
         double x = scene.getCamera().getEntity().transform.position.x / config.gridWidth();
         double y = scene.getCamera().getEntity().transform.position.y / config.gridHeight();
-        GameObject spotLightGameObject = new LightPrefab(new Light(x, y, 5, 5, 10, Color.WHITE),
+        GameObject spotLightGameObject = new LightPrefab(new Light(x, y, 0.5, 5, 10, Color.WHITE),
                 config.gridWidth(), config.gridHeight()).create(scene);
         scene.add(spotLightGameObject);
     }
@@ -184,6 +183,15 @@ public class EditorComponent extends Component {
         GameObject entity = new EntityPrefab(new Entity(name, x, y),
                 config.gridWidth(), config.gridHeight()).create(scene);
         scene.add(entity);
+    }
+
+    public void addDoor() {
+        Scene scene = getEntity().getScene();
+        int x = (int)(scene.getCamera().getEntity().transform.position.x / config.gridWidth());
+        int y = (int)(scene.getCamera().getEntity().transform.position.y / config.gridHeight());
+        GameObject door = new DoorPrefab(new Door(x, y, Direction.DOWN),
+                config.gridWidth(), config.gridHeight()).create(scene);
+        scene.add(door);
     }
 
     public GameObject getSelectedGameObject() {
@@ -245,6 +253,13 @@ public class EditorComponent extends Component {
                     config.gridWidth(), config.gridHeight()).create(scene);
             scene.add(entityGameObject);
         }
+
+        List<Door> doors = level.getLevelMap().getDoors();
+        for(Door door : doors) {
+            GameObject doorGameObject = new DoorPrefab(door,
+                    config.gridWidth(), config.gridHeight()).create(scene);
+            scene.add(doorGameObject);
+        }
     }
 
     private void saveLevel() {
@@ -274,6 +289,14 @@ public class EditorComponent extends Component {
                     .getComponent(EditorController.class, "Controller")
                     .getSerializable();
             level.getLevelMap().addEntity(entity);
+        }
+
+        List<GameObject> doorObjects = scene.getEntitiesByTag(Door.TAG);
+        for(GameObject doorObject : doorObjects) {
+            Door door = (Door) doorObject
+                    .getComponent(EditorController.class, "Controller")
+                    .getSerializable();
+            level.getLevelMap().addDoor(door);
         }
 
         level.save(currentPath);
@@ -326,14 +349,14 @@ public class EditorComponent extends Component {
     private void moveSelectedObject() {
         if(selectedGameObject != null) {
             Vector2d vector = getWorldMousePosition().sub(mouseBeginPosition);
-            selectedGameObject.getComponent(EditorController.class, "Controller").move(selectedObjectTransform, vector);
+            selectedGameObject.getComponent(EditorController.class, "Controller").move(selectedObjectTransform, mouseBeginPosition, vector);
         }
     }
 
     private void scaleSelectedObject() {
         if(selectedGameObject != null) {
             Vector2d vector = getWorldMousePosition().sub(mouseBeginPosition);
-            selectedGameObject.getComponent(EditorController.class, "Controller").scale(selectedObjectTransform, vector);
+            selectedGameObject.getComponent(EditorController.class, "Controller").scale(selectedObjectTransform, mouseBeginPosition, vector);
         }
     }
 
@@ -377,6 +400,11 @@ public class EditorComponent extends Component {
         List<GameObject> entitiesToRemove = scene.getEntitiesByTag(Entity.TAG);
         for(GameObject entity : entitiesToRemove) {
             scene.remove(entity);
+        }
+
+        List<GameObject> doorsToRemove = scene.getEntitiesByTag(Door.TAG);
+        for(GameObject door : doorsToRemove) {
+            scene.remove(door);
         }
     }
 

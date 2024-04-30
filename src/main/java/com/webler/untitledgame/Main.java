@@ -3,7 +3,7 @@ package com.webler.untitledgame;
 import com.webler.goliath.Config;
 import com.webler.goliath.Game;
 import com.webler.untitledgame.scenes.LevelEditorScene;
-import com.webler.untitledgame.scenes.Test;
+import com.webler.untitledgame.scenes.LevelScene;
 import com.webler.untitledgame.scenes.TestParams;
 
 public class Main {
@@ -18,7 +18,7 @@ public class Main {
                 new TestParams(null)
         );
         Game game = new Game(config);
-        game.registerScene(Test.class);
+        game.registerScene(LevelScene.class);
         game.registerScene(LevelEditorScene.class);
         game.registerScene(MyFirstScene.class);
         game.run();

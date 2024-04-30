@@ -19,9 +19,9 @@ public abstract class EditorController extends Component {
 
     public abstract void synchronize();
 
-    public abstract void move(Transform transform, Vector2d vector);
+    public abstract void move(Transform transform, Vector2d start, Vector2d vector);
 
-    public abstract void scale(Transform transform, Vector2d vector);
+    public abstract void scale(Transform transform, Vector2d start, Vector2d vector);
 
     public abstract boolean isRemovable();
 

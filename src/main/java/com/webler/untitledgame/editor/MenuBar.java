@@ -81,7 +81,7 @@ public class MenuBar {
             }
             if(ImGui.beginMenu("Fixed")) {
                 if (ImGui.menuItem("Door")) {
-
+                    editor.addDoor();
                 }
                 if (ImGui.menuItem("Wending Machine")) {
 

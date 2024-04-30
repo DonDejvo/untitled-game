@@ -48,14 +48,14 @@ public class EntityEditorController extends EditorController {
     }
 
     @Override
-    public void move(Transform transform, Vector2d vector) {
+    public void move(Transform transform, Vector2d start, Vector2d vector) {
         SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
         entity.x = (transform.position.x + vector.x) / renderer.getSprite().getWidth();
         entity.y = (transform.position.y + vector.y) / renderer.getSprite().getHeight();
     }
 
     @Override
-    public void scale(Transform transform, Vector2d vector) {
+    public void scale(Transform transform, Vector2d start, Vector2d vector) {
 
     }
 
