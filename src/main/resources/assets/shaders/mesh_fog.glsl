@@ -50,7 +50,7 @@ void main() {
 
     color = tex_color * u_color;
 
-    vec3 result;
+    vec3 result = vec3(0.0);
 
     for(int i = 0; i < u_spot_lights_count * 3; i += 3) {
         vec3 light_pos = u_spot_lights[i];

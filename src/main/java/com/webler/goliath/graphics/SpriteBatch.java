@@ -195,7 +195,6 @@ public class SpriteBatch {
                     .sorted(Comparator.comparingInt(a -> a.getSprite().getTexture().getTexId()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
-        System.out.println(visibleRenderers.size());
         return visibleRenderers;
     }
 
