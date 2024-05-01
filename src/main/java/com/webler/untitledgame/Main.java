@@ -4,7 +4,7 @@ import com.webler.goliath.Config;
 import com.webler.goliath.Game;
 import com.webler.untitledgame.scenes.LevelEditorScene;
 import com.webler.untitledgame.scenes.LevelScene;
-import com.webler.untitledgame.scenes.TestParams;
+import com.webler.untitledgame.scenes.LevelParams;
 
 public class Main {
 
@@ -15,12 +15,11 @@ public class Main {
                 1920,
                 1080,
                 "LevelEditorScene",
-                new TestParams(null)
+                new LevelParams(null)
         );
         Game game = new Game(config);
         game.registerScene(LevelScene.class);
         game.registerScene(LevelEditorScene.class);
-        game.registerScene(MyFirstScene.class);
         game.run();
     }
 }

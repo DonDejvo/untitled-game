@@ -4,9 +4,8 @@ import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.math.Rect;
-import com.webler.goliath.utils.AssetPool;
 import org.joml.Matrix4d;
-import org.joml.Vector3d;
+import org.joml.Vector4d;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -98,13 +97,12 @@ public class SpriteBatch {
 
     // TODO: Do only if needed
     public void initBuffers() {
+
         drawCalls.clear();
 
         if(spriteRenderers.isEmpty()) return;
 
-        ArrayList<SpriteRenderer> visibleRenderers = spriteRenderers.stream()
-                .sorted(Comparator.comparingInt(a -> a.getSprite().getTexture().getTexId()))
-                .collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<SpriteRenderer> visibleRenderers = getVisibleRenderers();
 
         float[] vertices = new float[visibleRenderers.size() * 4 * VERT_SIZE];
 
@@ -141,23 +139,6 @@ public class SpriteBatch {
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
     }
 
-    private static float[] getPositions(SpriteRenderer spriteRenderer, Sprite sprite) {
-        Transform transform = spriteRenderer.getEntity().transform;
-        Vector3d offsetPosition = spriteRenderer.getOffsetPosition();
-        float x = (float)offsetPosition.x;
-        float y = (float)offsetPosition.y;
-        float z = (float)offsetPosition.z;
-        float halfWidth = (float)(transform.scale.x * sprite.getWidth()) / 2;
-        float halfHeight = (float)(transform.scale.y * sprite.getHeight()) / 2;
-
-        return new float[] {
-                x - halfWidth, y - halfHeight, z,
-                x + halfWidth, y - halfHeight, z,
-                x + halfWidth, y + halfHeight, z,
-                x - halfWidth, y + halfHeight, z
-        };
-    }
-
     public void render() {
         initBuffers();
 
@@ -191,5 +172,55 @@ public class SpriteBatch {
 
     public boolean isFull() {
         return spriteRenderers.size() == MAX_SPRITES;
+    }
+
+    private ArrayList<SpriteRenderer> getVisibleRenderers() {
+        Camera camera = spriteRenderers.get(0).getEntity().getScene().getCamera();
+
+        ArrayList<SpriteRenderer> visibleRenderers = new ArrayList<>(spriteRenderers);
+
+        if(zIndex == -1) {
+            visibleRenderers.sort((a, b) -> {
+                double distToCam1 = a.getOffsetPosition().distance(camera.getEntity().transform.position);
+                double distToCam2 = b.getOffsetPosition().distance(camera.getEntity().transform.position);
+                return Double.compare(distToCam2, distToCam1);
+            });
+        } else {
+            Rect cameraBoundingRect = camera.getViewport();
+            visibleRenderers = visibleRenderers.stream()
+                    .filter(a -> {
+                        Rect boundingRect = a.getBoundingRect();
+                        return boundingRect.intersects(cameraBoundingRect);
+                    })
+                    .sorted(Comparator.comparingInt(a -> a.getSprite().getTexture().getTexId()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+        System.out.println(visibleRenderers.size());
+        return visibleRenderers;
+    }
+
+    private float[] getPositions(SpriteRenderer spriteRenderer, Sprite sprite) {
+        Transform transform = spriteRenderer.getEntity().transform;
+        Matrix4d mat = new Matrix4d(transform.getMatrix());
+        mat.translate(spriteRenderer.offset);
+        Vector4d[] positions = new Vector4d[] {
+                new Vector4d(-0.5, 0.5, 0, 1),
+                new Vector4d(0.5, 0.5, 0, 1),
+                new Vector4d(0.5, -0.5, 0, 1),
+                new Vector4d(-0.5, -0.5, 0, 1)
+        };
+        float[] vertices = new float[POS_SIZE * positions.length];
+        for (int i = 0; i < positions.length; ++i) {
+            positions[i].x *= spriteRenderer.getSprite().getWidth();
+            positions[i].y *= spriteRenderer.getSprite().getHeight();
+            positions[i].y *= zIndex == -1 ? 1 : -1;
+            positions[i].rotateZ(spriteRenderer.angle);
+            positions[i].mul(mat);
+            vertices[i * POS_SIZE] = (float)positions[i].x;
+            vertices[i * POS_SIZE + 1] = (float)positions[i].y;
+            vertices[i * POS_SIZE + 2] = (float)positions[i].z;
+        }
+
+        return vertices;
     }
 }

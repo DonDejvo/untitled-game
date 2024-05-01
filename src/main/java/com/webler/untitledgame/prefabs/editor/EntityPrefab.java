@@ -25,6 +25,7 @@ public class EntityPrefab implements Prefab {
     public GameObject create(Scene scene) {
         Texture texture = switch (entity.name) {
             case "player" -> AssetPool.getTexture("assets/tiles/player.png");
+            case "catgirl" -> AssetPool.getTexture("assets/images/4-3.png");
             default -> throw new IllegalStateException("Unexpected value: " + entity.name);
         };
         Sprite sprite = new Sprite(texture);

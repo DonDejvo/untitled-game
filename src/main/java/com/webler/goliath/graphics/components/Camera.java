@@ -1,6 +1,7 @@
 package com.webler.goliath.graphics.components;
 
 import com.webler.goliath.core.Component;
+import com.webler.goliath.graphics.Color;
 import com.webler.goliath.math.Rect;
 import org.joml.*;
 
@@ -14,6 +15,7 @@ public abstract class Camera extends Component {
     protected int viewportHeight;
     protected Matrix4d PVMatrix;
     protected Matrix4d inversePVMatrix;
+    private Color backgroundColor;
 
     public Camera(int viewportWidth, int viewportHeight) {
         this.viewportWidth = viewportWidth;
@@ -25,6 +27,7 @@ public abstract class Camera extends Component {
         right = new Vector3d();
         PVMatrix = new Matrix4d();
         inversePVMatrix = new Matrix4d();
+        backgroundColor = Color.BLACK;
     }
 
     public void updateView() {
@@ -61,7 +64,9 @@ public abstract class Camera extends Component {
     }
 
     public Rect getViewport() {
-        return new Rect(0, 0, viewportWidth, viewportHeight);
+        return new Rect(gameObject.transform.position.x - viewportWidth * 0.5,
+                gameObject.transform.position.y - viewportHeight * 0.5,
+                viewportWidth, viewportHeight);
     }
 
     @Override
@@ -94,5 +99,13 @@ public abstract class Camera extends Component {
         Vector4d v = new Vector4d((screenX - offsetX) / screenWidth * 2 - 1, (1 - (screenY - offsetY) / screenHeight) * 2 - 1, 0.0, 1.0);
         v.mul(inversePVMatrix);
         return new Vector2d(v.x, v.y);
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 }

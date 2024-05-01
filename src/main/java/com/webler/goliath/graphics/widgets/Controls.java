@@ -14,7 +14,7 @@ public class Controls {
         intControl(label, value, step, MIN_VALUE, MAX_VALUE);
     }
 
-    public static void intControl(String label, int[] value, float step, int min, int max) {
+    public static void intControl(String label, int[] value, float step, float min, float max) {
         ImGui.columns(2);
         ImGui.setColumnWidth(0, COL_WIDTH);
         ImGui.text(label);

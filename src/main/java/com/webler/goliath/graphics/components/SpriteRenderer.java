@@ -10,11 +10,13 @@ public class SpriteRenderer extends Component {
     private Sprite sprite;
     private int zIndex;
     private Color color;
+    public double angle;
 
     public SpriteRenderer(Sprite sprite, int zIndex) {
         this.sprite = sprite;
         this.color = Color.WHITE;
         this.zIndex = zIndex;
+        this.angle = 0;
     }
 
     @Override
@@ -66,6 +68,4 @@ public class SpriteRenderer extends Component {
         double height = gameObject.transform.scale.y * sprite.getHeight();
         return new Rect(offsetPosition.x - width / 2, offsetPosition.y - height / 2, width, height);
     }
-
-
 }

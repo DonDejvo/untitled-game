@@ -2,6 +2,8 @@ package com.webler.untitledgame.scenes;
 
 import com.webler.goliath.Game;
 import com.webler.goliath.core.SceneParams;
+import com.webler.goliath.graphics.Color;
+import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.prefabs.PerspectiveCameraPrefab;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
@@ -15,16 +17,17 @@ public class LevelScene extends Scene {
 
     @Override
     public void init(SceneParams params) {
-        TestParams testParams = (TestParams) params;
+        LevelParams levelParams = (LevelParams) params;
 
         Logger.log("This is test scene!", Logger.LEVEL_INFO);
 
         GameObject cameraGameObject = new PerspectiveCameraPrefab(Math.PI / 3, 0.1, 1000).create(this);
+        cameraGameObject.getComponent(Camera.class, "Camera").setBackgroundColor(Color.BLUE);
         add(cameraGameObject);
 
         GameObject levelGameObject = new GameObject(this, "Level");
         Level level = new Level();
-        level.load(testParams.getLevelPath());
+        level.load(levelParams.getLevelPath());
         levelGameObject.addComponent("Level", level);
         levelGameObject.addComponent("LevelRenderer", new LevelRenderer(level));
         add(levelGameObject);

@@ -1,7 +1,5 @@
 package com.webler.untitledgame.editor;
 
-import com.webler.untitledgame.components.Level;
-import com.webler.untitledgame.scenes.TestParams;
 import imgui.ImGui;
 
 public class MenuBar {
@@ -13,7 +11,6 @@ public class MenuBar {
     }
 
     private void createMenuFile() {
-        Level level = editor.getComponent(Level.class, "Level");
 
         if (ImGui.beginMenu("File")) {
             if (ImGui.menuItem("New")) {
@@ -60,32 +57,32 @@ public class MenuBar {
                     editor.addEntity("player");
                 }
                 if (ImGui.menuItem("Cat Girl")) {
-
+                    editor.addEntity("catgirl");
                 }
-                if (ImGui.menuItem("Slime")) {
-
-                }
+//                if (ImGui.menuItem("Slime")) {
+//
+//                }
                 ImGui.endMenu();
             }
-            if(ImGui.beginMenu("Item")) {
-                if (ImGui.menuItem("Key")) {
-
-                }
-                if (ImGui.menuItem("Diamond")) {
-
-                }
-                if (ImGui.menuItem("Espresso")) {
-
-                }
-                ImGui.endMenu();
-            }
+//            if(ImGui.beginMenu("Item")) {
+//                if (ImGui.menuItem("Key")) {
+//
+//                }
+//                if (ImGui.menuItem("Diamond")) {
+//
+//                }
+//                if (ImGui.menuItem("Espresso")) {
+//
+//                }
+//                ImGui.endMenu();
+//            }
             if(ImGui.beginMenu("Fixed")) {
                 if (ImGui.menuItem("Door")) {
                     editor.addDoor();
                 }
-                if (ImGui.menuItem("Wending Machine")) {
-
-                }
+//                if (ImGui.menuItem("Wending Machine")) {
+//
+//                }
                 ImGui.endMenu();
             }
             ImGui.endMenu();

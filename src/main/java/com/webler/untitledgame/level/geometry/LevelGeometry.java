@@ -53,13 +53,15 @@ public class LevelGeometry extends Geometry {
 
             if(top < globalCeiling) {
                 addGround(x1, y1, x2, y2, top);
-                addCeiling(x1, y1, x2, y2, ceiling);
             }
             if(top > 0) {
                 addWall(x1, y1, x1, y2, 0, top);
                 addWall(x1, y2, x2, y2, 0, top);
                 addWall(x2, y2, x2, y1, 0, top);
                 addWall(x2, y1, x1, y1, 0, top);
+            }
+            if(ceiling <= globalCeiling) {
+                addCeiling(x1, y1, x2, y2, ceiling);
             }
             if(ceiling < globalCeiling) {
                 addWall(x1, y1, x1, y2, ceiling, globalCeiling);

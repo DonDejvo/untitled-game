@@ -21,7 +21,7 @@ import com.webler.untitledgame.prefabs.editor.DoorPrefab;
 import com.webler.untitledgame.prefabs.editor.EntityPrefab;
 import com.webler.untitledgame.prefabs.editor.PlatformPrefab;
 import com.webler.untitledgame.prefabs.editor.LightPrefab;
-import com.webler.untitledgame.scenes.TestParams;
+import com.webler.untitledgame.scenes.LevelParams;
 import org.joml.Vector2d;
 import org.joml.Vector4d;
 
@@ -130,7 +130,7 @@ public class EditorComponent extends Component {
     public void handlePlay() {
         if(currentPath != null) {
             saveLevel();
-            getEntity().getGame().playScene("LevelScene", new TestParams(currentPath));
+            getEntity().getGame().playScene("LevelScene", new LevelParams(currentPath));
         }
     }
 

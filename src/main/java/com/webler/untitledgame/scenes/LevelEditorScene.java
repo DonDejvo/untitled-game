@@ -24,7 +24,7 @@ public class LevelEditorScene extends Scene {
 
     @Override
     public void init(SceneParams params) {
-        TestParams testParams = (TestParams) params;
+        LevelParams levelParams = (LevelParams) params;
 
         AssetPool.addSpritesheet("assets/spritesheets/tileset.png",
                 new Spritesheet(AssetPool.getTexture("assets/spritesheets/tileset.png"),
@@ -47,7 +47,7 @@ public class LevelEditorScene extends Scene {
         EditorConfig editorConfig = new EditorConfig(64, 64);
         GameObject editorGameObject = new GameObject(this, "Editor");
         Level level = new Level();
-        editorGameObject.addComponent("Editor", new EditorComponent(level, editorConfig, testParams.getLevelPath()));
+        editorGameObject.addComponent("Editor", new EditorComponent(level, editorConfig, levelParams.getLevelPath()));
         editorGameObject.addComponent("GridLines", new GridLines(editorConfig));
         editorGameObject.addComponent("Level", level);
         editorGameObject.addComponent("Controller", new LevelMapEditorController(level));

@@ -7,6 +7,7 @@ import com.webler.goliath.core.Scene;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Mesh;
 import com.webler.goliath.graphics.Sprite;
+import com.webler.goliath.graphics.components.Bilboard;
 import com.webler.goliath.graphics.components.Fog;
 import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.graphics.components.SpriteRenderer;
@@ -22,7 +23,7 @@ import com.webler.untitledgame.level.levelmap.Door;
 import com.webler.untitledgame.level.levelmap.Entity;
 import com.webler.untitledgame.level.levelmap.LevelMap;
 import com.webler.untitledgame.level.levelmap.Light;
-import com.webler.untitledgame.scenes.TestParams;
+import com.webler.untitledgame.scenes.LevelParams;
 import org.joml.Vector3d;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class LevelRenderer extends Component {
         gameObject.getGame().getRenderer().add(mesh);
 
         createLights();
-        createPlayer();
+        createEntities();
         createDoors();
     }
 
@@ -59,7 +60,7 @@ public class LevelRenderer extends Component {
         mesh.getModelMatrix().set(gameObject.transform.getMatrix());
         if(Input.keyPressed(GLFW_KEY_P)) {
             GameObject levelObject = getEntity().getScene().getEntityByName("Level");
-            getEntity().getGame().playScene("LevelEditorScene", new TestParams(levelObject.getComponent(Level.class, "Level").getPath()));
+            getEntity().getGame().playScene("LevelEditorScene", new LevelParams(levelObject.getComponent(Level.class, "Level").getPath()));
         }
     }
 
@@ -68,24 +69,39 @@ public class LevelRenderer extends Component {
         gameObject.getGame().getRenderer().remove(mesh);
     }
 
-    private void createPlayer() {
+    private void createEntities() {
         Scene scene = getEntity().getScene();
         LevelMap levelMap = level.getLevelMap();
-        levelMap.getEntities().stream()
-                .filter(e -> Objects.equals(e.name, "player"))
-                .findFirst()
-                .ifPresent(playerEntity -> {
-                    double y = level.getBlockTop((int)Math.floor(playerEntity.x - levelMap.minX), (int)Math.floor(playerEntity.y - levelMap.minY));
-                    Vector3d position = new Vector3d(playerEntity.x - levelMap.minX, y, playerEntity.y - levelMap.minY).mul(Level.TILE_SIZE);
-                    GameObject player = new GameObject(scene);
+        List<Entity> entities = levelMap.getEntities();
+        for (Entity entity : entities) {
+            GameObject go = new GameObject(scene);
+            double y = level.getBlockTop((int)Math.floor(entity.x - levelMap.minX), (int)Math.floor(entity.y - levelMap.minY));
+            Vector3d position = new Vector3d(entity.x - levelMap.minX, y, entity.y - levelMap.minY).mul(Level.TILE_SIZE);
+            go.transform.position.set(position);
+
+            switch (entity.name) {
+                case "player": {
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(2, 3, 2));
-                    player.addComponent("Collider", collider);
+                    go.addComponent("Collider", collider);
                     PlayerController playerController = new PlayerController(level, scene.getCamera(), collider);
-                    player.addComponent("Controller", playerController);
-                    position.y += collider.getSize().y / 2;
-                    player.transform.position.set(position);
-                    scene.add(player);
-                });
+                    go.addComponent("Controller", playerController);
+                    go.transform.position.y += collider.getSize().y / 2;
+                    break;
+                }
+                case "catgirl": {
+                    BoxCollider3D collider = new BoxCollider3D(new Vector3d(2, 3, 2));
+                    go.addComponent("Collider", collider);
+                    Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/4-3.png"));
+                    sprite.setWidth(2);
+                    sprite.setHeight(3);
+                    go.addComponent("Renderer", new SpriteRenderer(sprite, -1));
+                    go.addComponent("Bilboard", new Bilboard());
+                    go.transform.position.y += collider.getSize().y / 2;
+                }
+            }
+
+            scene.add(go);
+        }
     }
 
     private void createLights() {
@@ -101,6 +117,7 @@ public class LevelRenderer extends Component {
             sprite.setWidth(1);
             sprite.setHeight(1);
             go.addComponent("Renderer", new SpriteRenderer(sprite, -1));
+            go.addComponent("Bilboard", new Bilboard());
             scene.add(go);
         }
 
@@ -108,9 +125,9 @@ public class LevelRenderer extends Component {
         ambientLightGameObject.addComponent("AmbientLight", new AmbientLight(new Color(0.05, 0.05, 0.05)));
         scene.add(ambientLightGameObject);
 
-        GameObject fogGameObject = new GameObject(scene);
-        fogGameObject.addComponent("Fog", new Fog(20, 25, Color.BLACK));
-        scene.add(fogGameObject);
+//        GameObject fogGameObject = new GameObject(scene);
+//        fogGameObject.addComponent("Fog", new Fog(25, 50, Color.BLACK));
+//        scene.add(fogGameObject);
     }
 
     private void createDoors() {
@@ -141,7 +158,7 @@ public class LevelRenderer extends Component {
                     break;
             }
             doorGameObject.transform.position.set(position.mul(Level.TILE_SIZE));
-            doorGameObject.transform.scale.set(Level.TILE_SIZE, Level.TILE_SIZE, Level.TILE_SIZE * 0.25);
+            doorGameObject.transform.scale.set(Level.TILE_SIZE, Level.TILE_SIZE, Level.TILE_SIZE * 0.125);
             BoxCollider3D collider = new BoxCollider3D(new Vector3d(4, 4, 4));
             doorGameObject.addComponent("Collider", collider);
             doorGameObject.addComponent("Controller", new DoorController(level, collider, door.direction));

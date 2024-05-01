@@ -38,6 +38,9 @@ public class PlatformEditorController extends EditorController {
         int[] top = {platform.top};
         Controls.intControl("top", top, 0.1f, 0, 50);
         platform.top = top[0];
+        if(platform.ceiling < platform.top + 1) {
+            platform.ceiling = platform.top + 1;
+        }
 
         int[] ceiling = {platform.ceiling};
         Controls.intControl("ceiling", ceiling, 0.1f, platform.top + 1, 100);

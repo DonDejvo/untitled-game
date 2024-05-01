@@ -4,6 +4,7 @@ import com.webler.goliath.core.Scene;
 import com.webler.goliath.core.SceneParams;
 import com.webler.goliath.graphics.*;
 import com.webler.goliath.graphics.canvas.Canvas;
+import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.graphics.font.BitmapFont;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
@@ -124,14 +125,14 @@ public class Game {
         while ( !GLFW.glfwWindowShouldClose(window) ) {
 
             // TODO: refactor cursor locking
-            if(Input.keyBeginPress(GLFW.GLFW_KEY_F2)) {
-                if(cursorLocked) {
-                    GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
-                } else {
-                    GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
-                }
-                cursorLocked = !cursorLocked;
-            }
+//            if(Input.keyBeginPress(GLFW.GLFW_KEY_F2)) {
+//                if(cursorLocked) {
+//                    GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+//                } else {
+//                    GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+//                }
+//                cursorLocked = !cursorLocked;
+//            }
 
             int[] widthPointer = new int[1];
             int[] heightPointer = new int[1];
@@ -146,19 +147,22 @@ public class Game {
             }
 
             if(currentScene != null) {
+                Camera camera = currentScene.getCamera();
+
+                DebugDraw.get().beginFrame();
+                canvas.beginFrame();
+
+                currentScene.update(dt);
 
                 glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.getFbo());
 
                 glViewport(0, 0, width, height);
 
-                glClearColor(0, 0, 0, 1);
+                Color bg = camera.getBackgroundColor();
+                glClearColor((float)bg.r, (float)bg.g, (float)bg.b, (float)bg.a);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-                DebugDraw.get().beginFrame();
-                canvas.beginFrame();
-                currentScene.update(dt);
-
-                renderer.render(currentScene.getCamera().getPVMatrix(), currentScene.getCamera().getViewMatrix());
+                renderer.render(camera.getPVMatrix(), camera.getViewMatrix());
 
                 DebugDraw.get().draw(currentScene.getCamera().getPVMatrix());
 
