@@ -62,6 +62,7 @@ public abstract class Scene {
         while(!pendingEntities.isEmpty()) {
             GameObject e = pendingEntities.poll();
             entities.add(e);
+            e.registerListeners();
             e.start();
         }
         while(!entitiesToRemove.isEmpty()) {

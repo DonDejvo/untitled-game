@@ -3,7 +3,6 @@ package com.webler.goliath.graphics.canvas;
 import com.webler.goliath.Game;
 import com.webler.goliath.graphics.*;
 import com.webler.goliath.graphics.font.BitmapFont;
-import com.webler.goliath.logger.Logger;
 import com.webler.goliath.utils.AssetPool;
 import org.joml.Matrix4d;
 import org.joml.Vector2f;
@@ -40,12 +39,11 @@ public class Canvas {
     private Color color;
     private BitmapFont bitmapFont;
     private float fontSize;
+    private TextAlign textAlign;
     private Matrix4d projection;
     private Vector2f translate;
     private Stack<Vector2f> translateStack;
     private List<DrawCall> drawCalls;
-    private int lastTexId;
-    private int lastOffset;
     private List<CanvasQuad> quads;
 
     public Canvas(Game game) {
@@ -57,14 +55,13 @@ public class Canvas {
 
     public void start() {
         color = Color.WHITE;
+        textAlign = TextAlign.LEFT;
         translate = new Vector2f();
         translateStack = new Stack<>();
         drawCalls = new ArrayList<>();
-        lastTexId = -1;
-        lastOffset = 0;
         fontSize = 32;
-        bitmapFont = AssetPool.get().getBitmapFont("default");
-        shader = AssetPool.get().getShader("assets/shaders/canvas.glsl");
+        bitmapFont = AssetPool.getBitmapFont("default");
+        shader = AssetPool.getShader("assets/shaders/canvas.glsl");
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
@@ -120,6 +117,14 @@ public class Canvas {
         this.fontSize = fontSize;
     }
 
+    public void setTextAlign(TextAlign textAlign) {
+        this.textAlign = textAlign;
+    }
+
+    public TextAlign getTextAlign() {
+        return textAlign;
+    }
+
     public void pushTranslate(float x, float y) {
         Vector2f vec = new Vector2f(x, y);
         translateStack.push(vec);
@@ -137,8 +142,6 @@ public class Canvas {
     }
 
     public void beginFrame() {
-        lastTexId = -1;
-        lastOffset = 0;
         drawCalls.clear();
         quads.clear();
     }
@@ -170,16 +173,16 @@ public class Canvas {
                 }
                 System.arraycopy(colorData, 0, vertices, (i * 4 + j) * VERT_SIZE + COLOR_OFFSET, COLOR_SIZE);
             }
-            if(lastTexId != -1 && lastTexId != quad.texId) {
-
-                drawCalls.add(new DrawCall(lastOffset * 6, i * 6, lastTexId == 0 ? AssetPool.getTexture("assets/images/white_square.png").getTexId() : lastTexId));
-                lastOffset = i;
+            if(i == quads.size() - 1 || quad.texId != quads.get(i + 1).texId) {
+                if(drawCalls.isEmpty()) {
+                    drawCalls.add(new DrawCall(0, (i + 1) * 6, quad.texId));
+                } else {
+                    DrawCall prevDrawCall = drawCalls.get(drawCalls.size() - 1);
+                    int offset = prevDrawCall.offset() + prevDrawCall.count();
+                    int count = (i + 1) * 6 - offset;
+                    drawCalls.add(new DrawCall(offset, count, quad.texId));
+                }
             }
-            lastTexId = quad.texId;
-        }
-
-        if(lastOffset != quads.size()) {
-            drawCalls.add(new DrawCall(lastOffset * 6, quads.size() * 6, lastTexId));
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -216,7 +219,6 @@ public class Canvas {
 
     private void drawQuad(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h) {
         if(quads.size() == MAX_QUADS) {
-            Logger.log("Canvas is full", Logger.LEVEL_WARN);
             return;
         }
         quads.add(new CanvasQuad(texId, sx0, sy0, sx1, sy1, translate.x + x, translate.y + y, w, h, color));
@@ -239,6 +241,11 @@ public class Canvas {
         float charWidth = fontSize * spritesheet.getSpriteWidth() / spritesheet.getSpriteHeight();
         float charHeight = fontSize;
         float offsetX = 0;
+        float alignOffsetX = switch (textAlign) {
+            case CENTER -> -charWidth * text.length() * 0.5f;
+            case RIGHT -> -charWidth * text.length();
+            case LEFT -> 0;
+        };
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             Sprite sprite = bitmapFont.getCharSprite(c);
@@ -246,7 +253,7 @@ public class Canvas {
                 float[] uvs = sprite.getTexCoords();
                 image(sprite.getTexture().getTexId(),
                         uvs[0], uvs[1], uvs[4], uvs[5],
-                        x + offsetX, y, charWidth, charHeight);
+                        x + offsetX + alignOffsetX, y, charWidth, charHeight);
             }
             offsetX += charWidth;
         }

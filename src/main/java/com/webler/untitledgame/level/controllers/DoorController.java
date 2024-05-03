@@ -1,16 +1,23 @@
 package com.webler.untitledgame.level.controllers;
 
 import com.webler.goliath.colliders.BoxCollider3D;
+import com.webler.goliath.core.GameObject;
+import com.webler.goliath.eventsystem.EventManager;
+import com.webler.goliath.graphics.Color;
+import com.webler.goliath.graphics.DebugDraw;
+import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.level.events.DoorOpened;
 import com.webler.untitledgame.level.levelmap.Direction;
+import org.joml.Vector2d;
 import org.joml.Vector3d;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_L;
 
-public class DoorController extends EntityController {
+public class DoorController extends Controller {
     private Direction direction;
     private State state;
     private double openProgress;
@@ -34,8 +41,42 @@ public class DoorController extends EntityController {
     }
 
     @Override
+    protected boolean isInFrontOfPlayer() {
+        GameObject player = level.getPlayer();
+        if(player == null) {
+            return false;
+        }
+
+        MeshRenderer renderer = getComponent(MeshRenderer.class, "Renderer");
+
+        Vector3d playerDirection = new Vector3d(1, 0, 0);
+        playerDirection.rotateY(player.getComponent(PlayerController.class, "Controller").yaw);
+        playerDirection.normalize();
+
+        Vector3d offsetPosition = renderer.getOffsetPosition();
+        Vector3d directionToObject = new Vector3d(offsetPosition);
+        directionToObject.sub(player.transform.position);
+        directionToObject.normalize();
+        return player.transform.position.distance(offsetPosition) <= 6.0 &&
+                playerDirection.dot(directionToObject) > 0.875;
+    }
+
+    @Override
     public void start() {
-        updateRenderer(angleClosed);
+        updateAngle(angleClosed);
+        level.getFixedObjects().add(gameObject);
+        level.getFocusableObjects().add(gameObject);
+    }
+
+    @Override
+    protected void interact() {
+        open();
+    }
+
+    @Override
+    public Vector3d getFocusPosition() {
+        MeshRenderer renderer = getComponent(MeshRenderer.class, "Renderer");
+        return renderer.getOffsetPosition();
     }
 
     @Override
@@ -49,6 +90,7 @@ public class DoorController extends EntityController {
 
         if(state == State.OPENED) {
             collider.setSize(new Vector3d(0, 0, 0));
+            EventManager.dispatchEvent(new DoorOpened(gameObject));
         } else {
             collider.setSize(new Vector3d(4, 4, 4));
         }
@@ -66,12 +108,24 @@ public class DoorController extends EntityController {
                 openProgress = 0;
             }
         }
-        updateRenderer(MathUtils.lerp(angleClosed, angleOpened, MathUtils.clamp(openProgress / delay, 0, 1)));
+        updateAngle(MathUtils.lerp(angleClosed, angleOpened, MathUtils.clamp(openProgress / delay, 0, 1)));
+
+        MeshRenderer renderer = getComponent(MeshRenderer.class, "Renderer");
+        renderer.setColor(isFocused() ? new Color(1, 1, 1) : new Color(0.5, 0.5, 0.5));
+
+//        Vector3d offsetPosition = renderer.getOffsetPosition();
+//        DebugDraw.get().addLine(new Vector3d(0, -0.5, 0).add(offsetPosition),
+//                new Vector3d(0, 0.5, 0).add(offsetPosition), Color.YELLOW);
+//        DebugDraw.get().addLine(new Vector3d(-0.5, 0, 0).add(offsetPosition),
+//                new Vector3d(0.5, 0, 0).add(offsetPosition), Color.YELLOW);
+//        DebugDraw.get().addLine(new Vector3d(0, 0, -0.5).add(offsetPosition),
+//                new Vector3d(0, 0, 0.5).add(offsetPosition), Color.YELLOW);
     }
 
     @Override
     public void destroy() {
-
+        level.getFixedObjects().remove(gameObject);
+        level.getFocusableObjects().remove(gameObject);
     }
 
     public void open() {
@@ -86,7 +140,11 @@ public class DoorController extends EntityController {
         }
     }
 
-    private void updateRenderer(double angle) {
+    public Direction getDirection() {
+        return direction;
+    }
+
+    private void updateAngle(double angle) {
         gameObject.transform.rotation.setAngleAxis(angle, new Vector3d(0, 1, 0));
     }
 

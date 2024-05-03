@@ -9,33 +9,34 @@ import org.joml.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class UIElements {
     private Canvas canvas;
-    private UITheme theme;
+    public float fontSize;
+    public Color textColor;
+    public Color bgColor;
+    public Color hoverTextColor;
+    public Color hoverBgColor;
+    public Vector2f padding;
+    public float lineHeight;
 
     public UIElements(Canvas canvas) {
         this.canvas = canvas;
-        theme = new UITheme(new Color(0.25, 0.25, 0.25),
-                Color.WHITE,
-                Color.BLACK,
-                Color.RED,
-                Color.WHITE,
-                new Vector2f(10, 10),
-                32);
-    }
-
-    public void label(String text, float x, float y) {
-        canvas.setFontSize(theme.fontSize());
-        canvas.setColor(theme.textColor());
-        canvas.text(text, x, y);
+        fontSize = 32;
+        textColor = Color.GRAY;
+        bgColor = new Color(0, 0, 0, 0.5);
+        hoverTextColor = Color.WHITE;
+        hoverBgColor = Color.BLACK;
+        lineHeight = 36;
+        padding = new Vector2f(10, 10);
     }
 
     public void textBlock(String text, float x, float y, float width) {
         String[] words = text.split("( )+");
-        canvas.setFontSize(theme.fontSize());
+        canvas.setFontSize(fontSize);
         List<String> lines = new ArrayList<>();
         StringBuilder line = new StringBuilder();
         int wordCount = 0;
@@ -55,36 +56,47 @@ public class UIElements {
         if (wordCount > 0) {
             lines.add(line.toString());
         }
-        canvas.setColor(theme.textColor());
+        canvas.setColor(textColor);
         for (int i = 0; i < lines.size(); i++) {
-            canvas.text(lines.get(i), x, y + i * (theme.fontSize() + theme.padding().y));
+            canvas.text(lines.get(i), x, y + i * (lineHeight));
         }
     }
 
-    public boolean button(String text, float x, float y) {
+    public void text(String text, float x, float y) {
+        canvas.setFontSize(fontSize);
+        canvas.setColor(textColor);
+        canvas.text(text, x, y);
+    }
+
+    public boolean button(String text, float x, float y, float w, float h) {
         Vector2d pos = getTranslatedMousePosition();
-        canvas.setFontSize(theme.fontSize() - theme.padding().x);
-        float w = canvas.computeTextWidth(text) + theme.padding().y * 2;
-        float h = theme.fontSize() + theme.padding().y;
+        canvas.setFontSize(fontSize);
         Rect buttonRect = new Rect(x, y, w, h);
         boolean hovered = buttonRect.contains(pos);
         boolean clicked = hovered && Input.mouseButtonBeginPress(GLFW_MOUSE_BUTTON_LEFT);
 
         canvas.pushTranslate(x, y);
-        canvas.setColor(hovered ? theme.buttonHoverColor() : theme.buttonColor());
+        canvas.setColor(hovered ? hoverBgColor : bgColor);
         canvas.rect(0 ,0, w, h);
-        canvas.setColor(theme.buttonTextColor());
-        canvas.text(text, theme.padding().x, theme.padding().y);
+        canvas.setColor(hovered ? hoverTextColor : textColor);
+        canvas.text(text, padding.x, padding.y);
         canvas.popTranslate();
 
         return clicked;
     }
 
+    public boolean button(String text, float x, float y) {
+        canvas.setFontSize(fontSize);
+        float w = canvas.computeTextWidth(text) + padding.x * 2;
+        float h = fontSize + 2 * padding.y;
+        return button(text, x, y, w, h);
+    }
+
     public void begin(float x, float y, float w, float h) {
         canvas.pushTranslate(x, y);
-        canvas.setColor(theme.backgroundColor());
+        canvas.setColor(bgColor);
         canvas.rect(0 ,0, w, h);
-        canvas.pushTranslate(theme.padding().x, theme.padding().y);
+        canvas.pushTranslate(padding.x, padding.y);
     }
 
     public void end() {
@@ -94,14 +106,6 @@ public class UIElements {
 
     public Canvas getCanvas() {
         return canvas;
-    }
-
-    public UITheme getTheme() {
-        return theme;
-    }
-
-    public void setTheme(UITheme theme) {
-        this.theme = theme;
     }
 
     private Vector2d getTranslatedMousePosition() {

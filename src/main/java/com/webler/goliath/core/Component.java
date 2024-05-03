@@ -32,8 +32,9 @@ public abstract class Component {
     }
 
     public Vector3d getOffsetPosition() {
-        return new Vector3d(gameObject.transform.position).add(new Vector3d(offset)
+        return new Vector3d(offset)
+                .mul(gameObject.transform.scale)
                 .rotate(gameObject.transform.rotation)
-                .mul(gameObject.transform.scale));
+                .add(gameObject.transform.position);
     }
 }

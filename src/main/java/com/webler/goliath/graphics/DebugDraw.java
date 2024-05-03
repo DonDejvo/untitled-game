@@ -99,6 +99,7 @@ public class DebugDraw {
     }
 
     public void draw(Matrix4d PV) {
+        glDisable(GL_DEPTH_TEST);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);

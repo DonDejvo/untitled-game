@@ -1,19 +1,11 @@
 package com.webler.goliath.graphics;
 
-import com.sun.tools.javac.Main;
-import com.webler.goliath.logger.Logger;
-
-import javax.imageio.ImageIO;
-
 import static org.lwjgl.opengl.GL20.*;
 
 import java.awt.*;
-import java.awt.Color;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Hashtable;
@@ -87,7 +79,7 @@ public class Texture {
         } else if(channelsArray[0] == 4) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
         } else {
-            Logger.log("Unknown count of texture channels: " + channelsArray[0], Logger.LEVEL_WARN);
+
         }
     }
 

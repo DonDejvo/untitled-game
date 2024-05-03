@@ -8,9 +8,7 @@ import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.graphics.font.BitmapFont;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
-import com.webler.goliath.logger.Logger;
 import com.webler.goliath.utils.AssetPool;
-import org.joml.Vector3d;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
@@ -52,7 +50,6 @@ public class Game {
     }
 
     public void run() {
-        Logger.log("Hello LWJGL " + Version.getVersion() + "!", Logger.LEVEL_INFO);
 
         init();
         loop();
@@ -86,7 +83,7 @@ public class Game {
                 GLFWKeyCallback ignored3 = GLFW.glfwSetKeyCallback(
                         window, Input::keyCallback)
         ) {
-            Logger.log("Window callbacks initialized!", Logger.LEVEL_INFO);
+
         }
 
         GLFW.glfwMakeContextCurrent(window);
@@ -124,7 +121,6 @@ public class Game {
 
         while ( !GLFW.glfwWindowShouldClose(window) ) {
 
-            // TODO: refactor cursor locking
 //            if(Input.keyBeginPress(GLFW.GLFW_KEY_F2)) {
 //                if(cursorLocked) {
 //                    GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);

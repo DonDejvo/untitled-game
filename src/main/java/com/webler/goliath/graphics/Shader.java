@@ -1,6 +1,4 @@
 package com.webler.goliath.graphics;
-
-import com.webler.goliath.logger.Logger;
 import org.joml.*;
 
 import java.util.HashSet;
@@ -30,7 +28,6 @@ public class Shader {
         glAttachShader(program, fragmentShader);
         glLinkProgram(program);
         if(glGetProgrami(program, GL_LINK_STATUS) == 0) {
-            Logger.log(glGetProgramInfoLog(program), Logger.LEVEL_ERROR);
             throw new RuntimeException("Shader linking failed");
         }
 
@@ -97,7 +94,6 @@ public class Shader {
         glShaderSource(shader, source);
         glCompileShader(shader);
         if(glGetShaderi(shader, GL_COMPILE_STATUS) == 0) {
-            Logger.log(glGetShaderInfoLog(shader), Logger.LEVEL_ERROR);
             throw new RuntimeException("Shader compiling failed");
         }
         return shader;
