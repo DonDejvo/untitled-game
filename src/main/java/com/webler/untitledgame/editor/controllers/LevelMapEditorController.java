@@ -3,6 +3,7 @@ package com.webler.untitledgame.editor.controllers;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.widgets.Controls;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.LevelMap;
 import com.webler.untitledgame.level.levelmap.Serializable;
 import imgui.ImGui;
@@ -11,7 +12,8 @@ import org.joml.Vector2d;
 public class LevelMapEditorController extends EditorController {
     private Level level;
 
-    public LevelMapEditorController(Level level) {
+    public LevelMapEditorController(EditorComponent editorComponent, Level level) {
+        super(editorComponent);
         this.level = level;
     }
 

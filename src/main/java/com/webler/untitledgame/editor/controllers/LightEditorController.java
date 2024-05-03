@@ -4,6 +4,7 @@ import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.widgets.Controls;
+import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.Light;
 import com.webler.untitledgame.level.levelmap.Serializable;
 import imgui.ImGui;
@@ -14,7 +15,8 @@ import java.util.Locale;
 public class LightEditorController extends EditorController {
     private Light light;
 
-    public LightEditorController(final Light light) {
+    public LightEditorController(EditorComponent editorComponent, Light light) {
+        super(editorComponent);
         this.light = light;
     }
 
@@ -54,15 +56,13 @@ public class LightEditorController extends EditorController {
 
     @Override
     public void synchronize() {
-        SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        gameObject.transform.position.set(light.x * renderer.getSprite().getWidth(), light.y * renderer.getSprite().getHeight(), 0);
+        gameObject.transform.position.set(light.x * editorComponent.getConfig().gridWidth(), light.y * editorComponent.getConfig().gridHeight(), 0);
     }
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        light.x = (transform.position.x + vector.x) / renderer.getSprite().getWidth();
-        light.y = (transform.position.y + vector.y) / renderer.getSprite().getHeight();
+        light.x = (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth();
+        light.y = (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight();
     }
 
     @Override

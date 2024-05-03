@@ -8,6 +8,7 @@ import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.input.Input;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.events.DoorOpened;
+import com.webler.untitledgame.level.inventory.Inventory;
 import org.joml.Vector3d;
 
 import java.util.List;
@@ -21,10 +22,12 @@ public class PlayerController extends EntityController {
     private boolean canJump;
     private GameObject focusedObject;
     private State state;
+    private Inventory inventory;
 
-    public PlayerController(Level level, Camera camera, BoxCollider3D collider) {
-        super(level, collider, false);
+    public PlayerController(Level level, Camera camera, BoxCollider3D collider, Inventory inventory) {
+        super(level, collider, new String[]{ "npc", "fixed" });
         this.camera = camera;
+        this.inventory = inventory;
         bounciness = 0;
         speed = 100;
         rotationSpeed = 2.5;
@@ -37,9 +40,13 @@ public class PlayerController extends EntityController {
         return focusedObject;
     }
 
+    public void collect(String itemName) {
+        stopInteraction();
+    }
+
     @Override
     public void start() {
-        level.getFriendEntityObjects().add(gameObject);
+        level.addObjectToGroup(gameObject, "player");
     }
 
     @Override
@@ -51,6 +58,9 @@ public class PlayerController extends EntityController {
             case INTERACTING:
                 updateInteracting(dt);
                 break;
+            case LOOKING_INVENTORY:
+                updateLookingInventory(dt);
+                break;
         }
 
         friction = onGround ? 10 : 2.5;
@@ -59,7 +69,7 @@ public class PlayerController extends EntityController {
 
     @Override
     public void destroy() {
-        level.getFriendEntityObjects().remove(gameObject);
+        level.removeObjectFromGroup(gameObject, "player");
     }
 
     @EventHandler
@@ -76,9 +86,9 @@ public class PlayerController extends EntityController {
 
     private void startInteraction() {
         if(focusedObject != null) {
+            state = State.INTERACTING;
             Controller controller = focusedObject.getComponent(Controller.class, "Controller");
             controller.interact();
-            state = State.INTERACTING;
         }
     }
 
@@ -130,16 +140,20 @@ public class PlayerController extends EntityController {
             startInteraction();
         }
 
-        Vector3d direction = new Vector3d(1, 0, 0);
-        direction.rotateY(yaw);
+        if(Input.keyBeginPress(GLFW_KEY_I)) {
+            if(Input.keyBeginPress(GLFW_KEY_I)) {
+                state = State.LOOKING_INVENTORY;
+                inventory.setOpened(true);
+            }
+        }
 
-        camera.getEntity().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 1, 0));
-        camera.direction.lerp(direction, Math.min(dt * 10, 1));
+        updateCamera(dt);
 
         updateFocusedObject();
     }
 
     private void updateInteracting(double dt) {
+        acceleration.set(0);
 
         Vector3d focusPosition = focusedObject.getComponent(Controller.class, "Controller").getFocusPosition();
 
@@ -147,20 +161,42 @@ public class PlayerController extends EntityController {
         camera.direction.lerp(new Vector3d(focusPosition).sub(camera.getEntity().transform.position), Math.min(dt * 10, 1));
     }
 
+    private void updateLookingInventory(double dt) {
+        acceleration.set(0);
+
+        if(Input.keyBeginPress(GLFW_KEY_I)) {
+            inventory.setOpened(false);
+            state = State.IDLE;
+        }
+
+        updateCamera(dt);
+    }
+
+    private void updateCamera(double dt) {
+        Vector3d direction = new Vector3d(1, 0, 0);
+        direction.rotateY(yaw);
+
+        camera.getEntity().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 1, 0));
+        camera.direction.lerp(direction, Math.min(dt * 10, 1));
+    }
+
     private void updateFocusedObject() {
-        List<GameObject> focusableObjects = level.getFocusableObjects();
+        List<GameObject> focusableObjects = level.getObjectsByGroup("focusable");
         GameObject newFocusedObject = null;
+        double currentDistance = 0;
 
         for(GameObject object : focusableObjects) {
             Controller controller = object.getComponent(Controller.class, "Controller");
-            if(controller.isInFrontOfPlayer()) {
+            double distance = controller.getCenter().distance(camera.getEntity().transform.position);
+            if(controller.isInFrontOfPlayer() && (newFocusedObject == null || distance < currentDistance)) {
                 newFocusedObject = object;
+                currentDistance = distance;
             }
         }
         focusedObject = newFocusedObject;
     }
 
     private enum State {
-        INTERACTING, IDLE
+        INTERACTING, IDLE, LOOKING_INVENTORY
     }
 }

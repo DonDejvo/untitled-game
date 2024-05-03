@@ -1,44 +1,40 @@
 package com.webler.untitledgame.level.controllers;
 
 import com.webler.goliath.colliders.BoxCollider3D;
-import com.webler.goliath.dialogs.components.DialogComponent;
+import com.webler.goliath.core.GameObject;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.untitledgame.components.Level;
 import org.joml.Vector3d;
 
-public class NpcController extends EntityController{
-    public NpcController(Level level, BoxCollider3D collider) {
-        super(level, collider, new String[]{ "player", "fixed" });
-    }
+public class ItemController extends Controller {
+    private String itemName;
 
-    @Override
-    protected void interact() {
-        getComponent(DialogComponent.class, "Dialog").play();
-    }
-
-    @Override
-    public Vector3d getFocusPosition() {
-        return new Vector3d(gameObject.transform.position).add(0, 0.5, 0);
+    public ItemController(Level level, String itemName) {
+        super(level, new BoxCollider3D(new Vector3d()));
+        this.itemName = itemName;
     }
 
     @Override
     public void start() {
-        level.addObjectToGroup(gameObject, "npc");
         level.addObjectToGroup(gameObject, "focusable");
     }
 
     @Override
     public void update(double dt) {
-        updatePhysics(dt);
-
         SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
         renderer.setColor(isFocused() ? new Color(1.00, 1.00, 1.00) : new Color(0.5, 0.5, 0.5));
     }
 
     @Override
     public void destroy() {
-        level.removeObjectFromGroup(gameObject, "npc");
         level.removeObjectFromGroup(gameObject, "focusable");
+    }
+
+    @Override
+    protected void interact() {
+        GameObject player = level.getPlayer();
+        player.getComponent(PlayerController.class, "Controller").collect(itemName);
+        getEntity().getScene().remove(gameObject);
     }
 }

@@ -3,6 +3,7 @@ package com.webler.untitledgame.editor.controllers;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.widgets.Controls;
+import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.Platform;
 import com.webler.untitledgame.level.levelmap.Serializable;
 import imgui.ImGui;
@@ -11,7 +12,8 @@ import org.joml.Vector2d;
 public class PlatformEditorController extends EditorController {
     private Platform platform;
 
-    public PlatformEditorController(final Platform platform) {
+    public PlatformEditorController(EditorComponent editorComponent, Platform platform) {
+        super(editorComponent);
         this.platform = platform;
     }
 
@@ -56,7 +58,7 @@ public class PlatformEditorController extends EditorController {
     public void synchronize() {
         SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
         renderer.setzIndex(platform.top);
-        gameObject.transform.position.set(platform.x * renderer.getSprite().getWidth(), platform.y * renderer.getSprite().getHeight(), 0);
+        gameObject.transform.position.set(platform.x * editorComponent.getConfig().gridWidth(), platform.y * editorComponent.getConfig().gridHeight(), 0);
         gameObject.transform.scale.set(platform.width, platform.height, 1);
         renderer.getSprite().setRegion(0, 0,
                 platform.width * renderer.getSprite().getTexture().getWidth(),
@@ -65,16 +67,14 @@ public class PlatformEditorController extends EditorController {
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        platform.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / renderer.getSprite().getWidth()));
-        platform.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / renderer.getSprite().getHeight()));
+        platform.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth()));
+        platform.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight()));
     }
 
     @Override
     public void scale(Transform transform, Vector2d start, Vector2d vector) {
-        SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        platform.width = Math.max((int)(transform.scale.x + Math.floor(0.5 + vector.x / renderer.getSprite().getWidth())), 1);
-        platform.height = Math.max((int)(transform.scale.y + Math.floor(0.5 + vector.y / renderer.getSprite().getHeight())), 1);
+        platform.width = Math.max((int)(transform.scale.x + Math.floor(0.5 + vector.x / editorComponent.getConfig().gridWidth())), 1);
+        platform.height = Math.max((int)(transform.scale.y + Math.floor(0.5 + vector.y / editorComponent.getConfig().gridHeight())), 1);
     }
 
     @Override

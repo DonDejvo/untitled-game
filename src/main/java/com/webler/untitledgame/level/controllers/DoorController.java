@@ -1,17 +1,16 @@
 package com.webler.untitledgame.level.controllers;
 
 import com.webler.goliath.colliders.BoxCollider3D;
+import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.graphics.Color;
-import com.webler.goliath.graphics.DebugDraw;
 import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.events.DoorOpened;
 import com.webler.untitledgame.level.levelmap.Direction;
-import org.joml.Vector2d;
 import org.joml.Vector3d;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
@@ -41,31 +40,10 @@ public class DoorController extends Controller {
     }
 
     @Override
-    protected boolean isInFrontOfPlayer() {
-        GameObject player = level.getPlayer();
-        if(player == null) {
-            return false;
-        }
-
-        MeshRenderer renderer = getComponent(MeshRenderer.class, "Renderer");
-
-        Vector3d playerDirection = new Vector3d(1, 0, 0);
-        playerDirection.rotateY(player.getComponent(PlayerController.class, "Controller").yaw);
-        playerDirection.normalize();
-
-        Vector3d offsetPosition = renderer.getOffsetPosition();
-        Vector3d directionToObject = new Vector3d(offsetPosition);
-        directionToObject.sub(player.transform.position);
-        directionToObject.normalize();
-        return player.transform.position.distance(offsetPosition) <= 6.0 &&
-                playerDirection.dot(directionToObject) > 0.875;
-    }
-
-    @Override
     public void start() {
         updateAngle(angleClosed);
-        level.getFixedObjects().add(gameObject);
-        level.getFocusableObjects().add(gameObject);
+        level.addObjectToGroup(gameObject, "fixed");
+        level.addObjectToGroup(gameObject, "focusable");
     }
 
     @Override
@@ -124,8 +102,8 @@ public class DoorController extends Controller {
 
     @Override
     public void destroy() {
-        level.getFixedObjects().remove(gameObject);
-        level.getFocusableObjects().remove(gameObject);
+        level.removeObjectFromGroup(gameObject, "fixed");
+        level.removeObjectFromGroup(gameObject, "focusable");
     }
 
     public void open() {
@@ -138,6 +116,12 @@ public class DoorController extends Controller {
         if(state != State.CLOSED) {
             state = State.CLOSING;
         }
+    }
+
+    @Override
+    protected Vector3d getCenter() {
+        Component renderer = getComponent(Component.class, "Renderer");
+        return renderer.getOffsetPosition();
     }
 
     public Direction getDirection() {

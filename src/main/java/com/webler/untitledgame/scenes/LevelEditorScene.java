@@ -47,10 +47,11 @@ public class LevelEditorScene extends Scene {
         EditorConfig editorConfig = new EditorConfig(64, 64);
         GameObject editorGameObject = new GameObject(this, "Editor");
         Level level = new Level();
-        editorGameObject.addComponent("Editor", new EditorComponent(level, editorConfig, levelParams.getLevelPath()));
+        EditorComponent editorComponent = new EditorComponent(level, editorConfig, levelParams.getLevelPath());
+        editorGameObject.addComponent("Editor", editorComponent);
         editorGameObject.addComponent("GridLines", new GridLines(editorConfig));
         editorGameObject.addComponent("Level", level);
-        editorGameObject.addComponent("Controller", new LevelMapEditorController(level));
+        editorGameObject.addComponent("Controller", new LevelMapEditorController(editorComponent, level));
         add(editorGameObject);
     }
 

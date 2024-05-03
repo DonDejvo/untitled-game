@@ -3,6 +3,7 @@ package com.webler.untitledgame.editor.controllers;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.widgets.Controls;
+import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.Direction;
 import com.webler.untitledgame.level.levelmap.Door;
 import com.webler.untitledgame.level.levelmap.Serializable;
@@ -15,7 +16,8 @@ import java.util.Arrays;
 public class DoorEditorController extends EditorController {
     private Door door;
 
-    public DoorEditorController(Door door) {
+    public DoorEditorController(EditorComponent editorComponent, Door door) {
+        super(editorComponent);
         this.door = door;
     }
 
@@ -50,15 +52,13 @@ public class DoorEditorController extends EditorController {
 
     @Override
     public void synchronize() {
-        SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        gameObject.transform.position.set(door.x * renderer.getSprite().getWidth(), door.y * renderer.getSprite().getHeight(), 0);
+        gameObject.transform.position.set(door.x * editorComponent.getConfig().gridWidth(), door.y * editorComponent.getConfig().gridHeight(), 0);
     }
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        door.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / renderer.getSprite().getWidth()));
-        door.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / renderer.getSprite().getHeight()));
+        door.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth()));
+        door.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight()));
     }
 
     @Override

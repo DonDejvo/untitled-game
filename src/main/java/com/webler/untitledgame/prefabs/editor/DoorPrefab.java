@@ -13,23 +13,22 @@ import com.webler.untitledgame.level.levelmap.Door;
 public class DoorPrefab implements Prefab {
 
     private Door door;
-    private int tileWidth, tileHeight;
+    private EditorComponent editorComponent;
 
-    public DoorPrefab(Door door, int tileWidth, int tileHeight) {
+    public DoorPrefab(EditorComponent editorComponent, Door door) {
+        this.editorComponent = editorComponent;
         this.door = door;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
     }
 
     @Override
     public GameObject create(Scene scene) {
         Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/door.png"));
-        sprite.setWidth(tileWidth);
-        sprite.setHeight(tileHeight);
+        sprite.setWidth(editorComponent.getConfig().gridWidth());
+        sprite.setHeight(editorComponent.getConfig().gridHeight());
         GameObject gameObject = new GameObject(scene);
         gameObject.tags.add(Door.TAG);
         gameObject.tags.add(EditorComponent.SELECTABLE_TAG);
-        gameObject.addComponent("Controller", new DoorEditorController(door));
+        gameObject.addComponent("Controller", new DoorEditorController(editorComponent, door));
         SpriteRenderer renderer = new SpriteRenderer(sprite, 30);
         renderer.offset.set(sprite.getWidth() * 0.5, sprite.getHeight() * 0.5, 0);
         gameObject.addComponent("Renderer", renderer);

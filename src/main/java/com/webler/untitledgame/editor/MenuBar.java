@@ -59,30 +59,25 @@ public class MenuBar {
                 if (ImGui.menuItem("Cat Girl")) {
                     editor.addEntity("catgirl");
                 }
+                if (ImGui.menuItem("Vending Machine")) {
+                    editor.addEntity("vendingmachine");
+                }
 //                if (ImGui.menuItem("Slime")) {
 //
 //                }
                 ImGui.endMenu();
             }
-//            if(ImGui.beginMenu("Item")) {
-//                if (ImGui.menuItem("Key")) {
-//
-//                }
-//                if (ImGui.menuItem("Diamond")) {
-//
-//                }
-//                if (ImGui.menuItem("Espresso")) {
-//
-//                }
-//                ImGui.endMenu();
-//            }
+            if(ImGui.beginMenu("Item")) {
+                if (ImGui.menuItem("Key")) {
+                    editor.addEntity("key");
+                }
+                ImGui.endMenu();
+            }
             if(ImGui.beginMenu("Fixed")) {
                 if (ImGui.menuItem("Door")) {
                     editor.addDoor();
                 }
-//                if (ImGui.menuItem("Wending Machine")) {
-//
-//                }
+
                 ImGui.endMenu();
             }
             ImGui.endMenu();

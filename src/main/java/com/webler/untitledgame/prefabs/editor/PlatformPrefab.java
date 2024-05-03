@@ -12,23 +12,22 @@ import com.webler.untitledgame.level.levelmap.Platform;
 
 public class PlatformPrefab implements Prefab {
     private Platform platform;
-    private int tileWidth, tileHeight;
+    private EditorComponent editorComponent;
 
-    public PlatformPrefab(Platform platform, int tileWidth, int tileHeight) {
+    public PlatformPrefab(EditorComponent editorComponent, Platform platform) {
+        this.editorComponent = editorComponent;
         this.platform = platform;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
     }
 
     @Override
     public GameObject create(Scene scene) {
         Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/ceiling.png"));
-        sprite.setWidth(tileWidth);
-        sprite.setHeight(tileHeight);
+        sprite.setWidth(editorComponent.getConfig().gridWidth());
+        sprite.setHeight(editorComponent.getConfig().gridHeight());
         GameObject gameObject = new GameObject(scene);
         gameObject.tags.add(Platform.TAG);
         gameObject.tags.add(EditorComponent.SELECTABLE_TAG);
-        gameObject.addComponent("Controller", new PlatformEditorController(platform));
+        gameObject.addComponent("Controller", new PlatformEditorController(editorComponent, platform));
         SpriteRenderer renderer = new SpriteRenderer(sprite, 0);
         renderer.offset.set(sprite.getWidth() * 0.5, sprite.getHeight() * 0.5, 0);
         gameObject.addComponent("Renderer", renderer);

@@ -13,29 +13,52 @@ import com.webler.untitledgame.level.levelmap.Entity;
 
 public class EntityPrefab implements Prefab {
     private Entity entity;
-    private int tileWidth, tileHeight;
+    private EditorComponent editorComponent;
 
-    public EntityPrefab(Entity entity, int tileWidth, int tileHeight) {
+    public EntityPrefab(EditorComponent editorComponent, Entity entity) {
+        this.editorComponent = editorComponent;
         this.entity = entity;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
     }
 
     @Override
     public GameObject create(Scene scene) {
-        Texture texture = switch (entity.name) {
-            case "player" -> AssetPool.getTexture("assets/tiles/player.png");
-            case "catgirl" -> AssetPool.getTexture("assets/images/4-3.png");
-            default -> throw new IllegalStateException("Unexpected value: " + entity.name);
-        };
-        Sprite sprite = new Sprite(texture);
-        sprite.setWidth(tileWidth);
-        sprite.setHeight(tileHeight);
+        int tileWidth = editorComponent.getConfig().gridWidth();
+        int tileHeight = editorComponent.getConfig().gridHeight();
         GameObject go = new GameObject(scene);
         go.tags.add(Entity.TAG);
         go.tags.add(EditorComponent.SELECTABLE_TAG);
+        Sprite sprite;
+        switch (entity.name) {
+            case "player": {
+                sprite = new Sprite(AssetPool.getTexture("assets/tiles/player.png"));
+                sprite.setWidth(tileWidth);
+                sprite.setHeight(tileHeight);
+                break;
+            }
+            case "catgirl": {
+                sprite = new Sprite(AssetPool.getTexture("assets/images/4-3.png"));
+                sprite.setWidth((int)((double)tileHeight * sprite.getTexture().getWidth() / sprite.getTexture().getHeight()));
+                sprite.setHeight(tileHeight);
+                break;
+            }
+            case "vendingmachine": {
+                sprite = new Sprite(AssetPool.getTexture("assets/images/Vending_Machine_21.png"));
+                sprite.setWidth((int)((double)tileHeight * sprite.getTexture().getWidth() / sprite.getTexture().getHeight()));
+                sprite.setHeight(tileHeight);
+                break;
+            }
+            case "key": {
+                sprite = new Sprite(AssetPool.getTexture("assets/tiles/key.png"));
+                sprite.setWidth(tileWidth);
+                sprite.setHeight(tileHeight);
+                go.transform.scale.set(0.5);
+                break;
+            }
+            default:
+                throw new IllegalStateException("Unexpected value: " + entity.name);
+        }
         go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
-        go.addComponent("Controller", new EntityEditorController(entity));
+        go.addComponent("Controller", new EntityEditorController(editorComponent, entity));
         return go;
     }
 }

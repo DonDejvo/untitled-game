@@ -15,7 +15,23 @@ public abstract class Controller extends Component {
         this.collider = collider;
     }
 
-    protected abstract boolean isInFrontOfPlayer();
+    protected Vector3d getCenter() {
+        return gameObject.transform.position;
+    }
+
+    protected boolean isInFrontOfPlayer() {
+        GameObject player = level.getPlayer();
+
+        Vector3d playerDirection = new Vector3d(1, 0, 0);
+        playerDirection.rotateY(player.getComponent(PlayerController.class, "Controller").yaw);
+        playerDirection.normalize();
+
+        Vector3d center = getCenter();
+        Vector3d directionToObject = new Vector3d(center).sub(player.transform.position).normalize();
+        double distance = player.transform.position.distance(center);
+        return distance > 2 && distance < 6 &&
+                playerDirection.dot(directionToObject) > 0.9;
+    }
 
     protected void interact() {}
 

@@ -12,6 +12,11 @@ import com.webler.untitledgame.level.levelmap.Serializable;
 import org.joml.Vector2d;
 
 public abstract class EditorController extends Component {
+    protected EditorComponent editorComponent;
+
+    public EditorController(EditorComponent editorComponent) {
+        this.editorComponent = editorComponent;
+    }
 
     public abstract void editorImgui();
 
@@ -50,10 +55,6 @@ public abstract class EditorController extends Component {
     }
 
     private boolean isSelected() {
-        GameObject editor = getEntity().getScene().getEntityByName("Editor");
-        if (editor != null) {
-            return editor.getComponent(EditorComponent.class, "Editor").getSelectedGameObject() == getEntity();
-        }
-        return false;
+        return editorComponent.getSelectedGameObject() == getEntity();
     }
 }

@@ -18,6 +18,7 @@ import com.webler.goliath.graphics.light.AmbientLight;
 import com.webler.goliath.graphics.light.SpotLight;
 import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.controllers.*;
+import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.level.levelmap.*;
 import org.joml.Vector3d;
 import org.xml.sax.SAXException;
@@ -25,8 +26,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Level extends Component {
     public static final int TILE_SIZE = 4;
@@ -34,19 +34,13 @@ public class Level extends Component {
     private GridItem[][] grid;
     private String path;
     private GameObject player;
-    private List<GameObject> fixedObjects;
-    private List<GameObject> friendEntityObjects;
-    private List<GameObject> enemyEntityObjects;
-    private List<GameObject> focusableObjects;
+    private Map<String, List<GameObject>> objectGroups;
 
     public Level() {
         this.levelMap = new LevelMap();
         path = null;
         player = null;
-        fixedObjects = new ArrayList<>();
-        friendEntityObjects = new ArrayList<>();
-        enemyEntityObjects = new ArrayList<>();
-        focusableObjects = new ArrayList<>();
+        objectGroups = new HashMap<>();
         buildGrid();
     }
 
@@ -124,20 +118,21 @@ public class Level extends Component {
         return false;
     }
 
-    public List<GameObject> getFixedObjects() {
-        return fixedObjects;
+    public void addObjectToGroup(GameObject object, String group) {
+        if(!objectGroups.containsKey(group)) {
+            objectGroups.put(group, new ArrayList<>());
+        }
+        objectGroups.get(group).add(object);
     }
 
-    public List<GameObject> getEnemyEntityObjects() {
-        return enemyEntityObjects;
+    public void removeObjectFromGroup(GameObject object, String group) {
+        if(objectGroups.containsKey(group)) {
+            objectGroups.get(group).remove(object);
+        }
     }
 
-    public List<GameObject> getFriendEntityObjects() {
-        return friendEntityObjects;
-    }
-
-    public List<GameObject> getFocusableObjects() {
-        return focusableObjects;
+    public List<GameObject> getObjectsByGroup(String group) {
+        return objectGroups.get(group);
     }
 
     public void buildLevel() {
@@ -202,8 +197,10 @@ public class Level extends Component {
                     player = go;
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
                     go.addComponent("Collider", collider);
-                    PlayerController playerController = new PlayerController(this, scene.getCamera(), collider);
+                    Inventory inventory = new Inventory();
+                    PlayerController playerController = new PlayerController(this, scene.getCamera(), collider, inventory);
                     go.addComponent("Controller", playerController);
+                    go.addComponent("Inventory", inventory);
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
@@ -214,7 +211,6 @@ public class Level extends Component {
                     sprite.setWidth(2);
                     sprite.setHeight(3);
                     SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    renderer.setColor(new Color(0.75, 0.75, 0.75));
                     go.addComponent("Renderer", renderer);
                     go.addComponent("Bilboard", new Bilboard());
                     go.addComponent("Controller", new NpcController(this, collider));
@@ -227,6 +223,33 @@ public class Level extends Component {
                             new DialogNode("maid_chan__no-repeat", null)));
                     go.addComponent("Dialog", dialogComponent);
                     go.transform.position.y += collider.getSize().y / 2;
+                    break;
+                }
+                case "vendingmachine": {
+                    BoxCollider3D collider = new BoxCollider3D(new Vector3d(2, 4, 2));
+                    go.addComponent("Collider", collider);
+                    Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/Vending_Machine_21.png"));
+                    sprite.setWidth(2);
+                    sprite.setHeight(4);
+                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
+                    go.addComponent("Renderer", renderer);
+                    go.addComponent("Bilboard", new Bilboard());
+                    go.addComponent("Controller", new NpcController(this, collider));
+                    DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
+                    go.addComponent("Dialog", dialogComponent);
+                    go.transform.position.y += collider.getSize().y / 2;
+                    break;
+                }
+                case "key": {
+                    Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/key.png"));
+                    sprite.setWidth(1);
+                    sprite.setHeight(1);
+                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
+                    go.addComponent("Renderer", renderer);
+                    go.addComponent("Bilboard", new Bilboard());
+                    go.addComponent("Controller", new ItemController(this, entity.name));
+                    go.transform.position.y += sprite.getHeight();
+                    break;
                 }
             }
 
@@ -265,7 +288,6 @@ public class Level extends Component {
         for (Door door : doors) {
             GameObject doorGameObject = new GameObject(scene);
             MeshRenderer renderer = new MeshRenderer(new Cube(AssetPool.getTexture("assets/tiles/door.png").getTexId()));
-            renderer.setColor(new Color(0.5, 0.5, 0.5));
             renderer.offset.x = 0.5;
             doorGameObject.addComponent("Renderer", renderer);
             double y = getBlockTop((door.x - levelMap.minX), (door.y - levelMap.minY));
@@ -287,6 +309,7 @@ public class Level extends Component {
             doorGameObject.transform.position.set(position.mul(Level.TILE_SIZE));
             doorGameObject.transform.scale.set(Level.TILE_SIZE, Level.TILE_SIZE, Level.TILE_SIZE * 0.125);
             BoxCollider3D collider = new BoxCollider3D(new Vector3d(4, 4, 4));
+            collider.offset.x = 0.5;
             doorGameObject.addComponent("Collider", collider);
             doorGameObject.addComponent("Controller", new DoorController(this, collider, door.direction));
             scene.add(doorGameObject);

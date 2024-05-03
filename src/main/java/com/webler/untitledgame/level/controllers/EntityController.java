@@ -16,9 +16,9 @@ public abstract class EntityController extends Controller {
     protected double bounciness;
     protected double yaw, pitch;
     protected boolean onGround;
-    protected boolean isEnemy;
+    private String[] collisionGroups;
 
-    public EntityController(Level level, BoxCollider3D collider, boolean isEnemy) {
+    public EntityController(Level level, BoxCollider3D collider, String[] collisionGroups) {
         super(level, collider);
         velocity = new Vector3d();
         acceleration = new Vector3d();
@@ -28,25 +28,7 @@ public abstract class EntityController extends Controller {
         yaw = 0.0;
         pitch = 0.0;
         onGround = false;
-        this.isEnemy = isEnemy;
-    }
-
-    @Override
-    protected boolean isInFrontOfPlayer() {
-        GameObject player = level.getPlayer();
-        if(player == null) {
-            return false;
-        }
-
-        Vector3d playerDirection = new Vector3d(1, 0, 0);
-        playerDirection.rotateY(player.getComponent(PlayerController.class, "Controller").yaw);
-        playerDirection.normalize();
-
-        Vector3d directionToObject = new Vector3d(gameObject.transform.position);
-        directionToObject.sub(player.transform.position);
-        directionToObject.normalize();
-        return player.transform.position.distance(gameObject.transform.position) <= 6.000 &&
-                playerDirection.dot(directionToObject) > 0.875;
+        this.collisionGroups = collisionGroups;
     }
 
     protected void updatePhysics(double dt) {
@@ -117,22 +99,26 @@ public abstract class EntityController extends Controller {
 
     private boolean collides() {
 
-        List<GameObject> doorObjects = level.getFixedObjects();
-        for(GameObject doorObject : doorObjects) {
-            BoxCollider3D otherCollider = doorObject.getComponent(BoxCollider3D.class, "Collider");
-            if(collider.collidesWith(otherCollider)) {
-                return true;
-            }
-        }
-
-        List<GameObject> checkedObjects = isEnemy ?
-                level.getFriendEntityObjects() : level.getEnemyEntityObjects();
-        Vector2d positionXY = new Vector2d(gameObject.transform.position.x, gameObject.transform.position.z);
-        for(GameObject checkedObject : checkedObjects) {
-            BoxCollider3D otherCollider = checkedObject.getComponent(BoxCollider3D.class, "Collider");
-            Vector2d otherPositionXY = new Vector2d(checkedObject.transform.position.x, checkedObject.transform.position.z);
-            if(positionXY.distance(otherPositionXY) < (collider.getSize().x + otherCollider.getSize().x) * 0.5) {
-                return true;
+        for (String collisionGroup : collisionGroups) {
+            List<GameObject> objects = level.getObjectsByGroup(collisionGroup);
+            if (objects != null) {
+                if (collisionGroup.equals("fixed")) {
+                    for (GameObject doorObject : objects) {
+                        BoxCollider3D otherCollider = doorObject.getComponent(BoxCollider3D.class, "Collider");
+                        if (collider.collidesWith(otherCollider)) {
+                            return true;
+                        }
+                    }
+                } else {
+                    Vector2d positionXY = new Vector2d(gameObject.transform.position.x, gameObject.transform.position.z);
+                    for (GameObject checkedObject : objects) {
+                        BoxCollider3D otherCollider = checkedObject.getComponent(BoxCollider3D.class, "Collider");
+                        Vector2d otherPositionXY = new Vector2d(checkedObject.transform.position.x, checkedObject.transform.position.z);
+                        if (positionXY.distance(otherPositionXY) < (collider.getSize().x + otherCollider.getSize().x) * 0.5) {
+                            return true;
+                        }
+                    }
+                }
             }
         }
 

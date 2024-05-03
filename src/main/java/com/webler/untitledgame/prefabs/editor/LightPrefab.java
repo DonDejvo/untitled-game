@@ -12,25 +12,24 @@ import com.webler.untitledgame.level.levelmap.Light;
 
 public class LightPrefab implements Prefab {
     private Light light;
-    private int tileWidth, tileHeight;
+    private EditorComponent editorComponent;
 
-    public LightPrefab(Light light, int tileWidth, int tileHeight) {
+    public LightPrefab(EditorComponent editorComponent, Light light) {
+        this.editorComponent = editorComponent;
         this.light = light;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
     }
 
     @Override
     public GameObject create(Scene scene) {
         Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/torch.png"));
-        sprite.setWidth(tileWidth);
-        sprite.setHeight(tileHeight);
+        sprite.setWidth(editorComponent.getConfig().gridWidth());
+        sprite.setHeight(editorComponent.getConfig().gridHeight());
         GameObject go = new GameObject(scene);
         go.transform.scale.set(0.5);
         go.tags.add(Light.TAG);
         go.tags.add(EditorComponent.SELECTABLE_TAG);
         go.addComponent("Renderer", new SpriteRenderer(sprite, 100));
-        go.addComponent("Controller", new LightEditorController(light));
+        go.addComponent("Controller", new LightEditorController(editorComponent, light));
         return go;
     }
 }

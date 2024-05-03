@@ -162,8 +162,8 @@ public class EditorComponent extends Component {
         Scene scene = getEntity().getScene();
         int x = (int)(scene.getCamera().getEntity().transform.position.x / config.gridWidth());
         int y = (int)(scene.getCamera().getEntity().transform.position.y / config.gridHeight());
-        GameObject platformGameObject = new PlatformPrefab(new Platform(x, y, 1, 1, 0, level.getLevelMap().ceiling),
-                config.gridWidth(), config.gridHeight()).create(scene);
+        GameObject platformGameObject = new PlatformPrefab(this,
+                new Platform(x, y, 1, 1, 0, level.getLevelMap().ceiling)).create(scene);
         scene.add(platformGameObject);
     }
 
@@ -171,8 +171,8 @@ public class EditorComponent extends Component {
         Scene scene = getEntity().getScene();
         double x = scene.getCamera().getEntity().transform.position.x / config.gridWidth();
         double y = scene.getCamera().getEntity().transform.position.y / config.gridHeight();
-        GameObject spotLightGameObject = new LightPrefab(new Light(x, y, 0.5, 5, 10, Color.WHITE),
-                config.gridWidth(), config.gridHeight()).create(scene);
+        GameObject spotLightGameObject = new LightPrefab(this,
+                new Light(x, y, 0.5, 5, 10, Color.WHITE)).create(scene);
         scene.add(spotLightGameObject);
     }
 
@@ -180,8 +180,8 @@ public class EditorComponent extends Component {
         Scene scene = getEntity().getScene();
         double x = scene.getCamera().getEntity().transform.position.x / config.gridWidth();
         double y = scene.getCamera().getEntity().transform.position.y / config.gridHeight();
-        GameObject entity = new EntityPrefab(new Entity(name, x, y),
-                config.gridWidth(), config.gridHeight()).create(scene);
+        GameObject entity = new EntityPrefab(this,
+                new Entity(name, x, y)).create(scene);
         scene.add(entity);
     }
 
@@ -189,8 +189,8 @@ public class EditorComponent extends Component {
         Scene scene = getEntity().getScene();
         int x = (int)(scene.getCamera().getEntity().transform.position.x / config.gridWidth());
         int y = (int)(scene.getCamera().getEntity().transform.position.y / config.gridHeight());
-        GameObject door = new DoorPrefab(new Door(x, y, Direction.DOWN),
-                config.gridWidth(), config.gridHeight()).create(scene);
+        GameObject door = new DoorPrefab(this,
+                new Door(x, y, Direction.DOWN)).create(scene);
         scene.add(door);
     }
 
@@ -226,6 +226,10 @@ public class EditorComponent extends Component {
         this.levelWindowOpened = levelWindowOpened;
     }
 
+    public EditorConfig getConfig() {
+        return config;
+    }
+
     private void loadLevel() {
         Scene scene = gameObject.getScene();
 
@@ -235,29 +239,25 @@ public class EditorComponent extends Component {
 
         List<Platform> platforms = level.getLevelMap().getPlatforms();
         for(Platform platform : platforms) {
-            GameObject platformGameObject = new PlatformPrefab(platform,
-                    config.gridWidth(), config.gridHeight()).create(scene);
+            GameObject platformGameObject = new PlatformPrefab(this, platform).create(scene);
             scene.add(platformGameObject);
         }
 
         List<Light> lights = level.getLevelMap().getLights();
         for(Light light : lights) {
-            GameObject lightGameObject = new LightPrefab(light,
-                    config.gridWidth(), config.gridHeight()).create(scene);
+            GameObject lightGameObject = new LightPrefab(this, light).create(scene);
             scene.add(lightGameObject);
         }
 
         List<Entity> entities = level.getLevelMap().getEntities();
         for(Entity entity : entities) {
-            GameObject entityGameObject = new EntityPrefab(entity,
-                    config.gridWidth(), config.gridHeight()).create(scene);
+            GameObject entityGameObject = new EntityPrefab(this, entity).create(scene);
             scene.add(entityGameObject);
         }
 
         List<Door> doors = level.getLevelMap().getDoors();
         for(Door door : doors) {
-            GameObject doorGameObject = new DoorPrefab(door,
-                    config.gridWidth(), config.gridHeight()).create(scene);
+            GameObject doorGameObject = new DoorPrefab(this, door).create(scene);
             scene.add(doorGameObject);
         }
     }
