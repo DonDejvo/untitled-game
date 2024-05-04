@@ -9,6 +9,7 @@ import com.webler.goliath.input.Input;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.events.DoorOpened;
 import com.webler.untitledgame.level.inventory.Inventory;
+import com.webler.untitledgame.level.inventory.InventoryItem;
 import org.joml.Vector3d;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class PlayerController extends EntityController {
     }
 
     public void collect(String itemName) {
+        inventory.add(itemName);
         stopInteraction();
     }
 

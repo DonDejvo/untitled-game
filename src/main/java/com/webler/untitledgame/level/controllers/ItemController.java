@@ -5,6 +5,7 @@ import com.webler.goliath.core.GameObject;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.level.inventory.InventoryItem;
 import org.joml.Vector3d;
 
 public class ItemController extends Controller {

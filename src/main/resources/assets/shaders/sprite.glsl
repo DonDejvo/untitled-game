@@ -30,9 +30,28 @@ in vec4 v_color;
 
 uniform sampler2D u_tex;
 
+#ifdef FOG_ON
+uniform vec3 u_fog_color;
+uniform float u_fog_near;
+uniform float u_fog_far;
+#endif
+
 out vec4 color;
 
 void main() {
     vec4 tex_color = texture2D(u_tex, v_uv);
     color = v_color * tex_color;
+
+    #ifdef FOG_ON
+
+    float fog_alpha = tex_color.a;
+    vec3 fog_direction = normalize(v_view_pos);
+    float fog_depth = length(v_view_pos);
+
+    float fog_factor = smoothstep(u_fog_near, u_fog_far, fog_depth);
+    fog_factor = clamp(fog_factor, 0.0, 1.0);
+
+    color = mix(color, vec4(u_fog_color, fog_alpha), fog_factor);
+
+    #endif
 }

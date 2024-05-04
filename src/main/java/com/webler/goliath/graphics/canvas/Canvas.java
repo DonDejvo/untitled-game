@@ -217,7 +217,7 @@ public class Canvas {
         glUseProgram(0);
     }
 
-    private void drawQuad(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h) {
+    private void drawQuad(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h, Color color) {
         if(quads.size() == MAX_QUADS) {
             return;
         }
@@ -225,15 +225,19 @@ public class Canvas {
     }
 
     public void rect(float x, float y, float w, float h) {
-        drawQuad(0, 0, 0, 0, 0, x, y, w, h);
+        drawQuad(0, 0, 0, 0, 0, x, y, w, h, color);
+    }
+
+    public void image(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h, Color color) {
+        drawQuad(texId, sx0, sy0, sx1, sy1, x, y, w, h, color);
     }
 
     public void image(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h) {
-        drawQuad(texId, sx0, sy0, sx1, sy1, x, y, w, h);
+        image(texId, sx0, sy0, sx1, sy1, x, y, w, h, Color.WHITE);
     }
 
     public void image(int texId, float x, float y, float w, float h) {
-        drawQuad(texId, 0, 0, 1, 1, x, y, w, h);
+        image(texId, 0, 0, 1, 1, x, y, w, h);
     }
 
     public void text(String text, float x, float y) {
@@ -253,7 +257,7 @@ public class Canvas {
                 float[] uvs = sprite.getTexCoords();
                 image(sprite.getTexture().getTexId(),
                         uvs[0], uvs[1], uvs[4], uvs[5],
-                        x + offsetX + alignOffsetX, y, charWidth, charHeight);
+                        x + offsetX + alignOffsetX, y, charWidth, charHeight, color);
             }
             offsetX += charWidth;
         }

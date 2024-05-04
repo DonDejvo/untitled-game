@@ -22,6 +22,7 @@ public class UIElements {
     public Color hoverBgColor;
     public Vector2f padding;
     public float lineHeight;
+    private boolean isNextButtonHovered;
 
     public UIElements(Canvas canvas) {
         this.canvas = canvas;
@@ -32,6 +33,17 @@ public class UIElements {
         hoverBgColor = Color.BLACK;
         lineHeight = 36;
         padding = new Vector2f(10, 10);
+        isNextButtonHovered = false;
+    }
+
+    public void hoverNextButton() {
+        isNextButtonHovered = true;
+    }
+
+    private boolean popNextButtonHovered() {
+        boolean hovered = isNextButtonHovered;
+        isNextButtonHovered = false;
+        return hovered;
     }
 
     public void textBlock(String text, float x, float y, float width) {
@@ -76,9 +88,10 @@ public class UIElements {
         boolean clicked = hovered && Input.mouseButtonBeginPress(GLFW_MOUSE_BUTTON_LEFT);
 
         canvas.pushTranslate(x, y);
-        canvas.setColor(hovered ? hoverBgColor : bgColor);
+        boolean shouldHover = popNextButtonHovered();
+        canvas.setColor(hovered || shouldHover ? hoverBgColor : bgColor);
         canvas.rect(0 ,0, w, h);
-        canvas.setColor(hovered ? hoverTextColor : textColor);
+        canvas.setColor(hovered || shouldHover ? hoverTextColor : textColor);
         canvas.text(text, padding.x, padding.y);
         canvas.popTranslate();
 
@@ -90,6 +103,22 @@ public class UIElements {
         float w = canvas.computeTextWidth(text) + padding.x * 2;
         float h = fontSize + 2 * padding.y;
         return button(text, x, y, w, h);
+    }
+
+    public boolean imageButton(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h) {
+        Vector2d pos = getTranslatedMousePosition();
+        Rect buttonRect = new Rect(x, y, w, h);
+        boolean hovered = buttonRect.contains(pos);
+        boolean clicked = hovered && Input.mouseButtonBeginPress(GLFW_MOUSE_BUTTON_LEFT);
+
+        canvas.pushTranslate(x, y);
+        boolean shouldHover = popNextButtonHovered();
+        canvas.setColor(hovered || shouldHover ? hoverBgColor : bgColor);
+        canvas.rect(0 ,0, w, h);
+        canvas.image(texId, sx0, sy0, sx1, sy1, padding.x, padding.y, w - padding.x * 2, h - padding.y * 2);
+        canvas.popTranslate();
+
+        return clicked;
     }
 
     public void begin(float x, float y, float w, float h) {

@@ -3,6 +3,8 @@ package com.webler.untitledgame.level.controllers;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
+import com.webler.goliath.dialogs.DialogNode;
+import com.webler.goliath.dialogs.components.DialogManager;
 import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.components.MeshRenderer;
@@ -10,6 +12,7 @@ import com.webler.goliath.input.Input;
 import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.events.DoorOpened;
+import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.level.levelmap.Direction;
 import org.joml.Vector3d;
 
@@ -48,7 +51,14 @@ public class DoorController extends Controller {
 
     @Override
     protected void interact() {
-        open();
+        GameObject player = level.getPlayer();
+        Inventory inventory = player.getComponent(Inventory.class, "Inventory");
+        if(inventory.getItemCount("key") > 0) {
+            inventory.remove("key");
+            open();
+        } else {
+            level.getComponent(DialogManager.class, "DialogManager").showDialog(new DialogNode("you__no_key", null));
+        }
     }
 
     @Override

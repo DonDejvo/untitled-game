@@ -43,8 +43,13 @@ public class AssetPool {
     }
 
     public static Shader getShader(String resourceName) {
-        if(shaders.containsKey(resourceName)) {
-            return shaders.get(resourceName);
+        return getShader(resourceName, "", "");
+    }
+
+    public static Shader getShader(String resourceName, String preVertex, String preFragment) {
+        String key = resourceName + "$" + preVertex + ":" + preFragment;
+        if(shaders.containsKey(key)) {
+            return shaders.get(key);
         }
         try {
             InputStream is = ClassLoader.getSystemResourceAsStream(resourceName);
@@ -52,9 +57,9 @@ public class AssetPool {
                 throw new RuntimeException("Could not load resource path '" + resourceName + "'");
             }
             String textSource = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Shader shader = Shader.loadFromTextSource(textSource);
+            Shader shader = Shader.loadFromTextSource(textSource, preVertex, preFragment);
             shader.linkShader();
-            shaders.put(resourceName, shader);
+            shaders.put(key, shader);
             return shader;
         } catch (IOException e) {
             throw new RuntimeException("Could not load resource path '" + resourceName + "'");

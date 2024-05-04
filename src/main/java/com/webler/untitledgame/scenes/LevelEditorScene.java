@@ -5,6 +5,7 @@ import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.core.SceneParams;
 import com.webler.goliath.graphics.Spritesheet;
+import com.webler.goliath.graphics.Texture;
 import com.webler.goliath.graphics.components.*;
 import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.components.GridLines;
@@ -26,8 +27,12 @@ public class LevelEditorScene extends Scene {
     public void init(SceneParams params) {
         LevelParams levelParams = (LevelParams) params;
 
+        Texture potionsTexture = AssetPool.getTexture("assets/tiles/potions.png");
+        AssetPool.addSpritesheet("assets/tiles/potions.png", new Spritesheet(potionsTexture, 16, 16, 3, 3));
+
+        Texture tilesTexture = AssetPool.getTexture("assets/spritesheets/tileset.png");
         AssetPool.addSpritesheet("assets/spritesheets/tileset.png",
-                new Spritesheet(AssetPool.getTexture("assets/spritesheets/tileset.png"),
+                new Spritesheet(tilesTexture,
                         16,
                         16,
                         70,

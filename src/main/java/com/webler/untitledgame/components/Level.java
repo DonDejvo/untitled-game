@@ -19,6 +19,7 @@ import com.webler.goliath.graphics.light.SpotLight;
 import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.controllers.*;
 import com.webler.untitledgame.level.inventory.Inventory;
+import com.webler.untitledgame.level.inventory.InventoryItem;
 import com.webler.untitledgame.level.levelmap.*;
 import org.joml.Vector3d;
 import org.xml.sax.SAXException;
@@ -198,6 +199,10 @@ public class Level extends Component {
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
                     go.addComponent("Collider", collider);
                     Inventory inventory = new Inventory();
+                    inventory.registerItem("key", new InventoryItem("Key", new Sprite(AssetPool.getTexture("assets/tiles/key.png")), "Unlocks doors."));
+                    inventory.registerItem("caffelatte", new InventoryItem("Caffe Latte", AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(0), "Increases firing rate."));
+                    inventory.registerItem("espresso", new InventoryItem("Espresso", AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(1), "Regenerates 50% hitpoints."));
+                    inventory.registerItem("americano", new InventoryItem("Americano", AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(2), "Increases speed."));
                     PlayerController playerController = new PlayerController(this, scene.getCamera(), collider, inventory);
                     go.addComponent("Controller", playerController);
                     go.addComponent("Inventory", inventory);
@@ -251,6 +256,39 @@ public class Level extends Component {
                     go.transform.position.y += sprite.getHeight();
                     break;
                 }
+                case "caffelatte": {
+                    Sprite sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(0);
+                    sprite.setWidth(1);
+                    sprite.setHeight(1);
+                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
+                    go.addComponent("Renderer", renderer);
+                    go.addComponent("Bilboard", new Bilboard());
+                    go.addComponent("Controller", new ItemController(this, entity.name));
+                    go.transform.position.y += sprite.getHeight();
+                    break;
+                }
+                case "espresso": {
+                    Sprite sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(1);
+                    sprite.setWidth(1);
+                    sprite.setHeight(1);
+                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
+                    go.addComponent("Renderer", renderer);
+                    go.addComponent("Bilboard", new Bilboard());
+                    go.addComponent("Controller", new ItemController(this, entity.name));
+                    go.transform.position.y += sprite.getHeight();
+                    break;
+                }
+                case "americano": {
+                    Sprite sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(2);
+                    sprite.setWidth(1);
+                    sprite.setHeight(1);
+                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
+                    go.addComponent("Renderer", renderer);
+                    go.addComponent("Bilboard", new Bilboard());
+                    go.addComponent("Controller", new ItemController(this, entity.name));
+                    go.transform.position.y += sprite.getHeight();
+                    break;
+                }
             }
 
             scene.add(go);
@@ -276,10 +314,6 @@ public class Level extends Component {
         GameObject ambientLightGameObject = new GameObject(scene);
         ambientLightGameObject.addComponent("AmbientLight", new AmbientLight(new Color(0.05, 0.05, 0.05)));
         scene.add(ambientLightGameObject);
-
-//        GameObject fogGameObject = new GameObject(scene);
-//        fogGameObject.addComponent("Fog", new Fog(25, 50, Color.BLACK));
-//        scene.add(fogGameObject);
     }
 
     private void createDoors() {

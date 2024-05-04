@@ -33,18 +33,21 @@ public class EntityPrefab implements Prefab {
                 sprite = new Sprite(AssetPool.getTexture("assets/tiles/player.png"));
                 sprite.setWidth(tileWidth);
                 sprite.setHeight(tileHeight);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 20));
                 break;
             }
             case "catgirl": {
                 sprite = new Sprite(AssetPool.getTexture("assets/images/4-3.png"));
                 sprite.setWidth((int)((double)tileHeight * sprite.getTexture().getWidth() / sprite.getTexture().getHeight()));
                 sprite.setHeight(tileHeight);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 20));
                 break;
             }
             case "vendingmachine": {
                 sprite = new Sprite(AssetPool.getTexture("assets/images/Vending_Machine_21.png"));
                 sprite.setWidth((int)((double)tileHeight * sprite.getTexture().getWidth() / sprite.getTexture().getHeight()));
                 sprite.setHeight(tileHeight);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 20));
                 break;
             }
             case "key": {
@@ -52,12 +55,36 @@ public class EntityPrefab implements Prefab {
                 sprite.setWidth(tileWidth);
                 sprite.setHeight(tileHeight);
                 go.transform.scale.set(0.5);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
+                break;
+            }
+            case "caffelatte": {
+                sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(0);
+                sprite.setWidth(tileWidth);
+                sprite.setHeight(tileHeight);
+                go.transform.scale.set(0.5);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
+                break;
+            }
+            case "espresso": {
+                sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(1);
+                sprite.setWidth(tileWidth);
+                sprite.setHeight(tileHeight);
+                go.transform.scale.set(0.5);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
+                break;
+            }
+            case "americano": {
+                sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(2);
+                sprite.setWidth(tileWidth);
+                sprite.setHeight(tileHeight);
+                go.transform.scale.set(0.5);
+                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
                 break;
             }
             default:
                 throw new IllegalStateException("Unexpected value: " + entity.name);
         }
-        go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
         go.addComponent("Controller", new EntityEditorController(editorComponent, entity));
         return go;
     }

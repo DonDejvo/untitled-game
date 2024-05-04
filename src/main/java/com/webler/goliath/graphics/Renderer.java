@@ -1,6 +1,5 @@
 package com.webler.goliath.graphics;
 
-import com.webler.goliath.graphics.components.Fog;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.light.AmbientLight;
 import com.webler.goliath.graphics.light.SpotLight;
@@ -20,13 +19,15 @@ public class Renderer {
     private final List<AmbientLight> ambientLights;
     private final List<SpotLight> spotLights;
     private Fog fog;
+    public boolean fogOn = false;
+    public boolean lightOn = false;
 
     public Renderer() {
         meshes = new ArrayList<>();
         spriteBatches = new ArrayList<>();
         ambientLights = new ArrayList<>();
         spotLights = new ArrayList<>();
-        fog = null;
+        fog = new Fog(50, 100, Color.BLACK);
     }
 
     public void add(Mesh mesh) {
@@ -84,20 +85,13 @@ public class Renderer {
         return spotLights.remove(spotLight);
     }
 
-    public void setFog(Fog fog) {
-        this.fog = fog;
-    }
-
     public void render(Matrix4d PVMatrix, Matrix4d viewMatrix) {
-        Shader meshShader, spriteShader;
-        if(isFogEnabled()) {
-            meshShader = AssetPool.getShader("assets/shaders/mesh_fog.glsl");
-            spriteShader = AssetPool.getShader("assets/shaders/sprite_fog.glsl");
+        String preFragment = "";
+        if(fogOn) preFragment += "FOG_ON,";
+        if(lightOn) preFragment += "LIGHT_ON,";
 
-        } else {
-            meshShader = AssetPool.getShader("assets/shaders/mesh.glsl");
-            spriteShader = AssetPool.getShader("assets/shaders/sprite.glsl");
-        }
+        Shader meshShader = AssetPool.getShader("assets/shaders/mesh.glsl", "", preFragment);
+        Shader spriteShader = AssetPool.getShader("assets/shaders/sprite.glsl", "", preFragment);
 
         Vector3d[] spotLightVec = new Vector3d[spotLights.size() * 3];
         for(int i = 0; i < spotLights.size(); ++i) {
@@ -125,12 +119,12 @@ public class Renderer {
         meshShader.supplyUniform("u_spot_lights_count", spotLights.size());
         meshShader.supplyUniform("u_ambient_color", ambientColorVec);
 
-        if(isFogEnabled()) {
-            Color fogColor = fog.getFogColor();
+        if(fogOn) {
+            Color fogColor = fog.fogColor;
 
             meshShader.supplyUniform("u_fog_color", new Vector3d(fogColor.r, fogColor.g, fogColor.b));
-            meshShader.supplyUniform("u_fog_near", fog.getFogNear());
-            meshShader.supplyUniform("u_fog_far", fog.getFogFar());
+            meshShader.supplyUniform("u_fog_near", fog.fogNear);
+            meshShader.supplyUniform("u_fog_far", fog.fogFar);
         }
 
         meshShader.supplyUniform("u_view", viewMatrix);
@@ -151,12 +145,12 @@ public class Renderer {
         spriteShader.supplyUniform("u_PV", PVMatrix);
         spriteShader.supplyUniform("u_view", viewMatrix);
 
-        if(isFogEnabled()) {
-            Color fogColor = fog.getFogColor();
+        if(fogOn) {
+            Color fogColor = fog.fogColor;
 
             spriteShader.supplyUniform("u_fog_color", new Vector3d(fogColor.r, fogColor.g, fogColor.b));
-            spriteShader.supplyUniform("u_fog_near", fog.getFogNear());
-            spriteShader.supplyUniform("u_fog_far", fog.getFogFar());
+            spriteShader.supplyUniform("u_fog_near", fog.fogNear);
+            spriteShader.supplyUniform("u_fog_far", fog.fogFar);
         }
 
         for(SpriteBatch spriteBatch : spriteBatches) {
@@ -184,9 +178,10 @@ public class Renderer {
         spriteBatches.clear();
         spotLights.clear();
         ambientLights.clear();
-    }
-
-    private boolean isFogEnabled() {
-        return fog != null && fog.isEnabled();
+        fogOn = false;
+        lightOn = false;
+        fog.fogColor = Color.BLACK;
+        fog.fogNear = 50;
+        fog.fogFar = 100;
     }
 }

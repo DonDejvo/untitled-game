@@ -71,6 +71,15 @@ public class MenuBar {
                 if (ImGui.menuItem("Key")) {
                     editor.addEntity("key");
                 }
+                if (ImGui.menuItem("Caffe Latte")) {
+                    editor.addEntity("caffelatte");
+                }
+                if (ImGui.menuItem("Espresso")) {
+                    editor.addEntity("espresso");
+                }
+                if (ImGui.menuItem("Americano")) {
+                    editor.addEntity("americano");
+                }
                 ImGui.endMenu();
             }
             if(ImGui.beginMenu("Fixed")) {

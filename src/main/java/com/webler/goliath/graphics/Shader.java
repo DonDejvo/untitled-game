@@ -94,6 +94,7 @@ public class Shader {
         glShaderSource(shader, source);
         glCompileShader(shader);
         if(glGetShaderi(shader, GL_COMPILE_STATUS) == 0) {
+            System.out.println(glGetShaderInfoLog(shader));
             throw new RuntimeException("Shader compiling failed");
         }
         return shader;
@@ -111,7 +112,7 @@ public class Shader {
         glUseProgram(0);
     }
 
-    public static Shader loadFromTextSource(String textSource) {
+    public static Shader loadFromTextSource(String textSource, String preVertex, String preFragment) {
         String[] splitString = textSource.split("(#type)( )+([a-zA-Z0-9]+)");
 
         if (splitString.length < 2) {
@@ -128,25 +129,50 @@ public class Shader {
         endIndex = textSource.indexOf('\n', startIndex);
         String secondPattern = textSource.substring(startIndex, endIndex).trim();
 
-        String vertexSource, fragmentSource;
+        StringBuilder vertexSource;
+        StringBuilder fragmentSource;
 
         if (firstPattern.equals("vertex")) {
-            vertexSource = splitString[1];
+            vertexSource = new StringBuilder(splitString[1]);
         } else if (secondPattern.equals("vertex")) {
-            vertexSource = splitString[2];
+            vertexSource = new StringBuilder(splitString[2]);
         } else {
             throw new RuntimeException("Missing vertex shader source");
         }
 
         if (firstPattern.equals("fragment")) {
-            fragmentSource = splitString[1];
+            fragmentSource = new StringBuilder(splitString[1]);
         } else if (secondPattern.equals("fragment")) {
-            fragmentSource = splitString[2];
+            fragmentSource = new StringBuilder(splitString[2]);
         } else {
             throw new RuntimeException("Missing fragment shader source");
         }
 
-        return new Shader(vertexSource, fragmentSource);
+        String[] preVertexSplit = preVertex.split(",");
+        String[] preFragmentSplit = preFragment.split(",");
+
+        insertDefines(vertexSource, preVertexSplit);
+
+        insertDefines(fragmentSource, preFragmentSplit);
+
+        return new Shader(vertexSource.toString(), fragmentSource.toString());
+    }
+
+    private static void insertDefines(StringBuilder source, String[] preSplit) {
+        int firstLineEndIdx;
+        String firstLine;
+        firstLineEndIdx = source.indexOf("\n", source.indexOf("#version") + 9);
+        firstLine = source.substring(0, firstLineEndIdx + 1);
+        source.delete(0, firstLineEndIdx);
+
+        for (String s : preSplit) {
+            if(s.trim().isEmpty()) {
+                continue;
+            }
+            source.insert(0, "#define " + s.trim() + " 1" + "\n");
+        }
+
+        source.insert(0, firstLine);
     }
 
     public void destroy() {

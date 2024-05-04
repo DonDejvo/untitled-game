@@ -35,9 +35,17 @@ in vec3 v_normal;
 uniform sampler2D u_tex;
 uniform vec4 u_color;
 
+#ifdef LIGHT_ON
 uniform vec3 u_spot_lights[192];
 uniform int u_spot_lights_count;
 uniform vec3 u_ambient_color;
+#endif
+
+#ifdef FOG_ON
+uniform vec3 u_fog_color;
+uniform float u_fog_near;
+uniform float u_fog_far;
+#endif
 
 out vec4 color;
 
@@ -45,6 +53,8 @@ void main() {
     vec4 tex_color = texture2D(u_tex, v_uv);
 
     color = tex_color * u_color;
+
+    #ifdef LIGHT_ON
 
     vec3 result = vec3(0.0);
 
@@ -63,4 +73,19 @@ void main() {
     result += u_ambient_color;
 
     color.rgb *= result;
+
+    #endif
+
+    #ifdef FOG_ON
+
+    float fog_alpha = tex_color.a;
+    vec3 fog_direction = normalize(v_view_pos);
+    float fog_depth = length(v_view_pos);
+
+    float fog_factor = smoothstep(u_fog_near, u_fog_far, fog_depth);
+    fog_factor = clamp(fog_factor, 0.0, 1.0);
+
+    color = mix(color, vec4(u_fog_color, fog_alpha), fog_factor);
+
+    #endif
 }

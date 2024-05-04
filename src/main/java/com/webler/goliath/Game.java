@@ -9,7 +9,6 @@ import com.webler.goliath.graphics.font.BitmapFont;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.utils.AssetPool;
-import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
@@ -23,6 +22,7 @@ import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 
 public class Game {
+    private static final String charset = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
     private final Config config;
     private long window;
     private int width, height;
@@ -96,13 +96,14 @@ public class Game {
                 new Spritesheet(
                         AssetPool.getTexture("assets/font/pixfont-bold.png"),
                 12, 16, 95, 16
-            )," !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~".toCharArray())
+            ),charset.toCharArray())
         );
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         renderer = new Renderer();
+
         imGuiLayer = new ImGuiLayer(window);
         framebuffer = new Framebuffer(width, height);
         canvas = new Canvas(this);
