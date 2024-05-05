@@ -27,14 +27,14 @@ public class Sprite {
     public void setRegion(int x, int y, int width, int height) {
         int texWidth = tex.getWidth();
         int texHeight = tex.getHeight();
-        texCoords[0] = (float)x / texWidth;
-        texCoords[1] = (float)y / texHeight;
-        texCoords[2] = (float)(x + width) / texWidth;
-        texCoords[3] = (float)y / texHeight;
-        texCoords[4] = (float)(x + width) / texWidth;
-        texCoords[5] = (float)(y + height) / texHeight;
-        texCoords[6] = (float)x / texWidth;
-        texCoords[7] = (float)(y + height) / texHeight;
+        texCoords[0] = ((float)x) / texWidth;
+        texCoords[1] = ((float)y) / texHeight;
+        texCoords[2] = ((float)x + width) / texWidth;
+        texCoords[3] = ((float)y) / texHeight;
+        texCoords[4] = ((float)x + width) / texWidth;
+        texCoords[5] = ((float)y + height) / texHeight;
+        texCoords[6] = ((float)x) / texWidth;
+        texCoords[7] = ((float)y + height) / texHeight;
     }
 
     public float[] getTexCoords() {

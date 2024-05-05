@@ -4,9 +4,9 @@ import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.graphics.Mesh;
 import com.webler.goliath.input.Input;
-import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.geometry.LevelGeometry;
 import com.webler.untitledgame.scenes.LevelParams;
+import org.joml.Vector4d;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
 
@@ -20,12 +20,10 @@ public class LevelRenderer extends Component {
 
     @Override
     public void start() {
-        LevelGeometry geometry = new LevelGeometry(level,
-                AssetPool.getTexture("assets/tiles/ceiling.png").getTexId(),
-                AssetPool.getTexture("assets/tiles/wall.png").getTexId(),
-                AssetPool.getTexture("assets/tiles/wall.png").getTexId());
+        LevelGeometry geometry = new LevelGeometry(level);
 
         mesh = new Mesh(geometry);
+        mesh.getColor().mul(new Vector4d(0.75, 0.75, 0.75, 1.0));
         gameObject.getGame().getRenderer().add(mesh);
 
         level.buildLevel();

@@ -84,6 +84,10 @@ public class EditorComponent extends Component {
 
     }
 
+    public Level getLevel() {
+        return level;
+    }
+
     @Override
     public void imgui() {
 
@@ -139,7 +143,8 @@ public class EditorComponent extends Component {
     }
 
     public void handleNew() {
-
+        currentPath = null;
+        clearLevel();
     }
 
     public void handleSave() {

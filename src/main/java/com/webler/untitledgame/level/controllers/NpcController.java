@@ -8,13 +8,19 @@ import com.webler.untitledgame.components.Level;
 import org.joml.Vector3d;
 
 public class NpcController extends EntityController{
-    public NpcController(Level level, BoxCollider3D collider) {
+    protected DialogComponent dialogComponent;
+
+    public NpcController(Level level, BoxCollider3D collider, DialogComponent dialogComponent) {
         super(level, collider, new String[]{ "player", "fixed" });
+        this.dialogComponent = dialogComponent;
     }
+
+    protected void initDialogs() {}
 
     @Override
     protected void interact() {
-        getComponent(DialogComponent.class, "Dialog").play();
+        initDialogs();
+        dialogComponent.play();
     }
 
     @Override

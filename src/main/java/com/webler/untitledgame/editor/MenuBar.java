@@ -56,15 +56,21 @@ public class MenuBar {
                 if (ImGui.menuItem("Player")) {
                     editor.addEntity("player");
                 }
-                if (ImGui.menuItem("Cat Girl")) {
-                    editor.addEntity("catgirl");
-                }
                 if (ImGui.menuItem("Vending Machine")) {
-                    editor.addEntity("vendingmachine");
+                    editor.addEntity("vending_machine");
                 }
-//                if (ImGui.menuItem("Slime")) {
-//
-//                }
+                if(ImGui.beginMenu("NPC")) {
+                    if (ImGui.menuItem("Cat Girl 1")) {
+                        editor.addEntity("cat_girl_1");
+                    }
+                    if (ImGui.menuItem("Cat Girl 2")) {
+                        editor.addEntity("cat_girl_2");
+                    }
+                    if (ImGui.menuItem("Cat Girl 3")) {
+                        editor.addEntity("cat_girl_3");
+                    }
+                    ImGui.endMenu();
+                }
                 ImGui.endMenu();
             }
             if(ImGui.beginMenu("Item")) {
@@ -72,7 +78,7 @@ public class MenuBar {
                     editor.addEntity("key");
                 }
                 if (ImGui.menuItem("Caffe Latte")) {
-                    editor.addEntity("caffelatte");
+                    editor.addEntity("caffe_latte");
                 }
                 if (ImGui.menuItem("Espresso")) {
                     editor.addEntity("espresso");

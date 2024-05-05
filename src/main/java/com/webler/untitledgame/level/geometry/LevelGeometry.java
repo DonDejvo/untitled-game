@@ -1,7 +1,8 @@
 package com.webler.untitledgame.level.geometry;
 
-import com.webler.goliath.graphics.DrawCall;
-import com.webler.goliath.graphics.Geometry;
+import auburn.FastNoiseLite;
+import com.webler.goliath.graphics.*;
+import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.levelmap.LevelMap;
 import com.webler.untitledgame.level.levelmap.Platform;
@@ -20,15 +21,42 @@ public class LevelGeometry extends Geometry {
     private DrawCall[] drawCalls;
     private final Level level;
     private List<LevelGeometryQuad> quads;
-    private final int groundTexId;
-    private final int wallTexId;
-    private final int ceilingTexId;
+    private Sprite[] groundSprites;
+    private Sprite[] wallSprites;
+    private Sprite[] ceilingSprites;
+    private FastNoiseLite noise;
 
-    public LevelGeometry(Level level, int groundTexId, int wallTexId, int ceilingTexId) {
+    public LevelGeometry(Level level) {
         this.level = level;
-        this.groundTexId = groundTexId;
-        this.wallTexId = wallTexId;
-        this.ceilingTexId = ceilingTexId;
+
+        noise = new FastNoiseLite();
+        noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+
+        Spritesheet spritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
+
+        groundSprites = new Sprite[] {
+                spritesheet.getSprite(11),
+                spritesheet.getSprite(12),
+                spritesheet.getSprite(20),
+                spritesheet.getSprite(21),
+                spritesheet.getSprite(22),
+                spritesheet.getSprite(23),
+                spritesheet.getSprite(29),
+                spritesheet.getSprite(30),
+                spritesheet.getSprite(31),
+                spritesheet.getSprite(32),
+        };
+        wallSprites = new Sprite[] {
+                spritesheet.getSprite(42),
+                spritesheet.getSprite(51),
+                spritesheet.getSprite(43),
+                spritesheet.getSprite(52),
+                spritesheet.getSprite(44),
+                spritesheet.getSprite(53),
+        };
+        ceilingSprites = new Sprite[] {
+                spritesheet.getSprite(42)
+        };
 
         init();
     }
@@ -143,43 +171,99 @@ public class LevelGeometry extends Geometry {
     }
 
     private void addGround(float x1, float y1, float x2, float y2, float top) {
-        float[] positions = new float[]{
-                x1, top, y1,
-                x2, top, y1,
-                x2, top, y2,
-                x1, top, y2
-        };
-        quads.add(new LevelGeometryQuad(positions, groundTexId, Math.abs(x2 - x1), Math.abs(y2 - y1)));
+
+        for (float x = x1; x < x2; ++x) {
+            for (float y = y1; y < y2; ++y) {
+                float[] positions = new float[]{
+                        x, top, y,
+                        x + 1, top, y,
+                        x + 1, top, y + 1,
+                        x, top, y + 1
+                };
+                float value = noise.GetNoise(x * 100, y * 100) * 0.5f + 0.5f;
+                Sprite sprite = groundSprites[(int)Math.floor(value * groundSprites.length)];
+                quads.add(new LevelGeometryQuad(positions, sprite.getTexCoords(), sprite.getTexture().getTexId()));
+            }
+        }
     }
 
     private void addWall(float x1, float y1, float x2, float y2, float bottom, float top) {
-        float[] positions = new float[]{
-                x1, top, y1,
-                x2, top, y2,
-                x2, bottom, y2,
-                x1, bottom, y1
-        };
-        quads.add(new LevelGeometryQuad(positions, wallTexId, Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)), Math.max(top - bottom, 0)));
+        if(x1 == x2) {
+            if(y1 < y2) {
+                for (float y = y1; y < y2; ++y) {
+                    for(float i = bottom; i < top; ++i) {
+                        float[] positions = new float[]{
+                                x1, i + 1, y,
+                                x1, i + 1, y + 1,
+                                x1, i, y + 1,
+                                x1, i, y
+                        };
+                        float value = noise.GetNoise(y * 100, i * 100) * 0.5f + 0.5f;
+                        Sprite sprite = wallSprites[(int)Math.floor(value * wallSprites.length)];
+                        quads.add(new LevelGeometryQuad(positions, sprite.getTexCoords(), sprite.getTexture().getTexId()));
+                    }
+                }
+            } else {
+                for (float y = y1; y > y2; --y) {
+                    for(float i = bottom; i < top; ++i) {
+                        float[] positions = new float[]{
+                                x1, i + 1, y,
+                                x1, i + 1, y - 1,
+                                x1, i, y - 1,
+                                x1, i, y
+                        };
+                        float value = noise.GetNoise(y * 100, i * 100) * 0.5f + 0.5f;
+                        Sprite sprite = wallSprites[(int)Math.floor(value * wallSprites.length)];
+                        quads.add(new LevelGeometryQuad(positions, sprite.getTexCoords(), sprite.getTexture().getTexId()));
+                    }
+                }
+            }
+        } else {
+            if(x1 < x2) {
+                for (float x = x1; x < x2; ++x) {
+                    for(float i = bottom; i < top; ++i) {
+                        float[] positions = new float[]{
+                                x, i + 1, y1,
+                                x + 1, i + 1, y1,
+                                x + 1, i, y1,
+                                x, i, y1
+                        };
+                        float value = noise.GetNoise(x * 100, i * 100) * 0.5f + 0.5f;
+                        Sprite sprite = wallSprites[(int)Math.floor(value * wallSprites.length)];
+                        quads.add(new LevelGeometryQuad(positions, sprite.getTexCoords(), sprite.getTexture().getTexId()));
+                    }
+                }
+            } else {
+                for (float x = x1; x > x2; --x) {
+                    for(float i = bottom; i < top; ++i) {
+                        float[] positions = new float[]{
+                                x, i + 1, y1,
+                                x - 1, i + 1, y1,
+                                x - 1, i, y1,
+                                x, i, y1
+                        };
+                        float value = noise.GetNoise(x * 100, i * 100) * 0.5f + 0.5f;
+                        Sprite sprite = wallSprites[(int)Math.floor(value * wallSprites.length)];
+                        quads.add(new LevelGeometryQuad(positions, sprite.getTexCoords(), sprite.getTexture().getTexId()));
+                    }
+                }
+            }
+        }
     }
 
     private void addCeiling(float x1, float y1, float x2, float y2, float top) {
-        float[] positions = new float[]{
-                x1, top, y2,
-                x2, top, y2,
-                x2, top, y1,
-                x1, top, y1
-        };
-        quads.add(new LevelGeometryQuad(positions, ceilingTexId, Math.abs(x2 - x1), Math.abs(y2 - y1)));
-    }
-
-    private void addCeiling(float width, float height, float top) {
-        float[] positions = new float[]{
-                0, top, height,
-                width, top, height,
-                width, top, 0,
-                0, top, 0
-        };
-        quads.add(new LevelGeometryQuad(positions, ceilingTexId, width, height));
+        for (float x = x1; x < x2; ++x) {
+            for (float y = y1; y < y2; ++y) {
+                float[] positions = new float[]{
+                        x, top, y + 1,
+                        x + 1, top, y + 1,
+                        x + 1, top, y,
+                        x, top, y
+                };
+                Sprite sprite = ceilingSprites[0];
+                quads.add(new LevelGeometryQuad(positions, sprite.getTexCoords(), sprite.getTexture().getTexId()));
+            }
+        }
     }
 
     @Override
@@ -197,24 +281,15 @@ public class LevelGeometry extends Geometry {
         return drawCalls;
     }
 
-    private class LevelGeometryQuad {
-        private final float[] positions;
-        private final int texId;
-        private final float width;
-        private final float height;
-        private final float[] uvs;
+    private static class LevelGeometryQuad {
+        private float[] positions;
+        private float[] uvs;
+        private int texId;
 
-        public LevelGeometryQuad(float[] positions, int texId, float width, float height) {
+        public LevelGeometryQuad(float[] positions, float[] uvs, int texId) {
             this.positions = positions;
+            this.uvs = uvs;
             this.texId = texId;
-            this.width = width;
-            this.height = height;
-            uvs = new float[] {
-                    0, 0,
-                    width, 0,
-                    width, height,
-                    0, height
-            };
         }
 
         public float[] getPositions() {
@@ -227,14 +302,6 @@ public class LevelGeometry extends Geometry {
 
         public float[] getUvs() {
             return uvs;
-        }
-
-        public float getHeight() {
-            return height;
-        }
-
-        public float getWidth() {
-            return width;
         }
     }
 }

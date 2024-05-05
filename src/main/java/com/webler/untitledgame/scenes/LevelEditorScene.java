@@ -27,19 +27,13 @@ public class LevelEditorScene extends Scene {
     public void init(SceneParams params) {
         LevelParams levelParams = (LevelParams) params;
 
-        Texture potionsTexture = AssetPool.getTexture("assets/tiles/potions.png");
-        AssetPool.addSpritesheet("assets/tiles/potions.png", new Spritesheet(potionsTexture, 16, 16, 3, 3));
+        Texture tilesTexture = AssetPool.getTexture("untitled-game/spritesheets/tileset.png");
+        AssetPool.addSpritesheet("untitled-game/spritesheets/tileset.png",
+                new Spritesheet(tilesTexture, 16, 16, 70, 9, 2, 2));
 
-        Texture tilesTexture = AssetPool.getTexture("assets/spritesheets/tileset.png");
-        AssetPool.addSpritesheet("assets/spritesheets/tileset.png",
-                new Spritesheet(tilesTexture,
-                        16,
-                        16,
-                        70,
-                        9,
-                        0
-                )
-        );
+        Texture catgirlsTexture = AssetPool.getTexture("untitled-game/spritesheets/catgirls.png");
+        AssetPool.addSpritesheet("untitled-game/spritesheets/catgirls.png",
+                new Spritesheet(catgirlsTexture, 66, 86, 107, 12, 0, 0));
 
         GameObject cameraGameObject = new GameObject(this, "Camera");
         Camera camera = new OrthoCamera(1920, 1080);

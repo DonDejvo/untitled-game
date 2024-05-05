@@ -90,8 +90,8 @@ public class Renderer {
         if(fogOn) preFragment += "FOG_ON,";
         if(lightOn) preFragment += "LIGHT_ON,";
 
-        Shader meshShader = AssetPool.getShader("assets/shaders/mesh.glsl", "", preFragment);
-        Shader spriteShader = AssetPool.getShader("assets/shaders/sprite.glsl", "", preFragment);
+        Shader meshShader = AssetPool.getShader("goliath/shaders/mesh.glsl", "", preFragment);
+        Shader spriteShader = AssetPool.getShader("goliath/shaders/sprite.glsl", "", preFragment);
 
         Vector3d[] spotLightVec = new Vector3d[spotLights.size() * 3];
         for(int i = 0; i < spotLights.size(); ++i) {
@@ -115,9 +115,11 @@ public class Renderer {
 
         meshShader.bind();
 
-        meshShader.supplyUniform("u_spot_lights", spotLightVec);
-        meshShader.supplyUniform("u_spot_lights_count", spotLights.size());
-        meshShader.supplyUniform("u_ambient_color", ambientColorVec);
+        if(lightOn) {
+            meshShader.supplyUniform("u_spot_lights", spotLightVec);
+            meshShader.supplyUniform("u_spot_lights_count", spotLights.size());
+            meshShader.supplyUniform("u_ambient_color", ambientColorVec);
+        }
 
         if(fogOn) {
             Color fogColor = fog.fogColor;

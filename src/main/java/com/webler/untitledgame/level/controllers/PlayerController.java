@@ -2,14 +2,18 @@ package com.webler.untitledgame.level.controllers;
 
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.GameObject;
-import com.webler.goliath.dialogs.events.DialogEnded;
+import com.webler.goliath.dialogs.DialogOption;
+import com.webler.goliath.dialogs.components.DialogManager;
+import com.webler.goliath.dialogs.events.DialogEndedEvent;
+import com.webler.goliath.dialogs.events.DialogNextEvent;
+import com.webler.goliath.dialogs.nodes.DialogOptionsNode;
+import com.webler.goliath.dialogs.nodes.DialogTextNode;
 import com.webler.goliath.eventsystem.listeners.EventHandler;
 import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.input.Input;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.events.DoorOpened;
 import com.webler.untitledgame.level.inventory.Inventory;
-import com.webler.untitledgame.level.inventory.InventoryItem;
 import org.joml.Vector3d;
 
 import java.util.List;
@@ -30,7 +34,7 @@ public class PlayerController extends EntityController {
         this.camera = camera;
         this.inventory = inventory;
         bounciness = 0;
-        speed = 100;
+        speed = 80;
         rotationSpeed = 2.5;
         canJump = true;
         focusedObject = null;
@@ -46,9 +50,34 @@ public class PlayerController extends EntityController {
         stopInteraction();
     }
 
+    public void buy(String itemName, int price) {
+        if(inventory.getItemCount("gold") >= price) {
+            for (int i = 0; i < price; i++) {
+                inventory.remove("gold");
+            }
+            inventory.add(itemName);
+        }
+    }
+
     @Override
     public void start() {
         level.addObjectToGroup(gameObject, "player");
+
+        for (int i = 0; i < 200; i++) {
+            inventory.add("gold");
+        }
+
+        focusedObject = gameObject;
+        startInteraction();
+        level.getComponent(DialogManager.class, "DialogManager")
+                .showDialog(new DialogTextNode("system__learn_controls",
+                        new DialogOptionsNode(new DialogOption[]{
+                                new DialogOption("player__no", false, null),
+                                new DialogOption("player__yes", false,
+                                        new DialogTextNode("system__controls_move",
+                                                new DialogTextNode("system__controls_interact",
+                                                        new DialogTextNode("system__controls_inventory", null))))
+                        })));
     }
 
     @Override
@@ -75,8 +104,13 @@ public class PlayerController extends EntityController {
     }
 
     @EventHandler
-    public void onDialogEnded(DialogEnded event) {
+    public void onDialogEnded(DialogEndedEvent event) {
         stopInteraction();
+    }
+
+    @EventHandler
+    public void onDialogNext(DialogNextEvent event) {
+
     }
 
     @EventHandler
@@ -116,7 +150,7 @@ public class PlayerController extends EntityController {
         moveVec.mul(speed * (onGround ? 1 : 0.3));
 
         if(Input.keyPressed(GLFW_KEY_LEFT_SHIFT) && onGround && moveVec.x > 0) {
-            moveVec.x *= 1.5;
+            moveVec.x *= 2;
         }
 
         if(Input.keyPressed(GLFW_KEY_A)) {
@@ -142,11 +176,9 @@ public class PlayerController extends EntityController {
             startInteraction();
         }
 
-        if(Input.keyBeginPress(GLFW_KEY_I)) {
-            if(Input.keyBeginPress(GLFW_KEY_I)) {
-                state = State.LOOKING_INVENTORY;
-                inventory.setOpened(true);
-            }
+        if(Input.keyBeginPress(GLFW_KEY_TAB) || Input.keyBeginPress(GLFW_KEY_I)) {
+            state = State.LOOKING_INVENTORY;
+            inventory.setOpened(true);
         }
 
         updateCamera(dt);
@@ -157,16 +189,21 @@ public class PlayerController extends EntityController {
     private void updateInteracting(double dt) {
         acceleration.set(0);
 
-        Vector3d focusPosition = focusedObject.getComponent(Controller.class, "Controller").getFocusPosition();
+        if(gameObject != focusedObject) {
+            Vector3d focusPosition = focusedObject.getComponent(Controller.class, "Controller").getFocusPosition();
 
-        camera.getEntity().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 1, 0));
-        camera.direction.lerp(new Vector3d(focusPosition).sub(camera.getEntity().transform.position), Math.min(dt * 10, 1));
+            camera.getEntity().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 1, 0));
+
+            camera.direction.lerp(new Vector3d(focusPosition).sub(camera.getEntity().transform.position), Math.min(dt * 10, 1));
+        } else {
+            updateCamera(dt);
+        }
     }
 
     private void updateLookingInventory(double dt) {
         acceleration.set(0);
 
-        if(Input.keyBeginPress(GLFW_KEY_I)) {
+        if(Input.keyBeginPress(GLFW_KEY_TAB) || Input.keyBeginPress(GLFW_KEY_ESCAPE) || Input.keyBeginPress(GLFW_KEY_I)) {
             inventory.setOpened(false);
             state = State.IDLE;
         }

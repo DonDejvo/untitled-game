@@ -9,6 +9,11 @@ public class Dialog {
         this.title = title;
     }
 
+    public Dialog(String text) {
+        this.text = text;
+        this.title = "";
+    }
+
     public String getText() {
         return text;
     }

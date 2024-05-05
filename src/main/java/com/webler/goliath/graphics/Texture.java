@@ -52,37 +52,6 @@ public class Texture {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
     }
 
-    public void init(String path) throws IOException {
-        int[] widthArray = new int[1];
-        int[] heightArray = new int[1];
-        int[] channelsArray = new int[1];
-
-        ByteBuffer buffer = stbi_load(path, widthArray, heightArray, channelsArray, 0);
-        if(buffer == null) {
-            throw new IOException("Unable to load texture path: " + path);
-        }
-
-        texId = glGenTextures();
-        width = widthArray[0];
-        height = heightArray[0];
-
-        glBindTexture(GL_TEXTURE_2D, texId);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        if(channelsArray[0] == 3) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-        } else if(channelsArray[0] == 4) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-        } else {
-
-        }
-    }
-
     public int getTexId() {
         return texId;
     }

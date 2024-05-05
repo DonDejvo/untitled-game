@@ -94,7 +94,7 @@ public class Game {
 
         AssetPool.addBitmapFont("default", new BitmapFont(
                 new Spritesheet(
-                        AssetPool.getTexture("assets/font/pixfont-bold.png"),
+                        AssetPool.getTexture("goliath/font/pixfont-bold.png"),
                 12, 16, 95, 16
             ),charset.toCharArray())
         );

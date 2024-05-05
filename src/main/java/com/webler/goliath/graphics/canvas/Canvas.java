@@ -8,7 +8,6 @@ import org.joml.Matrix4d;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 
@@ -36,6 +35,7 @@ public class Canvas {
     private int ebo;
     private final float[] vertices;
     private Shader shader;
+    private Texture defaultTexture;
     private Color color;
     private BitmapFont bitmapFont;
     private float fontSize;
@@ -61,7 +61,8 @@ public class Canvas {
         drawCalls = new ArrayList<>();
         fontSize = 32;
         bitmapFont = AssetPool.getBitmapFont("default");
-        shader = AssetPool.getShader("assets/shaders/canvas.glsl");
+        shader = AssetPool.getShader("goliath/shaders/canvas.glsl");
+        defaultTexture = AssetPool.getTexture("goliath/images/square.png");
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
@@ -147,7 +148,6 @@ public class Canvas {
     }
 
     public void endFrame() {
-        quads.sort(Comparator.comparingInt(a -> a.texId));
 
         for(int i = 0; i < quads.size(); ++i) {
             CanvasQuad quad = quads.get(i);
@@ -205,7 +205,7 @@ public class Canvas {
         glEnableVertexAttribArray(COLOR_INDEX);
 
         for (DrawCall drawCall : drawCalls) {
-            glBindTexture(GL_TEXTURE_2D, drawCall.texId());
+            glBindTexture(GL_TEXTURE_2D, drawCall.texId() == 0 ? defaultTexture.getTexId() : drawCall.texId());
             glDrawElements(GL_TRIANGLES, drawCall.count(), GL_UNSIGNED_INT, (long) drawCall.offset() * Integer.BYTES);
         }
 
@@ -215,13 +215,6 @@ public class Canvas {
 
         glBindVertexArray(0);
         glUseProgram(0);
-    }
-
-    private void drawQuad(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h, Color color) {
-        if(quads.size() == MAX_QUADS) {
-            return;
-        }
-        quads.add(new CanvasQuad(texId, sx0, sy0, sx1, sy1, translate.x + x, translate.y + y, w, h, color));
     }
 
     public void rect(float x, float y, float w, float h) {
@@ -284,6 +277,13 @@ public class Canvas {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);
+    }
+
+    private void drawQuad(int texId, float sx0, float sy0, float sx1, float sy1, float x, float y, float w, float h, Color color) {
+        if(quads.size() == MAX_QUADS) {
+            return;
+        }
+        quads.add(new CanvasQuad(texId, sx0, sy0, sx1, sy1, translate.x + x, translate.y + y, w, h, color));
     }
 
     private static class CanvasQuad {

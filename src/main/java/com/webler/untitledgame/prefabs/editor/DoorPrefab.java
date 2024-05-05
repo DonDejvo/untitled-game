@@ -22,7 +22,7 @@ public class DoorPrefab implements Prefab {
 
     @Override
     public GameObject create(Scene scene) {
-        Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/door.png"));
+        Sprite sprite = new Sprite(AssetPool.getTexture("untitled-game/images/door.png"));
         sprite.setWidth(editorComponent.getConfig().gridWidth());
         sprite.setHeight(editorComponent.getConfig().gridHeight());
         GameObject gameObject = new GameObject(scene);

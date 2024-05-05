@@ -3,7 +3,7 @@ package com.webler.untitledgame.level.controllers;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
-import com.webler.goliath.dialogs.DialogNode;
+import com.webler.goliath.dialogs.nodes.DialogTextNode;
 import com.webler.goliath.dialogs.components.DialogManager;
 import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.graphics.Color;
@@ -57,7 +57,7 @@ public class DoorController extends Controller {
             inventory.remove("key");
             open();
         } else {
-            level.getComponent(DialogManager.class, "DialogManager").showDialog(new DialogNode("you__no_key", null));
+            level.getComponent(DialogManager.class, "DialogManager").showDialog(new DialogTextNode("door__no_key", null));
         }
     }
 

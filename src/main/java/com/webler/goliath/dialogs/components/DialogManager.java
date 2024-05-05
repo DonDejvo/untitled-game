@@ -2,10 +2,13 @@ package com.webler.goliath.dialogs.components;
 
 import com.webler.goliath.core.Component;
 import com.webler.goliath.dialogs.Dialog;
-import com.webler.goliath.dialogs.DialogNode;
+import com.webler.goliath.dialogs.nodes.DialogNode;
+import com.webler.goliath.dialogs.nodes.DialogNodeType;
+import com.webler.goliath.dialogs.nodes.DialogOptionsNode;
+import com.webler.goliath.dialogs.nodes.DialogTextNode;
 import com.webler.goliath.dialogs.DialogOption;
-import com.webler.goliath.dialogs.events.DialogEnded;
-import com.webler.goliath.dialogs.events.DialogNext;
+import com.webler.goliath.dialogs.events.DialogEndedEvent;
+import com.webler.goliath.dialogs.events.DialogNextEvent;
 import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.canvas.Canvas;
@@ -13,8 +16,11 @@ import com.webler.goliath.graphics.canvas.TextAlign;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -26,6 +32,7 @@ public class DialogManager extends Component {
     private DialogOption selectedOption;
     private State state;
     private int hoveredOptionIdx;
+    private boolean isNestedOption;
 
     public DialogManager() {
         dialogs = new HashMap<>();
@@ -34,15 +41,50 @@ public class DialogManager extends Component {
         selectedOption = null;
         state = State.ENDED;
         hoveredOptionIdx = 0;
+        isNestedOption = false;
     }
 
     public void addDialog(String name, Dialog dialog) {
         dialogs.put(name, dialog);
     }
 
+    public Dialog getDialog(String name) {
+        if (!dialogs.containsKey(name)) {
+            throw new RuntimeException("No such dialog: " + name);
+        }
+        return dialogs.get(name);
+    }
+
+    public void loadDialogs(String resourceName) {
+        InputStream is = ClassLoader.getSystemResourceAsStream(resourceName);
+        if(is == null) {
+            throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        try {
+            while(reader.ready()) {
+                String line = reader.readLine();
+                String[] parts = line.split(";");
+
+                if(parts.length < 2) continue;
+
+                String name = parts[0].trim();
+
+                if(parts.length == 2) {
+                    addDialog(name, new Dialog(parts[1].trim()));
+                } else {
+                    addDialog(name, new Dialog(parts[2].trim(), parts[1].trim()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void startDialog(DialogComponent dialog) {
         currentDialog = dialog;
-        openOptionSelecting();
+        openOptionSelecting(false);
     }
 
     public void showDialog(DialogNode dialog) {
@@ -52,7 +94,7 @@ public class DialogManager extends Component {
     public void endDialog() {
         currentDialog = null;
         state = State.ENDED;
-        EventManager.dispatchEvent(new DialogEnded());
+        EventManager.dispatchEvent(new DialogEndedEvent());
     }
 
     @Override
@@ -93,17 +135,14 @@ public class DialogManager extends Component {
         Color prevTextColor = ui.textColor;
         Color prevHoverTextColor = ui.hoverTextColor;
         Color prevHoverBgColor = ui.hoverBgColor;
-        List<DialogOption> options = currentDialog.getOptions();
-        if(Input.keyBeginPress(GLFW_KEY_W)) {
+        DialogOption[] options = isNestedOption ? ((DialogOptionsNode)currentNode).getOptions() : currentDialog.getOptions().toArray(DialogOption[]::new);
+        if(Input.keyBeginPress(GLFW_KEY_UP) || Input.keyBeginPress(GLFW_KEY_W)) {
             hoveredOptionIdx = Math.max(hoveredOptionIdx - 1, 0);
-        }
-        if(Input.keyBeginPress(GLFW_KEY_S)) {
-            hoveredOptionIdx = Math.min(hoveredOptionIdx + 1, options.size());
-        }
-        if(Input.keyBeginPress(GLFW_KEY_ENTER)) {
-            if(hoveredOptionIdx < options.size()) {
-                DialogOption option = options.get(hoveredOptionIdx);
-                handleOptionSelect(option);
+        } else if(Input.keyBeginPress(GLFW_KEY_DOWN) || Input.keyBeginPress(GLFW_KEY_S)) {
+            hoveredOptionIdx = Math.min(hoveredOptionIdx + 1, isNestedOption ? options.length - 1 : options.length);
+        } else if(Input.keyBeginPress(GLFW_KEY_ENTER)) {
+            if(hoveredOptionIdx < options.length) {
+                handleOptionSelect(options, hoveredOptionIdx);
             } else {
                 endDialog();
             }
@@ -112,20 +151,22 @@ public class DialogManager extends Component {
         ui.textColor = Color.GRAY;
         ui.hoverTextColor = Color.WHITE;
         ui.hoverBgColor = new Color(1, 1, 1, 0);
-        for(int i = 0; i < options.size(); i++) {
-            DialogOption option = options.get(i);
+        for(int i = 0; i < options.length; i++) {
+            DialogOption option = options[i];
             if(i == hoveredOptionIdx) {
                 ui.hoverNextButton();
             }
-            if(ui.button(option.getText(), 0, i * ui.lineHeight, h * 1.2f, ui.lineHeight)) {
-                handleOptionSelect(option);
+            if(ui.button(getDialog(option.getDialogName()).getText(), 0, i * ui.lineHeight, h * 1.2f, ui.lineHeight)) {
+                handleOptionSelect(options, i);
             }
         }
-        if(hoveredOptionIdx == options.size()) {
-            ui.hoverNextButton();
-        }
-        if(ui.button("END", 0, options.size() * ui.lineHeight)) {
-            endDialog();
+        if(!isNestedOption) {
+            if(hoveredOptionIdx == options.length) {
+                ui.hoverNextButton();
+            }
+            if(ui.button("END", 0, options.length * ui.lineHeight)) {
+                endDialog();
+            }
         }
         ui.bgColor = prevBgColor;
         ui.textColor = prevTextColor;
@@ -139,8 +180,8 @@ public class DialogManager extends Component {
         Canvas ctx = getEntity().getGame().getCanvas();
         int w = ctx.getWidth(), h = ctx.getHeight();
 
-        Dialog dialog = dialogs.get(currentNode.getDialogName());
-        boolean hasTitle = dialog.getTitle() != null;
+        Dialog dialog = getDialog(((DialogTextNode)currentNode).getDialogName());
+        boolean hasTitle = !dialog.getTitle().isEmpty();
 
         ui.padding.set(h * 0.01f);
         ui.lineHeight = h * 0.04f;
@@ -159,24 +200,33 @@ public class DialogManager extends Component {
         ctx.setTextAlign(prevTextAlign);
         ui.textColor = prevColor;
         if(ui.button("Next", h * 1.04f - ui.padding.x * 2, h * 0.26f - ui.padding.y * 2 - ui.lineHeight, h * 0.16f, ui.lineHeight) ||
-        Input.keyBeginPress(GLFW_KEY_ENTER)) {
+        Input.keyBeginPress(GLFW_KEY_ENTER) || Input.keyBeginPress(GLFW_KEY_ESCAPE)) {
             nextDialog(currentNode.getNext());
         }
         ui.end();
     }
 
-    private void handleOptionSelect(DialogOption option) {
-        selectedOption = option;
-        nextDialog(selectedOption.getNode());
+    private void handleOptionSelect(DialogOption[] options, int selected) {
+        if(isNestedOption) {
+            ((DialogOptionsNode)currentNode).selectOption(selected);
+            nextDialog(currentNode.getNext());
+        } else {
+            selectedOption = options[selected];
+            nextDialog(selectedOption.getNode());
+        }
     }
 
     private void nextDialog(DialogNode node) {
         currentNode = node;
         if(currentNode != null) {
-            EventManager.dispatchEvent(new DialogNext(currentNode.getDialogName()));
-            state = State.TALKING;
+            if(currentNode.getType() == DialogNodeType.OPTIONS) {
+                openOptionSelecting(true);
+            } else {
+                EventManager.dispatchEvent(new DialogNextEvent(((DialogTextNode)currentNode).getDialogName()));
+                state = State.TALKING;
+            }
         } else {
-            if(selectedOption == null) {
+            if(currentDialog == null) {
                 endDialog();
                 return;
             }
@@ -184,11 +234,12 @@ public class DialogManager extends Component {
                 currentDialog.removeOption(selectedOption);
             }
             selectedOption = null;
-            openOptionSelecting();
+            openOptionSelecting(false);
         }
     }
 
-    private void openOptionSelecting() {
+    private void openOptionSelecting(boolean isNestedOption) {
+        this.isNestedOption = isNestedOption;
         state = State.OPTION_SELECTING;
         hoveredOptionIdx = 0;
     }

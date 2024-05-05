@@ -3,6 +3,7 @@ package com.webler.untitledgame.prefabs.editor;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.graphics.Sprite;
+import com.webler.goliath.graphics.Spritesheet;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.prefabs.Prefab;
 import com.webler.goliath.utils.AssetPool;
@@ -21,7 +22,7 @@ public class LightPrefab implements Prefab {
 
     @Override
     public GameObject create(Scene scene) {
-        Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/torch.png"));
+        Sprite sprite = editorComponent.getLevel().getSprite("light");
         sprite.setWidth(editorComponent.getConfig().gridWidth());
         sprite.setHeight(editorComponent.getConfig().gridHeight());
         GameObject go = new GameObject(scene);

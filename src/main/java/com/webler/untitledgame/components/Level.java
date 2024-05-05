@@ -4,12 +4,11 @@ import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
-import com.webler.goliath.dialogs.DialogNode;
-import com.webler.goliath.dialogs.DialogOption;
 import com.webler.goliath.dialogs.components.DialogComponent;
 import com.webler.goliath.dialogs.components.DialogManager;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Sprite;
+import com.webler.goliath.graphics.Spritesheet;
 import com.webler.goliath.graphics.components.Bilboard;
 import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.graphics.components.SpriteRenderer;
@@ -19,7 +18,6 @@ import com.webler.goliath.graphics.light.SpotLight;
 import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.controllers.*;
 import com.webler.untitledgame.level.inventory.Inventory;
-import com.webler.untitledgame.level.inventory.InventoryItem;
 import com.webler.untitledgame.level.levelmap.*;
 import org.joml.Vector3d;
 import org.xml.sax.SAXException;
@@ -36,18 +34,37 @@ public class Level extends Component {
     private String path;
     private GameObject player;
     private Map<String, List<GameObject>> objectGroups;
+    private Map<String, Sprite> spriteMap;
 
     public Level() {
         this.levelMap = new LevelMap();
         path = null;
         player = null;
         objectGroups = new HashMap<>();
+        spriteMap = new HashMap<>();
         buildGrid();
+    }
+
+    public Sprite getSprite(String name) {
+        return spriteMap.get(name);
     }
 
     @Override
     public void start() {
+        Spritesheet tilesetSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
+        Spritesheet catgirlsSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/catgirls.png");
 
+        spriteMap.put("player", new Sprite(AssetPool.getTexture("untitled-game/images/player.png")));
+        spriteMap.put("vending_machine", new Sprite(AssetPool.getTexture("untitled-game/images/vending_machine.png")));
+        spriteMap.put("gold", tilesetSpritesheet.getSprite(0));
+        spriteMap.put("key", tilesetSpritesheet.getSprite(5));
+        spriteMap.put("caffe_latte", tilesetSpritesheet.getSprite(6));
+        spriteMap.put("espresso", tilesetSpritesheet.getSprite(7));
+        spriteMap.put("americano", tilesetSpritesheet.getSprite(8));
+        spriteMap.put("light", tilesetSpritesheet.getSprite(37));
+        spriteMap.put("cat_girl_1", catgirlsSpritesheet.getSprite(0));
+        spriteMap.put("cat_girl_2", catgirlsSpritesheet.getSprite(1));
+        spriteMap.put("cat_girl_3", catgirlsSpritesheet.getSprite(2));
     }
 
     @Override
@@ -198,88 +215,46 @@ public class Level extends Component {
                     player = go;
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
                     go.addComponent("Collider", collider);
-                    Inventory inventory = new Inventory();
-                    inventory.registerItem("key", new InventoryItem("Key", new Sprite(AssetPool.getTexture("assets/tiles/key.png")), "Unlocks doors."));
-                    inventory.registerItem("caffelatte", new InventoryItem("Caffe Latte", AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(0), "Increases firing rate."));
-                    inventory.registerItem("espresso", new InventoryItem("Espresso", AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(1), "Regenerates 50% hitpoints."));
-                    inventory.registerItem("americano", new InventoryItem("Americano", AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(2), "Increases speed."));
+                    Inventory inventory = new Inventory(this);
                     PlayerController playerController = new PlayerController(this, scene.getCamera(), collider, inventory);
                     go.addComponent("Controller", playerController);
                     go.addComponent("Inventory", inventory);
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
-                case "catgirl": {
+                case "cat_girl_1", "cat_girl_2", "cat_girl_3": {
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
                     go.addComponent("Collider", collider);
-                    Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/4-3.png"));
+                    Sprite sprite = new Sprite(spriteMap.get(entity.name));
                     sprite.setWidth(2);
                     sprite.setHeight(3);
                     SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
                     go.addComponent("Renderer", renderer);
                     go.addComponent("Bilboard", new Bilboard());
-                    go.addComponent("Controller", new NpcController(this, collider));
                     DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
-                    dialogComponent.addOption(new DialogOption(true, "Hello.",
-                            new DialogNode("maid_chan__first",
-                                new DialogNode("you__confusion",
-                                    new DialogNode("maid_chan__second", null)))));
-                    dialogComponent.addOption(new DialogOption(false, "(No-repeat option)",
-                            new DialogNode("maid_chan__no-repeat", null)));
+                    go.addComponent("Controller", new NpcController(this, collider, dialogComponent));
+
                     go.addComponent("Dialog", dialogComponent);
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
-                case "vendingmachine": {
+                case "vending_machine": {
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(2, 4, 2));
                     go.addComponent("Collider", collider);
-                    Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/Vending_Machine_21.png"));
+                    Sprite sprite = new Sprite(spriteMap.get(entity.name));
                     sprite.setWidth(2);
                     sprite.setHeight(4);
                     SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
                     go.addComponent("Renderer", renderer);
                     go.addComponent("Bilboard", new Bilboard());
-                    go.addComponent("Controller", new NpcController(this, collider));
                     DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
+                    go.addComponent("Controller", new VendingMachineController(this, collider, dialogComponent));
                     go.addComponent("Dialog", dialogComponent);
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
-                case "key": {
-                    Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/key.png"));
-                    sprite.setWidth(1);
-                    sprite.setHeight(1);
-                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    go.addComponent("Renderer", renderer);
-                    go.addComponent("Bilboard", new Bilboard());
-                    go.addComponent("Controller", new ItemController(this, entity.name));
-                    go.transform.position.y += sprite.getHeight();
-                    break;
-                }
-                case "caffelatte": {
-                    Sprite sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(0);
-                    sprite.setWidth(1);
-                    sprite.setHeight(1);
-                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    go.addComponent("Renderer", renderer);
-                    go.addComponent("Bilboard", new Bilboard());
-                    go.addComponent("Controller", new ItemController(this, entity.name));
-                    go.transform.position.y += sprite.getHeight();
-                    break;
-                }
-                case "espresso": {
-                    Sprite sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(1);
-                    sprite.setWidth(1);
-                    sprite.setHeight(1);
-                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    go.addComponent("Renderer", renderer);
-                    go.addComponent("Bilboard", new Bilboard());
-                    go.addComponent("Controller", new ItemController(this, entity.name));
-                    go.transform.position.y += sprite.getHeight();
-                    break;
-                }
-                case "americano": {
-                    Sprite sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(2);
+                case "key", "caffe_latte", "espresso", "americano": {
+                    Sprite sprite = new Sprite(spriteMap.get(entity.name));
                     sprite.setWidth(1);
                     sprite.setHeight(1);
                     SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
@@ -303,7 +278,7 @@ public class Level extends Component {
             go.transform.position.set(new Vector3d(light.x - levelMap.minX, light.top, light.y - levelMap.minY).mul(Level.TILE_SIZE));
             SpotLight spotLight = new SpotLight(new Color(light.color), light.radiusMin * Level.TILE_SIZE, light.radiusMax * Level.TILE_SIZE);
             go.addComponent("Light", spotLight);
-            Sprite sprite = new Sprite(AssetPool.getTexture("assets/tiles/torch.png"));
+            Sprite sprite = new Sprite(spriteMap.get("light"));
             sprite.setWidth(1);
             sprite.setHeight(1);
             go.addComponent("Renderer", new SpriteRenderer(sprite, -1));
@@ -321,7 +296,7 @@ public class Level extends Component {
         List<Door> doors = levelMap.getDoors();
         for (Door door : doors) {
             GameObject doorGameObject = new GameObject(scene);
-            MeshRenderer renderer = new MeshRenderer(new Cube(AssetPool.getTexture("assets/tiles/door.png").getTexId()));
+            MeshRenderer renderer = new MeshRenderer(new Cube(AssetPool.getTexture("untitled-game/images/door.png").getTexId()));
             renderer.offset.x = 0.5;
             doorGameObject.addComponent("Renderer", renderer);
             double y = getBlockTop((door.x - levelMap.minX), (door.y - levelMap.minY));

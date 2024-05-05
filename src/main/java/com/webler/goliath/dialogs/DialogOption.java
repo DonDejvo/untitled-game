@@ -1,18 +1,20 @@
 package com.webler.goliath.dialogs;
 
+import com.webler.goliath.dialogs.nodes.DialogNode;
+
 public class DialogOption {
     private boolean repeat;
-    private String text;
+    private String dialogName;
     private DialogNode node;
 
-    public DialogOption(boolean repeat, String text, DialogNode node) {
+    public DialogOption(String dialogName, boolean repeat, DialogNode node) {
+        this.dialogName = dialogName;
         this.repeat = repeat;
-        this.text = text;
         this.node = node;
     }
 
-    public String getText() {
-        return text;
+    public String getDialogName() {
+        return dialogName;
     }
 
     public DialogNode getNode() {

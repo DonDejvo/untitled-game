@@ -1,0 +1,14 @@
+vm__buy_caffe_latte;;Caffe Latte (1 gold)
+vm__buy_espresso;;Espresso (2 gold)
+vm__buy_americano;;Americano (3 gold)
+vm__sell_caffe_latte;Vending Machine;*Sold one Caffe Latte*
+vm__sell_espresso;Vending Machine;*Sold one Espresso*
+vm__sell_americano;Vending Machine;*Sold one Americano*
+vm__no_gold;;I don't have enough gold.
+door__no_key;;I need a key.
+system__learn_controls;System;Would you like to learn about the controls?
+player__no;;NO
+player__yes;;YES
+system__controls_move;System;Use WSAD to move player, hold SHIFT to run and use SPACE to jump.
+system__controls_interact;System;Focus an object by standing nearby and looking its direction. Press F to interact.
+system__controls_inventory;System;Use I or TAB to open the inventory and use arrows or WSAD to move in the invetory.

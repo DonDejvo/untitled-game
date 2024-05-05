@@ -3,7 +3,7 @@ package com.webler.untitledgame.prefabs.editor;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.graphics.Sprite;
-import com.webler.goliath.graphics.Texture;
+import com.webler.goliath.graphics.Spritesheet;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.prefabs.Prefab;
 import com.webler.goliath.utils.AssetPool;
@@ -30,52 +30,28 @@ public class EntityPrefab implements Prefab {
         Sprite sprite;
         switch (entity.name) {
             case "player": {
-                sprite = new Sprite(AssetPool.getTexture("assets/tiles/player.png"));
+                sprite = editorComponent.getLevel().getSprite(entity.name);
                 sprite.setWidth(tileWidth);
                 sprite.setHeight(tileHeight);
                 go.addComponent("Renderer", new SpriteRenderer(sprite, 20));
                 break;
             }
-            case "catgirl": {
-                sprite = new Sprite(AssetPool.getTexture("assets/images/4-3.png"));
-                sprite.setWidth((int)((double)tileHeight * sprite.getTexture().getWidth() / sprite.getTexture().getHeight()));
+            case "cat_girl_1", "cat_girl_2", "cat_girl_3": {
+                sprite = editorComponent.getLevel().getSprite(entity.name);
+                sprite.setWidth(tileWidth / 3 * 2);
                 sprite.setHeight(tileHeight);
                 go.addComponent("Renderer", new SpriteRenderer(sprite, 20));
                 break;
             }
-            case "vendingmachine": {
-                sprite = new Sprite(AssetPool.getTexture("assets/images/Vending_Machine_21.png"));
-                sprite.setWidth((int)((double)tileHeight * sprite.getTexture().getWidth() / sprite.getTexture().getHeight()));
+            case "vending_machine": {
+                sprite = new Sprite(AssetPool.getTexture("untitled-game/images/vending_machine.png"));
+                sprite.setWidth(tileWidth / 3 * 2);
                 sprite.setHeight(tileHeight);
                 go.addComponent("Renderer", new SpriteRenderer(sprite, 20));
                 break;
             }
-            case "key": {
-                sprite = new Sprite(AssetPool.getTexture("assets/tiles/key.png"));
-                sprite.setWidth(tileWidth);
-                sprite.setHeight(tileHeight);
-                go.transform.scale.set(0.5);
-                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
-                break;
-            }
-            case "caffelatte": {
-                sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(0);
-                sprite.setWidth(tileWidth);
-                sprite.setHeight(tileHeight);
-                go.transform.scale.set(0.5);
-                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
-                break;
-            }
-            case "espresso": {
-                sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(1);
-                sprite.setWidth(tileWidth);
-                sprite.setHeight(tileHeight);
-                go.transform.scale.set(0.5);
-                go.addComponent("Renderer", new SpriteRenderer(sprite, 50));
-                break;
-            }
-            case "americano": {
-                sprite = AssetPool.getSpritesheet("assets/tiles/potions.png").getSprite(2);
+            case "key", "caffe_latte", "espresso", "americano": {
+                sprite = editorComponent.getLevel().getSprite(entity.name);
                 sprite.setWidth(tileWidth);
                 sprite.setHeight(tileHeight);
                 go.transform.scale.set(0.5);
