@@ -70,7 +70,11 @@ public class EditorComponent extends Component {
         levelWindow = new LevelWindow(this);
         inspectorWindow = new InspectorWindow(this);
         if(currentPath != null) {
-            loadLevel();
+            try {
+                loadLevel(currentPath);
+            } catch (LevelMapFormatException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -117,14 +121,26 @@ public class EditorComponent extends Component {
         if(FileBrowser.getModal()) {
             if(FileBrowser.getResultPath() != null) {
                 switch (FileBrowser.getAction()) {
-                    case OPEN:
-                        currentPath = FileBrowser.getResultPath();
-                        loadLevel();
+                    case OPEN: {
+                        String path = FileBrowser.getResultPath();
+                        try {
+                            loadLevel(path);
+                            currentPath = path;
+                        } catch (LevelMapFormatException e) {
+                            e.printStackTrace();
+                        }
                         break;
-                    case SAVE:
-                        currentPath = FileBrowser.getResultPath();
-                        saveLevel();
+                    }
+                    case SAVE: {
+                        String path = FileBrowser.getResultPath();
+                        try {
+                            saveLevel(path);
+                            currentPath = path;
+                        } catch (LevelMapFormatException e) {
+                            e.printStackTrace();
+                        }
                         break;
+                    }
                 }
 
             }
@@ -133,8 +149,12 @@ public class EditorComponent extends Component {
 
     public void handlePlay() {
         if(currentPath != null) {
-            saveLevel();
-            getEntity().getGame().playScene("LevelScene", new LevelParams(currentPath));
+            try {
+                saveLevel(currentPath);
+                getEntity().getGame().playScene("LevelScene", new LevelParams(currentPath));
+            } catch (LevelMapFormatException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -151,7 +171,11 @@ public class EditorComponent extends Component {
         if(currentPath == null) {
             fileBrowserAction = FileBrowserAction.SAVE;
         } else {
-            saveLevel();
+            try {
+                saveLevel(currentPath);
+            } catch (LevelMapFormatException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -235,39 +259,39 @@ public class EditorComponent extends Component {
         return config;
     }
 
-    private void loadLevel() {
+    private void loadLevel(String fileName) throws LevelMapFormatException {
         Scene scene = gameObject.getScene();
 
-        level.load(currentPath);
+            level.load(fileName);
 
-        clearLevel();
+            clearLevel();
 
-        List<Platform> platforms = level.getLevelMap().getPlatforms();
-        for(Platform platform : platforms) {
-            GameObject platformGameObject = new PlatformPrefab(this, platform).create(scene);
-            scene.add(platformGameObject);
-        }
+            List<Platform> platforms = level.getLevelMap().getPlatforms();
+            for(Platform platform : platforms) {
+                GameObject platformGameObject = new PlatformPrefab(this, platform).create(scene);
+                scene.add(platformGameObject);
+            }
 
-        List<Light> lights = level.getLevelMap().getLights();
-        for(Light light : lights) {
-            GameObject lightGameObject = new LightPrefab(this, light).create(scene);
-            scene.add(lightGameObject);
-        }
+            List<Light> lights = level.getLevelMap().getLights();
+            for(Light light : lights) {
+                GameObject lightGameObject = new LightPrefab(this, light).create(scene);
+                scene.add(lightGameObject);
+            }
 
-        List<Entity> entities = level.getLevelMap().getEntities();
-        for(Entity entity : entities) {
-            GameObject entityGameObject = new EntityPrefab(this, entity).create(scene);
-            scene.add(entityGameObject);
-        }
+            List<Entity> entities = level.getLevelMap().getEntities();
+            for(Entity entity : entities) {
+                GameObject entityGameObject = new EntityPrefab(this, entity).create(scene);
+                scene.add(entityGameObject);
+            }
 
-        List<Door> doors = level.getLevelMap().getDoors();
-        for(Door door : doors) {
-            GameObject doorGameObject = new DoorPrefab(this, door).create(scene);
-            scene.add(doorGameObject);
-        }
+            List<Door> doors = level.getLevelMap().getDoors();
+            for(Door door : doors) {
+                GameObject doorGameObject = new DoorPrefab(this, door).create(scene);
+                scene.add(doorGameObject);
+            }
     }
 
-    private void saveLevel() {
+    private void saveLevel(String fileName) throws LevelMapFormatException {
         Scene scene = gameObject.getScene();
 
         level.getLevelMap().clear();
@@ -304,7 +328,7 @@ public class EditorComponent extends Component {
             level.getLevelMap().addDoor(door);
         }
 
-        level.save(currentPath);
+        level.save(fileName);
     }
 
     private void handleInput() {

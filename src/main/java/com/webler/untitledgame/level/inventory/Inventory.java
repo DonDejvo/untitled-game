@@ -3,13 +3,12 @@ package com.webler.untitledgame.level.inventory;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Sprite;
-import com.webler.goliath.graphics.Spritesheet;
 import com.webler.goliath.graphics.canvas.Canvas;
 import com.webler.goliath.graphics.canvas.TextAlign;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
-import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.components.LevelItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +20,6 @@ public class Inventory extends Component {
     private Level level;
     private boolean isOpened;
     private Map<String, Integer> itemCounts;
-    private Map<String, InventoryItem> itemRegistry;
     private InventoryItem selectedItem;
     private int hoveredItemIdx;
 
@@ -29,13 +27,8 @@ public class Inventory extends Component {
         this.level = level;
         isOpened = false;
         itemCounts = new HashMap<>();
-        itemRegistry = new HashMap<>();
         selectedItem = null;
         hoveredItemIdx = 0;
-    }
-
-    public void registerItem(String identifier, InventoryItem item) {
-        itemRegistry.put(identifier, item);
     }
 
     public void add(String identifier) {
@@ -61,16 +54,7 @@ public class Inventory extends Component {
 
     @Override
     public void start() {
-        registerItem("gold",
-                new InventoryItem("Gold", level.getSprite("gold"), "Yellowish shiny coins."));
-        registerItem("key",
-                new InventoryItem("Key", level.getSprite("key"), "Unlocks doors."));
-        registerItem("caffe_latte",
-                new InventoryItem("Caffe Latte", level.getSprite("caffe_latte"), "Increases firing rate."));
-        registerItem("espresso",
-                new InventoryItem("Espresso", level.getSprite("espresso"), "Regenerates 50% hitpoints."));
-        registerItem("americano",
-                new InventoryItem("Americano", level.getSprite("americano"), "Increases speed."));
+
     }
 
     @Override
@@ -123,34 +107,32 @@ public class Inventory extends Component {
         }
 
         for(Map.Entry<String, Integer> entry : entries) {
-            InventoryItem item = itemRegistry.get(entry.getKey());
+            InventoryItem item = new InventoryItem((LevelItem) level.getRegisteredObject(entry.getKey()));
 
-            if(item != null) {
-                if(hoveredItemIdx % entries.size() == y * numCols + x) {
-                    ui.hoverNextButton();
-                }
+            if (hoveredItemIdx % entries.size() == y * numCols + x) {
+                ui.hoverNextButton();
+            }
 
-                int count = entry.getValue();
-                Sprite sprite = item.getSprite();
-                float[] texCoords = sprite.getTexCoords();
-                Color prevHoverBgColor = ui.hoverBgColor;
-                ui.hoverBgColor = new Color(0.5, 0, 0, 1);
-                if(ui.imageButton(sprite.getTexture().getTexId(), texCoords[0], texCoords[1], texCoords[4], texCoords[5], x * h * 0.1f, y * h * 0.1f, h * 0.08f, h * 0.08f)) {
-                    hoveredItemIdx = y * numCols + x;
-                }
-                ui.hoverBgColor = prevHoverBgColor;
+            int count = entry.getValue();
+            Sprite sprite = item.getLevelItem().getSprite();
+            float[] texCoords = sprite.getTexCoords();
+            Color prevHoverBgColor = ui.hoverBgColor;
+            ui.hoverBgColor = new Color(0.5, 0, 0, 1);
+            if(ui.imageButton(sprite.getTexture().getTexId(), texCoords[0], texCoords[1], texCoords[4], texCoords[5], x * h * 0.1f, y * h * 0.1f, h * 0.08f, h * 0.08f)) {
+                hoveredItemIdx = y * numCols + x;
+            }
+            ui.hoverBgColor = prevHoverBgColor;
 
-                ui.textColor = Color.WHITE;
-                ui.fontSize = h * 0.02f;
-                TextAlign prevTextAlign = ctx.getTextAlign();
-                ctx.setTextAlign(TextAlign.RIGHT);
-                String text = count < 100 ? String.valueOf(count) : "99+";
-                ui.text( text, x * h * 0.1f + h * 0.08f, y * h * 0.1f  + h * 0.08f - ui.fontSize);
-                ctx.setTextAlign(prevTextAlign);
+            ui.textColor = Color.WHITE;
+            ui.fontSize = h * 0.02f;
+            TextAlign prevTextAlign = ctx.getTextAlign();
+            ctx.setTextAlign(TextAlign.RIGHT);
+            String text = count < 100 ? String.valueOf(count) : "99+";
+            ui.text( text, x * h * 0.1f + h * 0.08f, y * h * 0.1f  + h * 0.08f - ui.fontSize);
+            ctx.setTextAlign(prevTextAlign);
 
-                if(hoveredItemIdx % entries.size() == y * numCols + x) {
-                    selectedItem = itemRegistry.get(entry.getKey());
-                }
+            if(hoveredItemIdx % entries.size() == y * numCols + x) {
+                selectedItem = new InventoryItem((LevelItem) level.getRegisteredObject(entry.getKey()));
             }
 
             x += 1;
@@ -161,14 +143,14 @@ public class Inventory extends Component {
         }
 
         if(selectedItem != null) {
-            Sprite sprite = selectedItem.getSprite();
+            Sprite sprite = selectedItem.getLevelItem().getSprite();
             float[] texCoords = sprite.getTexCoords();
 
             ctx.image(sprite.getTexture().getTexId(), texCoords[0], texCoords[1], texCoords[4], texCoords[5], 0, h * 0.6f, h * 0.16f, h * 0.16f);
 
             ui.fontSize = h * 0.025f;
-            ui.text(selectedItem.getTitle(), h * 0.18f, h * 0.6f);
-            ui.textBlock(selectedItem.getDescription(), h * 0.18f, h * 0.6f + ui.lineHeight, h * 0.42f - ui.padding.x);
+            ui.text(selectedItem.getLevelItem().getName(), h * 0.18f, h * 0.6f);
+            ui.textBlock(selectedItem.getLevelItem().getDescription(), h * 0.18f, h * 0.6f + ui.lineHeight, h * 0.42f - ui.padding.x);
         }
 
         ui.end();

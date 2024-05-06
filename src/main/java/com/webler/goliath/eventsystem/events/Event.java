@@ -1,13 +1,15 @@
 package com.webler.goliath.eventsystem.events;
 
-public abstract class Event {
-    private boolean cancelled;
+import com.webler.goliath.core.GameObject;
 
-    public boolean isCancelled() {
-        return this.cancelled;
+public abstract class Event {
+    private GameObject gameObject;
+
+    public Event(GameObject gameObject) {
+        this.gameObject = gameObject;
     }
 
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public GameObject getGameObject() {
+        return gameObject;
     }
 }

@@ -51,13 +51,15 @@ public class DoorController extends Controller {
 
     @Override
     protected void interact() {
-        GameObject player = level.getPlayer();
-        Inventory inventory = player.getComponent(Inventory.class, "Inventory");
-        if(inventory.getItemCount("key") > 0) {
-            inventory.remove("key");
-            open();
-        } else {
-            level.getComponent(DialogManager.class, "DialogManager").showDialog(new DialogTextNode("door__no_key", null));
+        if(state == State.CLOSED) {
+            GameObject player = level.getPlayer();
+            Inventory inventory = player.getComponent(Inventory.class, "Inventory");
+            if(inventory.getItemCount("key") > 0) {
+                inventory.remove("key");
+                open();
+            } else {
+                level.getComponent(DialogManager.class, "DialogManager").showDialog(new DialogTextNode("door__no_key", null));
+            }
         }
     }
 

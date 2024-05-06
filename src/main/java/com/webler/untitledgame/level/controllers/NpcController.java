@@ -5,13 +5,14 @@ import com.webler.goliath.dialogs.components.DialogComponent;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.components.PathFinder;
 import org.joml.Vector3d;
 
 public class NpcController extends EntityController{
     protected DialogComponent dialogComponent;
 
-    public NpcController(Level level, BoxCollider3D collider, DialogComponent dialogComponent) {
-        super(level, collider, new String[]{ "player", "fixed" });
+    public NpcController(Level level, BoxCollider3D collider, DialogComponent dialogComponent, PathFinder pathFinder, double speed) {
+        super(level, collider, new String[]{ "player", "fixed" }, pathFinder, speed);
         this.dialogComponent = dialogComponent;
     }
 

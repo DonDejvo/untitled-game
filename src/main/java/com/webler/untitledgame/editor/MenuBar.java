@@ -1,6 +1,11 @@
 package com.webler.untitledgame.editor;
 
+import com.webler.untitledgame.components.LevelObject;
+import com.webler.untitledgame.components.LevelObjectType;
 import imgui.ImGui;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MenuBar {
     private EditorComponent editor;
@@ -39,6 +44,9 @@ public class MenuBar {
     }
 
     private void createMenuGameObject() {
+        List<LevelObject> levelEntities = editor.getLevel().getRegisteredObjects(LevelObjectType.ENTITY);
+        List<LevelObject> levelItems = editor.getLevel().getRegisteredObjects(LevelObjectType.ITEM);
+
         if (ImGui.beginMenu("GameObject")) {
             if(ImGui.beginMenu("Area")) {
                 if (ImGui.menuItem("Platform")) {
@@ -52,47 +60,28 @@ public class MenuBar {
                 }
                 ImGui.endMenu();
             }
-            if(ImGui.beginMenu("Entity")) {
-                if (ImGui.menuItem("Player")) {
-                    editor.addEntity("player");
-                }
-                if (ImGui.menuItem("Vending Machine")) {
-                    editor.addEntity("vending_machine");
-                }
-                if(ImGui.beginMenu("NPC")) {
-                    if (ImGui.menuItem("Cat Girl 1")) {
-                        editor.addEntity("cat_girl_1");
-                    }
-                    if (ImGui.menuItem("Cat Girl 2")) {
-                        editor.addEntity("cat_girl_2");
-                    }
-                    if (ImGui.menuItem("Cat Girl 3")) {
-                        editor.addEntity("cat_girl_3");
-                    }
-                    ImGui.endMenu();
-                }
-                ImGui.endMenu();
-            }
-            if(ImGui.beginMenu("Item")) {
-                if (ImGui.menuItem("Key")) {
-                    editor.addEntity("key");
-                }
-                if (ImGui.menuItem("Caffe Latte")) {
-                    editor.addEntity("caffe_latte");
-                }
-                if (ImGui.menuItem("Espresso")) {
-                    editor.addEntity("espresso");
-                }
-                if (ImGui.menuItem("Americano")) {
-                    editor.addEntity("americano");
-                }
-                ImGui.endMenu();
-            }
             if(ImGui.beginMenu("Fixed")) {
                 if (ImGui.menuItem("Door")) {
                     editor.addDoor();
                 }
 
+                ImGui.endMenu();
+            }
+            if(ImGui.beginMenu("Entities")) {
+                for(LevelObject entity : levelEntities) {
+                    if (ImGui.menuItem(entity.getName())) {
+                        editor.addEntity(entity.getIdentifier());
+                    }
+                }
+                ImGui.endMenu();
+            }
+
+            if(ImGui.beginMenu("Items")) {
+                for(LevelObject item : levelItems) {
+                    if (ImGui.menuItem(item.getName())) {
+                        editor.addEntity(item.getIdentifier());
+                    }
+                }
                 ImGui.endMenu();
             }
             ImGui.endMenu();

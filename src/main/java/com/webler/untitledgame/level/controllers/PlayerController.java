@@ -12,6 +12,7 @@ import com.webler.goliath.eventsystem.listeners.EventHandler;
 import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.input.Input;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.components.PathFinder;
 import com.webler.untitledgame.level.events.DoorOpened;
 import com.webler.untitledgame.level.inventory.Inventory;
 import org.joml.Vector3d;
@@ -22,23 +23,23 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends EntityController {
     private Camera camera;
-    private double speed;
     private double rotationSpeed;
     private boolean canJump;
     private GameObject focusedObject;
     private State state;
     private Inventory inventory;
+    private GameObject companion;
 
-    public PlayerController(Level level, Camera camera, BoxCollider3D collider, Inventory inventory) {
-        super(level, collider, new String[]{ "npc", "fixed" });
+    public PlayerController(Level level, Camera camera, BoxCollider3D collider, Inventory inventory, PathFinder pathFinder) {
+        super(level, collider, new String[]{ "npc", "fixed" }, pathFinder, 80);
         this.camera = camera;
         this.inventory = inventory;
         bounciness = 0;
-        speed = 80;
         rotationSpeed = 2.5;
         canJump = true;
         focusedObject = null;
         state = State.IDLE;
+        companion = null;
     }
 
     public GameObject getFocusedObject() {
@@ -62,10 +63,6 @@ public class PlayerController extends EntityController {
     @Override
     public void start() {
         level.addObjectToGroup(gameObject, "player");
-
-        for (int i = 0; i < 200; i++) {
-            inventory.add("gold");
-        }
 
         focusedObject = gameObject;
         startInteraction();
@@ -98,6 +95,14 @@ public class PlayerController extends EntityController {
         updatePhysics(dt);
     }
 
+    public GameObject getCompanion() {
+        return companion;
+    }
+
+    public void setCompanion(GameObject companion) {
+        this.companion = companion;
+    }
+
     @Override
     public void destroy() {
         level.removeObjectFromGroup(gameObject, "player");
@@ -110,7 +115,9 @@ public class PlayerController extends EntityController {
 
     @EventHandler
     public void onDialogNext(DialogNextEvent event) {
-
+        if (event.getDialogName().equals("player__give_coffee")) {
+            inventory.remove("caffe_latte");
+        }
     }
 
     @EventHandler
@@ -187,7 +194,8 @@ public class PlayerController extends EntityController {
     }
 
     private void updateInteracting(double dt) {
-        acceleration.set(0);
+        acceleration.x = 0;
+        acceleration.z = 0;
 
         if(gameObject != focusedObject) {
             Vector3d focusPosition = focusedObject.getComponent(Controller.class, "Controller").getFocusPosition();
@@ -201,7 +209,8 @@ public class PlayerController extends EntityController {
     }
 
     private void updateLookingInventory(double dt) {
-        acceleration.set(0);
+        acceleration.x = 0;
+        acceleration.z = 0;
 
         if(Input.keyBeginPress(GLFW_KEY_TAB) || Input.keyBeginPress(GLFW_KEY_ESCAPE) || Input.keyBeginPress(GLFW_KEY_I)) {
             inventory.setOpened(false);

@@ -45,7 +45,9 @@ public class DialogManager extends Component {
     }
 
     public void addDialog(String name, Dialog dialog) {
-        dialogs.put(name, dialog);
+        if (!dialogs.containsKey(name)) {
+            dialogs.put(name, dialog);
+        }
     }
 
     public Dialog getDialog(String name) {
@@ -94,7 +96,7 @@ public class DialogManager extends Component {
     public void endDialog() {
         currentDialog = null;
         state = State.ENDED;
-        EventManager.dispatchEvent(new DialogEndedEvent());
+        EventManager.dispatchEvent(new DialogEndedEvent(gameObject));
     }
 
     @Override
@@ -207,6 +209,7 @@ public class DialogManager extends Component {
     }
 
     private void handleOptionSelect(DialogOption[] options, int selected) {
+        EventManager.dispatchEvent(new DialogNextEvent(currentDialog != null ? currentDialog.getEntity() : gameObject, options[selected].getDialogName()));
         if(isNestedOption) {
             ((DialogOptionsNode)currentNode).selectOption(selected);
             nextDialog(currentNode.getNext());
@@ -222,7 +225,7 @@ public class DialogManager extends Component {
             if(currentNode.getType() == DialogNodeType.OPTIONS) {
                 openOptionSelecting(true);
             } else {
-                EventManager.dispatchEvent(new DialogNextEvent(((DialogTextNode)currentNode).getDialogName()));
+                EventManager.dispatchEvent(new DialogNextEvent(currentDialog != null ? currentDialog.getEntity() : gameObject, ((DialogTextNode)currentNode).getDialogName()));
                 state = State.TALKING;
             }
         } else {

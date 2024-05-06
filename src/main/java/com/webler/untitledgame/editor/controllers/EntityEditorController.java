@@ -1,15 +1,11 @@
 package com.webler.untitledgame.editor.controllers;
 
 import com.webler.goliath.core.components.Transform;
-import com.webler.goliath.graphics.Spritesheet;
-import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.widgets.Controls;
-import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.Entity;
 import com.webler.untitledgame.level.levelmap.Serializable;
 import imgui.ImGui;
-import imgui.type.ImString;
 import org.joml.Vector2d;
 
 import java.util.Locale;

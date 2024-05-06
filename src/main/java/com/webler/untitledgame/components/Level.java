@@ -1,5 +1,8 @@
 package com.webler.untitledgame.components;
 
+import com.webler.goliath.algorithm.Dijkstra;
+import com.webler.goliath.algorithm.Edge;
+import com.webler.goliath.algorithm.Vertex;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
@@ -19,13 +22,12 @@ import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.controllers.*;
 import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.level.levelmap.*;
+import org.joml.Vector2d;
 import org.joml.Vector3d;
-import org.xml.sax.SAXException;
+import org.joml.Vector3i;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Level extends Component {
     public static final int TILE_SIZE = 4;
@@ -34,37 +36,65 @@ public class Level extends Component {
     private String path;
     private GameObject player;
     private Map<String, List<GameObject>> objectGroups;
-    private Map<String, Sprite> spriteMap;
+    private List<LevelObject> levelObjectRegistry;
+    private Dijkstra dijkstra;
 
     public Level() {
         this.levelMap = new LevelMap();
         path = null;
         player = null;
         objectGroups = new HashMap<>();
-        spriteMap = new HashMap<>();
+        levelObjectRegistry = new ArrayList<>();
+        dijkstra = new Dijkstra();
         buildGrid();
     }
 
-    public Sprite getSprite(String name) {
-        return spriteMap.get(name);
+    public List<LevelObject> getRegisteredObjects() {
+        return levelObjectRegistry;
+    }
+
+    public LevelObject getRegisteredObject(String identifier) {
+        return levelObjectRegistry.stream()
+                .filter(item -> item.getIdentifier().equals(identifier))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<LevelObject> getRegisteredObjects(LevelObjectType type) {
+        return levelObjectRegistry.stream()
+                .filter(item -> item.getType() == type)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private void init() {
+        Spritesheet tilesetSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
+        Spritesheet catgirlsSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/catgirls.png");
+
+        levelObjectRegistry.add(new LevelEntity("player", "Player",
+                new Sprite(AssetPool.getTexture("untitled-game/images/player.png")), new Vector2d(0.75, 0.75), 25));
+        levelObjectRegistry.add(new LevelEntity("vending_machine", "Vending Machine",
+                new Sprite(AssetPool.getTexture("untitled-game/images/vending_machine.png")), new Vector2d(0.5, 1), 20));
+        levelObjectRegistry.add(new LevelItem("gold", "Gold",
+                tilesetSpritesheet.getSprite(0), new Vector2d(0.5, 0.5), 50, "Needed to purchase items in vending machines.", 1));
+        levelObjectRegistry.add(new LevelItem("key", "Key", tilesetSpritesheet.getSprite(5), new Vector2d(0.5, 0.5),50, "Required to unlock door.",
+                0));
+        levelObjectRegistry.add(new LevelItem("caffe_latte", "Caffe Latte", tilesetSpritesheet.getSprite(6), new Vector2d(0.5, 0.5), 50, "Restores your health.",
+                1));
+        levelObjectRegistry.add(new LevelItem("caffe_mocha", "Caffe Mocha", tilesetSpritesheet.getSprite(7), new Vector2d(0.5, 0.5), 50, "Boosts your firing power.",
+                 2));
+        levelObjectRegistry.add(new LevelItem("cappuccino", "Cappuccino", tilesetSpritesheet.getSprite(8), new Vector2d(0.5, 0.5), 50, "Increases your speed.",
+                3));
+        levelObjectRegistry.add(new LevelEntity("cat_girl_1", "Cat girl 1",
+                catgirlsSpritesheet.getSprite(0), new Vector2d(0.5, 0.75), 24));
+        levelObjectRegistry.add(new LevelEntity("cat_girl_2", "Cat girl 2",
+                catgirlsSpritesheet.getSprite(1), new Vector2d(0.5, 0.75), 24));
+        levelObjectRegistry.add(new LevelEntity("cat_girl_3", "Cat girl 3",
+                catgirlsSpritesheet.getSprite(2), new Vector2d(0.5, 0.75), 24));
     }
 
     @Override
     public void start() {
-        Spritesheet tilesetSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
-        Spritesheet catgirlsSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/catgirls.png");
-
-        spriteMap.put("player", new Sprite(AssetPool.getTexture("untitled-game/images/player.png")));
-        spriteMap.put("vending_machine", new Sprite(AssetPool.getTexture("untitled-game/images/vending_machine.png")));
-        spriteMap.put("gold", tilesetSpritesheet.getSprite(0));
-        spriteMap.put("key", tilesetSpritesheet.getSprite(5));
-        spriteMap.put("caffe_latte", tilesetSpritesheet.getSprite(6));
-        spriteMap.put("espresso", tilesetSpritesheet.getSprite(7));
-        spriteMap.put("americano", tilesetSpritesheet.getSprite(8));
-        spriteMap.put("light", tilesetSpritesheet.getSprite(37));
-        spriteMap.put("cat_girl_1", catgirlsSpritesheet.getSprite(0));
-        spriteMap.put("cat_girl_2", catgirlsSpritesheet.getSprite(1));
-        spriteMap.put("cat_girl_3", catgirlsSpritesheet.getSprite(2));
+        init();
     }
 
     @Override
@@ -81,24 +111,16 @@ public class Level extends Component {
         return levelMap;
     }
 
-    public void load(String fileName) {
-        try {
-            levelMap.clear();
-            levelMap.load(fileName);
-            path = fileName;
-            buildGrid();
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
-        }
+    public void load(String fileName) throws LevelMapFormatException {
+        levelMap.clear();
+        levelMap.load(fileName);
+        path = fileName;
+        buildGrid();
     }
 
-    public void save(String fileName) {
-        try {
-            levelMap.save(fileName);
-            path = fileName;
-        } catch (TransformerException | ParserConfigurationException | IOException e) {
-            e.printStackTrace();
-        }
+    public void save(String fileName) throws LevelMapFormatException {
+        levelMap.save(fileName);
+        path = fileName;
     }
 
     public String getPath() {
@@ -115,6 +137,13 @@ public class Level extends Component {
         }
         GridItem gridItem = grid[z][x];
         return gridItem.top == -1 || y < gridItem.top || y >= gridItem.ceiling;
+    }
+
+    public Vector3i getBlockCoords(Vector3d pos) {
+        int blockMinX = (int)Math.floor(pos.x / TILE_SIZE);
+        int blockMinZ = (int)Math.floor(pos.z / TILE_SIZE);
+        int blockMinY = (int) Math.floor(pos.y / TILE_SIZE);
+        return new Vector3i(blockMinX, blockMinY, blockMinZ);
     }
 
     public boolean isBlockAtBox(Vector3d min, Vector3d max) {
@@ -150,6 +179,9 @@ public class Level extends Component {
     }
 
     public List<GameObject> getObjectsByGroup(String group) {
+        if(!objectGroups.containsKey(group)) {
+            objectGroups.put(group, new ArrayList<>());
+        }
         return objectGroups.get(group);
     }
 
@@ -157,10 +189,66 @@ public class Level extends Component {
         createDoors();
         createEntities();
         createLights();
+
+        List<Vertex> vertices = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+
+        int levelWidth = grid[0].length;
+        int levelHeight = grid.length;
+        for (int i = 0; i < levelHeight; i++) {
+            for (int j = 0; j < levelWidth; j++) {
+                int top = grid[i][j].top;
+
+                if (top == -1) continue;
+
+                vertices.add(new Vertex(i * levelWidth + j));
+
+                boolean left = false,
+                        right = false,
+                        up = false,
+                        down = false;
+
+                if(j > 0 && Math.abs(grid[i][j - 1].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, i * levelWidth + j - 1, 1));
+                    left = true;
+                }
+                if(j < levelWidth - 1 && Math.abs(grid[i][j + 1].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, i * levelWidth + j + 1, 1));
+                    right = true;
+                }
+                if(i > 0 && Math.abs(grid[i - 1][j].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, (i - 1) * levelWidth + j, 1));
+                    up = true;
+                }
+                if(i < levelHeight - 1 && Math.abs(grid[i + 1][j].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, (i + 1) * levelWidth + j, 1));
+                    down = true;
+                }
+
+                if(left && up && Math.abs(grid[i - 1][j - 1].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, (i - 1) * levelWidth + j - 1, 1));
+                }
+                if(up && right && Math.abs(grid[i - 1][j + 1].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, (i - 1) * levelWidth + j + 1, 1));
+                }
+                if(right && down && Math.abs(grid[i + 1][j + 1].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, (i + 1) * levelWidth + j + 1, 1));
+                }
+                if(down && left && Math.abs(grid[i + 1][j - 1].top - top) == 0) {
+                    edges.add(new Edge(i * levelWidth + j, (i + 1) * levelWidth + j - 1, 1));
+                }
+            }
+        }
+
+        dijkstra.buildGraph(vertices.toArray(new Vertex[0]), edges.toArray(new Edge[0]), true);
     }
 
     public GameObject getPlayer() {
         return player;
+    }
+
+    public Dijkstra getDijkstra() {
+        return dijkstra;
     }
 
     private void buildGrid() {
@@ -206,33 +294,38 @@ public class Level extends Component {
         Scene scene = getEntity().getScene();
         List<Entity> entities = levelMap.getEntities();
         for (Entity entity : entities) {
+            LevelObject levelObject = getRegisteredObject(entity.name);
             GameObject go = new GameObject(scene);
             double y = getBlockTop((int)Math.floor(entity.x - levelMap.minX), (int)Math.floor(entity.y - levelMap.minY));
             Vector3d position = new Vector3d(entity.x - levelMap.minX, y, entity.y - levelMap.minY).mul(Level.TILE_SIZE);
             go.transform.position.set(position);
+            Sprite sprite = new Sprite(levelObject.getSprite());
+            sprite.setWidth((int)(Level.TILE_SIZE * levelObject.getScale().x));
+            sprite.setHeight((int)(Level.TILE_SIZE * levelObject.getScale().y));
+            SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
+            PathFinder pathFinder = new PathFinder(this);
+            go.addComponent("PathFinder", pathFinder);
+            if(!entity.name.equals("player")) {
+                go.addComponent("Renderer", renderer);
+                go.addComponent("Bilboard", new Bilboard());
+            }
             switch (entity.name) {
                 case "player": {
                     player = go;
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
                     go.addComponent("Collider", collider);
                     Inventory inventory = new Inventory(this);
-                    PlayerController playerController = new PlayerController(this, scene.getCamera(), collider, inventory);
+                    PlayerController playerController = new PlayerController(this, scene.getCamera(), collider, inventory, pathFinder);
                     go.addComponent("Controller", playerController);
                     go.addComponent("Inventory", inventory);
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
                 case "cat_girl_1", "cat_girl_2", "cat_girl_3": {
-                    BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
+                    BoxCollider3D collider = new BoxCollider3D(new Vector3d(1, 3, 1));
                     go.addComponent("Collider", collider);
-                    Sprite sprite = new Sprite(spriteMap.get(entity.name));
-                    sprite.setWidth(2);
-                    sprite.setHeight(3);
-                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    go.addComponent("Renderer", renderer);
-                    go.addComponent("Bilboard", new Bilboard());
                     DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
-                    go.addComponent("Controller", new NpcController(this, collider, dialogComponent));
+                    go.addComponent("Controller", new CatGirlController(this, collider, dialogComponent, pathFinder));
 
                     go.addComponent("Dialog", dialogComponent);
                     go.transform.position.y += collider.getSize().y / 2;
@@ -241,29 +334,17 @@ public class Level extends Component {
                 case "vending_machine": {
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(2, 4, 2));
                     go.addComponent("Collider", collider);
-                    Sprite sprite = new Sprite(spriteMap.get(entity.name));
-                    sprite.setWidth(2);
-                    sprite.setHeight(4);
-                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    go.addComponent("Renderer", renderer);
-                    go.addComponent("Bilboard", new Bilboard());
                     DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
-                    go.addComponent("Controller", new VendingMachineController(this, collider, dialogComponent));
+                    go.addComponent("Controller", new VendingMachineController(this, collider, dialogComponent, pathFinder));
                     go.addComponent("Dialog", dialogComponent);
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
-                case "key", "caffe_latte", "espresso", "americano": {
-                    Sprite sprite = new Sprite(spriteMap.get(entity.name));
-                    sprite.setWidth(1);
-                    sprite.setHeight(1);
-                    SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
-                    go.addComponent("Renderer", renderer);
-                    go.addComponent("Bilboard", new Bilboard());
-                    go.addComponent("Controller", new ItemController(this, entity.name));
-                    go.transform.position.y += sprite.getHeight();
-                    break;
-                }
+            }
+            if(levelObject.getType() == LevelObjectType.ITEM) {
+                go.transform.scale.set(0.5);
+                go.addComponent("Controller", new ItemController(this, entity.name));
+                go.transform.position.y += sprite.getHeight() * levelObject.getScale().y;
             }
 
             scene.add(go);
@@ -278,7 +359,7 @@ public class Level extends Component {
             go.transform.position.set(new Vector3d(light.x - levelMap.minX, light.top, light.y - levelMap.minY).mul(Level.TILE_SIZE));
             SpotLight spotLight = new SpotLight(new Color(light.color), light.radiusMin * Level.TILE_SIZE, light.radiusMax * Level.TILE_SIZE);
             go.addComponent("Light", spotLight);
-            Sprite sprite = new Sprite(spriteMap.get("light"));
+            Sprite sprite = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png").getSprite(37);
             sprite.setWidth(1);
             sprite.setHeight(1);
             go.addComponent("Renderer", new SpriteRenderer(sprite, -1));

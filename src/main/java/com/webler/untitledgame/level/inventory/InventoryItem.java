@@ -1,27 +1,15 @@
 package com.webler.untitledgame.level.inventory;
 
-import com.webler.goliath.graphics.Sprite;
+import com.webler.untitledgame.components.LevelItem;
 
 public class InventoryItem {
-    private String title;
-    private Sprite sprite;
-    private String description;
+    private LevelItem levelItem;
 
-    public InventoryItem(String name, Sprite sprite, String description) {
-        this.title = name;
-        this.sprite = sprite;
-        this.description = description;
+    public InventoryItem(LevelItem levelItem) {
+        this.levelItem = levelItem;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public Sprite getSprite() {
-        return sprite;
-    }
-
-    public String getDescription() {
-        return description;
+    public LevelItem getLevelItem() {
+        return levelItem;
     }
 }

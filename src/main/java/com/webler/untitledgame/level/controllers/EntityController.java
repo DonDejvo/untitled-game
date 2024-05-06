@@ -1,10 +1,13 @@
 package com.webler.untitledgame.level.controllers;
 
+import com.webler.goliath.algorithm.Vertex;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.GameObject;
 import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.components.PathFinder;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
+import org.joml.Vector3i;
 
 import java.util.List;
 
@@ -16,9 +19,14 @@ public abstract class EntityController extends Controller {
     protected double bounciness;
     protected double yaw, pitch;
     protected boolean onGround;
+    protected double speed;
     private String[] collisionGroups;
+    protected PathFinder pathFinder;
+    private int currentPathIdx;
+    private Vector3d followTargetPos;
+    protected double followTargetDistance;
 
-    public EntityController(Level level, BoxCollider3D collider, String[] collisionGroups) {
+    public EntityController(Level level, BoxCollider3D collider, String[] collisionGroups, PathFinder pathFinder, double speed) {
         super(level, collider);
         velocity = new Vector3d();
         acceleration = new Vector3d();
@@ -28,7 +36,49 @@ public abstract class EntityController extends Controller {
         yaw = 0.0;
         pitch = 0.0;
         onGround = false;
+        this.speed = speed;
         this.collisionGroups = collisionGroups;
+        this.pathFinder = pathFinder;
+        currentPathIdx = 0;
+        followTargetPos = new Vector3d();
+        followTargetDistance = 4;
+    }
+
+    protected void findPath(Vector3d targetPos) {
+        pathFinder.calculatePath(targetPos);
+        currentPathIdx = 0;
+        followTargetPos.set(targetPos);
+    }
+
+    protected void followPath() {
+        Vertex[] path = pathFinder.getPath();
+        if(path == null || currentPathIdx >= path.length ||
+                gameObject.transform.position.distance(followTargetPos) < followTargetDistance) {
+            acceleration.x = 0;
+            acceleration.z = 0;
+            return;
+        }
+
+        int levelWidth = level.getLevelMap().getWidth();
+
+        Vertex currentVertex = pathFinder.getPath()[currentPathIdx];
+        int vertexId = currentVertex.getId();
+        int coordX = vertexId % levelWidth;
+        int coordY = vertexId / levelWidth;
+
+        Vector3i blockCoords = level.getBlockCoords(gameObject.transform.position);
+
+        if(coordX == blockCoords.x && coordY == blockCoords.z) {
+            ++currentPathIdx;
+        }
+
+        Vector3d targetPos = new Vector3d(coordX + 0.5, 0, coordY + 0.5).mul(Level.TILE_SIZE);
+        Vector3d direction = new Vector3d(targetPos.x, 0, targetPos.z)
+                .sub(gameObject.transform.position)
+                .normalize();
+
+        acceleration.x = direction.x * speed;
+        acceleration.z = direction.z * speed;
     }
 
     protected void updatePhysics(double dt) {
@@ -76,25 +126,6 @@ public abstract class EntityController extends Controller {
                 i = steps;
             }
         }
-
-//        List<GameObject> doorObjects = level.getFixedObjects();
-//        for(GameObject doorObject : doorObjects) {
-//            BoxCollider3D otherCollider = doorObject.getComponent(BoxCollider3D.class, "Collider");
-//            if(collider.collidesWith(otherCollider)) {
-//                Vector3d center = collider.getCenter();
-//                Vector3d otherCenter = otherCollider.getCenter();
-//
-//                double deltaX = Math.max((collider.getSize().x + otherCollider.getSize().x) * 0.5
-//                        - Math.abs(center.x - otherCenter.x), 0);
-//                double deltaZ = Math.max((collider.getSize().z + otherCollider.getSize().z) * 0.5
-//                        - Math.abs(center.z - otherCenter.z), 0);
-//                if(deltaX > deltaZ) {
-//                    gameObject.transform.position.x += Math.signum(center.x - otherCenter.x) * deltaX;
-//                } else {
-//                    gameObject.transform.position.z += Math.signum(center.z - otherCenter.z) * deltaZ;
-//                }
-//            }
-//        }
     }
 
     private boolean collides() {

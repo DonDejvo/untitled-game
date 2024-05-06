@@ -1,10 +1,3 @@
-vm__buy_caffe_latte;;Caffe Latte (1 gold)
-vm__buy_espresso;;Espresso (2 gold)
-vm__buy_americano;;Americano (3 gold)
-vm__sell_caffe_latte;Vending Machine;*Sold one Caffe Latte*
-vm__sell_espresso;Vending Machine;*Sold one Espresso*
-vm__sell_americano;Vending Machine;*Sold one Americano*
-vm__no_gold;;I don't have enough gold.
 door__no_key;;I need a key.
 system__learn_controls;System;Would you like to learn about the controls?
 player__no;;NO
@@ -12,3 +5,14 @@ player__yes;;YES
 system__controls_move;System;Use WSAD to move player, hold SHIFT to run and use SPACE to jump.
 system__controls_interact;System;Focus an object by standing nearby and looking its direction. Press F to interact.
 system__controls_inventory;System;Use I or TAB to open the inventory and use arrows or WSAD to move in the invetory.
+player__follow;;Follow me!
+player__stop_follow;;Wait here!
+cat_girl__follow;Cat Girl;Yes, I make you great companion, Master!
+cat_girl__stop_follow;Cat Girl;I stay here until you come back, Master!
+player__whats_up;;What's up?
+cat_girl__whats_up_1;Cat Girl;Thanks for your bravery and willingness to help others, Master!
+cat_girl__whats_up_2;Cat Girl;I cherish all these moments we spend together, Master!
+cat_girl__whats_up_3;Cat Girl;You will save the world, I have strong belief in you, Master!
+cat_girl__whats_up_4;Cat Girl;I am ready to do anything to make you happy, Master!
+player__give_coffee;;Here, take a coffee.
+cat_girl__take_coffee;Cat Girl;Thank you so much! I could fall in love with you, Master!

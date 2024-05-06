@@ -1,23 +1,31 @@
 package com.webler.untitledgame.level.levelmap;
 
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LevelMap implements Serializable {
+    public static final String[] ENTITIES = new String[]{
+            "player",
+            "cat_girl_1",
+            "cat_girl_2",
+            "cat_girl_3",
+            "key",
+            "gold",
+            "caffe_latte",
+            "caffe_mocha",
+            "cappuccino",
+            "vending_machine"
+    };
     public static final String TAG = "levelmap";
     public int minX, minY, maxX, maxY;
     public int ceiling;
@@ -57,7 +65,17 @@ public class LevelMap implements Serializable {
         lights.add(light);
     }
 
-    public void addEntity(Entity entity) {
+    public void addEntity(Entity entity) throws LevelMapFormatException {
+        boolean isValid = false;
+        for (String s : ENTITIES) {
+            if (entity.name.equals(s)) {
+                isValid = true;
+                break;
+            }
+        }
+        if(!isValid) {
+            throw new LevelMapFormatException("Entity name contains invalid value: " + entity.name);
+        }
         entities.add(entity);
     }
 
@@ -65,36 +83,41 @@ public class LevelMap implements Serializable {
         doors.add(door);
     }
 
-    public void load(String fileName) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = builder.parse(new File(fileName));
-        doc.getDocumentElement().normalize();
-
-        Node levelNode = doc.getElementsByTagName(TAG).item(0);
+    public void load(String fileName) throws LevelMapFormatException {
         try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = builder.parse(new File(fileName));
+            doc.getDocumentElement().normalize();
+
+            Node levelNode = doc.getElementsByTagName(TAG).item(0);
             deserialize((Element) levelNode);
-        } catch (NullPointerException e) {
-            throw new ParserConfigurationException(e.getMessage());
+        } catch (Exception e) {
+            throw new LevelMapFormatException(e.getMessage());
         }
     }
 
-    public void save(String fileName) throws TransformerException, IOException, ParserConfigurationException {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
+    public void save(String fileName) throws LevelMapFormatException {
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
 
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = builder.newDocument();
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = builder.newDocument();
 
-        Element levelMapElement = doc.createElement(TAG);
-        serialize(levelMapElement);
-        doc.appendChild(levelMapElement);
+            Element levelMapElement = doc.createElement(TAG);
+            serialize(levelMapElement);
+            doc.appendChild(levelMapElement);
 
-        DOMSource source = new DOMSource(doc);
+            DOMSource source = new DOMSource(doc);
 
-        FileWriter writer = new FileWriter(fileName);
-        StreamResult result = new StreamResult(writer);
+            FileWriter writer = new FileWriter(fileName);
+            StreamResult result = new StreamResult(writer);
 
-        transformer.transform(source, result);
+            transformer.transform(source, result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new LevelMapFormatException(e.getMessage());
+        }
     }
 
     @Override
@@ -131,7 +154,7 @@ public class LevelMap implements Serializable {
     }
 
     @Override
-    public void deserialize(Element levelMapElement) {
+    public void deserialize(Element levelMapElement) throws LevelMapFormatException {
         int minX = Integer.parseInt(levelMapElement.getAttribute("min-x"));
         int minY = Integer.parseInt(levelMapElement.getAttribute("min-y"));
         int maxX = Integer.parseInt(levelMapElement.getAttribute("max-x"));
