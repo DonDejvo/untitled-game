@@ -3,6 +3,7 @@ package com.webler.untitledgame.components;
 import com.webler.goliath.algorithm.Dijkstra;
 import com.webler.goliath.algorithm.Edge;
 import com.webler.goliath.algorithm.Vertex;
+import com.webler.goliath.animation.components.Animator;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
@@ -35,9 +36,9 @@ public class Level extends Component {
     private GridItem[][] grid;
     private String path;
     private GameObject player;
-    private Map<String, List<GameObject>> objectGroups;
-    private List<LevelObject> levelObjectRegistry;
-    private Dijkstra dijkstra;
+    private final Map<String, List<GameObject>> objectGroups;
+    private final List<LevelObject> levelObjectRegistry;
+    private final Dijkstra dijkstra;
 
     public Level() {
         this.levelMap = new LevelMap();
@@ -69,6 +70,8 @@ public class Level extends Component {
     private void init() {
         Spritesheet tilesetSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
         Spritesheet catgirlsSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/catgirls.png");
+        Spritesheet houseSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/house_asset.png");
+        Spritesheet ghostSpritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/ghost.png");
 
         levelObjectRegistry.add(new LevelEntity("player", "Player",
                 new Sprite(AssetPool.getTexture("untitled-game/images/player.png")), new Vector2d(0.75, 0.75), 25));
@@ -90,6 +93,16 @@ public class Level extends Component {
                 catgirlsSpritesheet.getSprite(1), new Vector2d(0.5, 0.75), 24));
         levelObjectRegistry.add(new LevelEntity("cat_girl_3", "Cat girl 3",
                 catgirlsSpritesheet.getSprite(2), new Vector2d(0.5, 0.75), 24));
+        levelObjectRegistry.add(new LevelEntity("pc_desk", "PC Desk",
+                houseSpritesheet.getSprite(6), new Vector2d(0.675, 0.675), 20));
+        levelObjectRegistry.add(new LevelEntity("drawer", "Drawer",
+                houseSpritesheet.getSprite(4), new Vector2d(0.675, 0.675), 20));
+        levelObjectRegistry.add(new LevelEntity("cupboard", "Cupboard",
+                houseSpritesheet.getSprite(2), new Vector2d(0.675, 0.675), 20));
+        levelObjectRegistry.add(new LevelEntity("sink", "Sink",
+                houseSpritesheet.getSprite(3), new Vector2d(0.675, 0.675), 20));
+        levelObjectRegistry.add(new LevelEntity("ghost", "Ghost",
+                ghostSpritesheet.getSprite(0), new Vector2d(0.75, 0.75), 24));
     }
 
     @Override
@@ -128,7 +141,17 @@ public class Level extends Component {
     }
 
     public int getBlockTop(int x, int y) {
+        if(x < 0 || y < 0 || y >= grid.length || x >= grid[0].length) {
+            return 0;
+        }
         return grid[y][x].top;
+    }
+
+    public Platform getBlockPlatform(int x, int y) {
+        if(x < 0 || y < 0 || y >= grid.length || x >= grid[0].length) {
+            return null;
+        }
+        return grid[y][x].platform;
     }
 
     public boolean isBlockAt(int x, int y, int z) {
@@ -195,32 +218,32 @@ public class Level extends Component {
 
         int levelWidth = grid[0].length;
         int levelHeight = grid.length;
+
         for (int i = 0; i < levelHeight; i++) {
             for (int j = 0; j < levelWidth; j++) {
-                int top = grid[i][j].top;
+                GridItem item = grid[i][j];
+                int top = item.top;
 
                 if (top == -1) continue;
-
-                vertices.add(new Vertex(i * levelWidth + j));
 
                 boolean left = false,
                         right = false,
                         up = false,
                         down = false;
 
-                if(j > 0 && Math.abs(grid[i][j - 1].top - top) == 0) {
-                    edges.add(new Edge(i * levelWidth + j, i * levelWidth + j - 1, 1));
+                if(j > 0 && Math.abs(grid[i][j - 1].top - top) == 0 && grid[i][j - 1].platform != item.platform) {
                     left = true;
+                    edges.add(new Edge(i * levelWidth + j, i * levelWidth + j - 1, 1));
                 }
-                if(j < levelWidth - 1 && Math.abs(grid[i][j + 1].top - top) == 0) {
+                if(j < levelWidth - 1 && Math.abs(grid[i][j + 1].top - top) == 0 && grid[i][j + 1].platform != item.platform) {
                     edges.add(new Edge(i * levelWidth + j, i * levelWidth + j + 1, 1));
                     right = true;
                 }
-                if(i > 0 && Math.abs(grid[i - 1][j].top - top) == 0) {
+                if(i > 0 && Math.abs(grid[i - 1][j].top - top) == 0 && grid[i - 1][j].platform != item.platform) {
                     edges.add(new Edge(i * levelWidth + j, (i - 1) * levelWidth + j, 1));
                     up = true;
                 }
-                if(i < levelHeight - 1 && Math.abs(grid[i + 1][j].top - top) == 0) {
+                if(i < levelHeight - 1 && Math.abs(grid[i + 1][j].top - top) == 0 && grid[i + 1][j].platform != item.platform) {
                     edges.add(new Edge(i * levelWidth + j, (i + 1) * levelWidth + j, 1));
                     down = true;
                 }
@@ -236,6 +259,26 @@ public class Level extends Component {
                 }
                 if(down && left && Math.abs(grid[i + 1][j - 1].top - top) == 0) {
                     edges.add(new Edge(i * levelWidth + j, (i + 1) * levelWidth + j - 1, 1));
+                }
+
+                if(left || right || up || down) {
+                    vertices.add(new Vertex(i * levelWidth + j));
+                }
+            }
+        }
+
+        for(Vertex v : vertices) {
+            int i = v.getId() / levelWidth;
+            int j = v.getId() % levelWidth;
+            GridItem item = grid[i][j];
+
+            for(Vertex u : vertices) {
+                int k = u.getId() / levelWidth;
+                int l = u.getId() % levelWidth;
+
+                if(v.getId() != u.getId() && grid[k][l].platform == item.platform) {
+                    int d = (int)Math.sqrt(Math.pow(j - l, 2) + Math.pow(i - k, 2));
+                    edges.add(new Edge(v.getId(), u.getId(), d));
                 }
             }
         }
@@ -272,6 +315,7 @@ public class Level extends Component {
                     GridItem gridItem = grid[y][x];
                     if(gridItem.top <= platform.top) {
                         gridItem.top = platform.top;
+                        gridItem.platform = platform;
                     }
                     if(gridItem.ceiling >= platform.ceiling) {
                         gridItem.ceiling = platform.ceiling;
@@ -281,17 +325,8 @@ public class Level extends Component {
         }
     }
 
-    private static class GridItem {
-        private int top, ceiling;
-
-        public GridItem(int top, int ceiling) {
-            this.top = top;
-            this.ceiling = ceiling;
-        }
-    }
-
     private void createEntities() {
-        Scene scene = getEntity().getScene();
+        Scene scene = getGameObject().getScene();
         List<Entity> entities = levelMap.getEntities();
         for (Entity entity : entities) {
             LevelObject levelObject = getRegisteredObject(entity.name);
@@ -319,6 +354,7 @@ public class Level extends Component {
                     go.addComponent("Controller", playerController);
                     go.addComponent("Inventory", inventory);
                     go.transform.position.y += collider.getSize().y / 2;
+
                     break;
                 }
                 case "cat_girl_1", "cat_girl_2", "cat_girl_3": {
@@ -340,6 +376,27 @@ public class Level extends Component {
                     go.transform.position.y += collider.getSize().y / 2;
                     break;
                 }
+                case "pc_desk", "drawer", "cupboard", "sink": {
+                    BoxCollider3D collider = new BoxCollider3D(new Vector3d(2.5, 2.5, 2.5));
+                    go.addComponent("Collider", collider);
+                    DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
+                    go.addComponent("Controller", new NpcController(this, collider, dialogComponent, pathFinder, 0));
+                    go.addComponent("Dialog", dialogComponent);
+                    go.transform.position.y += collider.getSize().y / 2;
+                    break;
+                }
+                case "ghost": {
+                    BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
+                    go.addComponent("Collider", collider);
+                    DialogComponent dialogComponent = new DialogComponent(getComponent(DialogManager.class, "DialogManager"));
+                    go.addComponent("Controller", new NpcController(this, collider, dialogComponent, pathFinder, 0));
+                    Animator animator = new Animator(renderer);
+                    go.addComponent("Animator", animator);
+                    animator.playAnim(AssetPool.getAnimation("untitled-game/animations/ghost__idle"), true);
+                    go.addComponent("Dialog", dialogComponent);
+                    go.transform.position.y += collider.getSize().y / 2;
+                    break;
+                }
             }
             if(levelObject.getType() == LevelObjectType.ITEM) {
                 go.transform.scale.set(0.5);
@@ -352,7 +409,7 @@ public class Level extends Component {
     }
 
     private void createLights() {
-        Scene scene = getEntity().getScene();
+        Scene scene = getGameObject().getScene();
         List<Light> lights = levelMap.getLights();
         for (Light light : lights) {
             GameObject go = new GameObject(scene);
@@ -373,7 +430,7 @@ public class Level extends Component {
     }
 
     private void createDoors() {
-        Scene scene = getEntity().getScene();
+        Scene scene = getGameObject().getScene();
         List<Door> doors = levelMap.getDoors();
         for (Door door : doors) {
             GameObject doorGameObject = new GameObject(scene);
@@ -403,6 +460,16 @@ public class Level extends Component {
             doorGameObject.addComponent("Collider", collider);
             doorGameObject.addComponent("Controller", new DoorController(this, collider, door.direction));
             scene.add(doorGameObject);
+        }
+    }
+
+    private static class GridItem {
+        private int top, ceiling;
+        private Platform platform;
+
+        public GridItem(int top, int ceiling) {
+            this.top = top;
+            this.ceiling = ceiling;
         }
     }
 }

@@ -175,14 +175,14 @@ public class SpriteBatch {
     }
 
     private ArrayList<SpriteRenderer> getVisibleRenderers() {
-        Camera camera = spriteRenderers.get(0).getEntity().getScene().getCamera();
+        Camera camera = spriteRenderers.get(0).getGameObject().getScene().getCamera();
 
         ArrayList<SpriteRenderer> visibleRenderers = new ArrayList<>(spriteRenderers);
 
         if(zIndex == -1) {
             visibleRenderers.sort((a, b) -> {
-                double distToCam1 = a.getOffsetPosition().distance(camera.getEntity().transform.position);
-                double distToCam2 = b.getOffsetPosition().distance(camera.getEntity().transform.position);
+                double distToCam1 = a.getOffsetPosition().distance(camera.getGameObject().transform.position);
+                double distToCam2 = b.getOffsetPosition().distance(camera.getGameObject().transform.position);
                 return Double.compare(distToCam2, distToCam1);
             });
         } else {
@@ -199,7 +199,7 @@ public class SpriteBatch {
     }
 
     private float[] getPositions(SpriteRenderer spriteRenderer, Sprite sprite) {
-        Transform transform = spriteRenderer.getEntity().transform;
+        Transform transform = spriteRenderer.getGameObject().transform;
         Matrix4d mat = new Matrix4d(transform.getMatrix());
         mat.translate(spriteRenderer.offset);
         Vector4d[] positions = new Vector4d[] {

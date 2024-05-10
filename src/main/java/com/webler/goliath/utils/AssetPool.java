@@ -1,15 +1,16 @@
 package com.webler.goliath.utils;
 
+import com.webler.goliath.animation.Animation;
+import com.webler.goliath.animation.Frame;
+import com.webler.goliath.exceptions.ResourceFormatException;
+import com.webler.goliath.exceptions.ResourceNotFoundException;
 import com.webler.goliath.graphics.Shader;
 import com.webler.goliath.graphics.Spritesheet;
 import com.webler.goliath.graphics.Texture;
 import com.webler.goliath.graphics.font.BitmapFont;
 
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ public class AssetPool {
     private static final Map<String, Shader> shaders = new HashMap<>();
     private static final Map<String, Spritesheet> spritesheets = new HashMap<>();
     private static final Map<String, BitmapFont> bitmapFonts = new HashMap<>();
+    private static final Map<String, Animation> animations = new HashMap<>();
 
     public static AssetPool get() {
         return new AssetPool();
@@ -38,7 +40,7 @@ public class AssetPool {
             textures.put(resourceName, texture);
             return texture;
         } catch (IOException e) {
-            throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+            throw new ResourceNotFoundException("Could not load resource path '" + resourceName + "'");
         }
     }
 
@@ -51,18 +53,42 @@ public class AssetPool {
         if(shaders.containsKey(key)) {
             return shaders.get(key);
         }
-        try {
-            InputStream is = ClassLoader.getSystemResourceAsStream(resourceName);
-            if(is == null) {
-                throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+        Shader shader = Shader.load(resourceName, preVertex, preFragment);
+        shader.linkShader();
+        shaders.put(key, shader);
+        return shader;
+    }
+
+    public static Animation getAnimation(String resourceName) {
+        if(animations.containsKey(resourceName)) {
+            return animations.get(resourceName);
+        }
+        InputStream inputStream = ClassLoader.getSystemResourceAsStream(resourceName);
+        if (inputStream == null) {
+            throw new ResourceNotFoundException(resourceName);
+        }
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            line = reader.readLine().trim();
+            String[] tokens = line.split(" ");
+            int frameCount = Integer.parseInt((tokens[2]));
+            int frameWidth = Integer.parseInt((tokens[0]));
+            int frameHeight = Integer.parseInt((tokens[1]));
+            Frame[] frames = new Frame[frameCount];
+            for(int i = 0; i < frameCount; ++i) {
+                line = reader.readLine().trim();
+                tokens = line.split(" ");
+                int frameX = Integer.parseInt(tokens[0]);
+                int frameY = Integer.parseInt(tokens[1]);
+                int frameDuration = Integer.parseInt(tokens[2]);
+                frames[i] = new Frame(frameX, frameY, frameDuration * 0.001);
             }
-            String textSource = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            Shader shader = Shader.loadFromTextSource(textSource, preVertex, preFragment);
-            shader.linkShader();
-            shaders.put(key, shader);
-            return shader;
-        } catch (IOException e) {
-            throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+            File file = new File(resourceName);
+            Animation animation = new Animation(file.getName(), frameWidth, frameHeight, frames);
+            animations.put(resourceName, animation);
+            return animation;
+        } catch (Exception e) {
+            throw new ResourceFormatException(resourceName + e.getMessage());
         }
     }
 
@@ -76,7 +102,7 @@ public class AssetPool {
         if(spritesheets.containsKey(resourceName)) {
             return spritesheets.get(resourceName);
         }
-        throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+        throw new ResourceNotFoundException("Could not load resource path '" + resourceName + "'");
     }
 
     public static void addBitmapFont(String resourceName, BitmapFont bitmapFont) {
@@ -89,7 +115,7 @@ public class AssetPool {
         if(bitmapFonts.containsKey(resourceName)) {
             return bitmapFonts.get(resourceName);
         }
-        throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+        throw new ResourceNotFoundException("Could not load resource path '" + resourceName + "'");
     }
 
     public static void destroy() {

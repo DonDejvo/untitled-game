@@ -1,14 +1,22 @@
 package com.webler.goliath.graphics;
+import com.webler.goliath.eventsystem.EventManager;
+import com.webler.goliath.exceptions.ResourceFormatException;
+import com.webler.goliath.exceptions.ResourceNotFoundException;
 import org.joml.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
+    private static final Logger log = Logger.getLogger(Shader.class.getName());
     private int program;
     private final String vertexSource;
     private final String fragmentSource;
@@ -28,7 +36,7 @@ public class Shader {
         glAttachShader(program, fragmentShader);
         glLinkProgram(program);
         if(glGetProgrami(program, GL_LINK_STATUS) == 0) {
-            throw new RuntimeException("Shader linking failed");
+            log.severe(glGetProgramInfoLog(program));
         }
 
         glDetachShader(program, vertexShader);
@@ -61,7 +69,8 @@ public class Shader {
                 .orElse(null);
 
         if(uniform == null) {
-            throw new RuntimeException("");
+            log.warning("Could not find uniform " + name);
+            return;
         }
 
         int location = uniform.location();
@@ -94,8 +103,7 @@ public class Shader {
         glShaderSource(shader, source);
         glCompileShader(shader);
         if(glGetShaderi(shader, GL_COMPILE_STATUS) == 0) {
-            System.out.println(glGetShaderInfoLog(shader));
-            throw new RuntimeException("Shader compiling failed");
+            log.severe(glGetShaderInfoLog(shader));
         }
         return shader;
     }
@@ -112,50 +120,60 @@ public class Shader {
         glUseProgram(0);
     }
 
-    public static Shader loadFromTextSource(String textSource, String preVertex, String preFragment) {
-        String[] splitString = textSource.split("(#type)( )+([a-zA-Z0-9]+)");
-
-        if (splitString.length < 2) {
-            throw new RuntimeException("Wrong shader source file format");
+    public static Shader load(String resourceName, String preVertex, String preFragment) {
+        String textSource;
+        try {
+            InputStream is = ClassLoader.getSystemResourceAsStream(resourceName);
+            if(is == null) {
+                throw new ResourceNotFoundException("Could not load resource path '" + resourceName + "'");
+            }
+            textSource = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ResourceNotFoundException("Could not load resource path '" + resourceName + "'");
         }
+        try {
+            String[] splitString = textSource.split("(#type)( )+([a-zA-Z0-9]+)");
 
-        int startIndex, endIndex;
+            int startIndex, endIndex;
 
-        startIndex = textSource.indexOf("#type") + 6;
-        endIndex = textSource.indexOf('\n', startIndex);
-        String firstPattern = textSource.substring(startIndex, endIndex).trim();
+            startIndex = textSource.indexOf("#type") + 6;
+            endIndex = textSource.indexOf('\n', startIndex);
+            String firstPattern = textSource.substring(startIndex, endIndex).trim();
 
-        startIndex = textSource.indexOf("#type", endIndex) + 6;
-        endIndex = textSource.indexOf('\n', startIndex);
-        String secondPattern = textSource.substring(startIndex, endIndex).trim();
+            startIndex = textSource.indexOf("#type", endIndex) + 6;
+            endIndex = textSource.indexOf('\n', startIndex);
+            String secondPattern = textSource.substring(startIndex, endIndex).trim();
 
-        StringBuilder vertexSource;
-        StringBuilder fragmentSource;
+            StringBuilder vertexSource;
+            StringBuilder fragmentSource;
 
-        if (firstPattern.equals("vertex")) {
-            vertexSource = new StringBuilder(splitString[1]);
-        } else if (secondPattern.equals("vertex")) {
-            vertexSource = new StringBuilder(splitString[2]);
-        } else {
-            throw new RuntimeException("Missing vertex shader source");
+            if (firstPattern.equals("vertex")) {
+                vertexSource = new StringBuilder(splitString[1]);
+            } else if (secondPattern.equals("vertex")) {
+                vertexSource = new StringBuilder(splitString[2]);
+            } else {
+                throw new ResourceFormatException("Missing vertex shader source");
+            }
+
+            if (firstPattern.equals("fragment")) {
+                fragmentSource = new StringBuilder(splitString[1]);
+            } else if (secondPattern.equals("fragment")) {
+                fragmentSource = new StringBuilder(splitString[2]);
+            } else {
+                throw new ResourceFormatException("Missing fragment shader source");
+            }
+
+            String[] preVertexSplit = preVertex.split(",");
+            String[] preFragmentSplit = preFragment.split(",");
+
+            insertDefines(vertexSource, preVertexSplit);
+
+            insertDefines(fragmentSource, preFragmentSplit);
+
+            return new Shader(vertexSource.toString(), fragmentSource.toString());
+        } catch (Exception e) {
+            throw new ResourceFormatException("Wrong format of shader source '" + resourceName + "':\n" + e.getMessage());
         }
-
-        if (firstPattern.equals("fragment")) {
-            fragmentSource = new StringBuilder(splitString[1]);
-        } else if (secondPattern.equals("fragment")) {
-            fragmentSource = new StringBuilder(splitString[2]);
-        } else {
-            throw new RuntimeException("Missing fragment shader source");
-        }
-
-        String[] preVertexSplit = preVertex.split(",");
-        String[] preFragmentSplit = preFragment.split(",");
-
-        insertDefines(vertexSource, preVertexSplit);
-
-        insertDefines(fragmentSource, preFragmentSplit);
-
-        return new Shader(vertexSource.toString(), fragmentSource.toString());
     }
 
     private static void insertDefines(StringBuilder source, String[] preSplit) {

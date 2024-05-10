@@ -1,6 +1,7 @@
 package com.webler.goliath.core;
 
 import com.webler.goliath.Game;
+import com.webler.goliath.core.exceptions.SceneException;
 import com.webler.goliath.graphics.components.Camera;
 
 import java.util.*;
@@ -43,8 +44,7 @@ public abstract class Scene {
 
     public void start() {
         if(camera == null) {
-            // TODO: Create own exception class
-            throw new RuntimeException("Camera is not set in scene " + game.getCurrentSceneName());
+            throw new SceneException("Camera is not set in scene " + game.getCurrentSceneName());
         }
         running = true;
         for (GameObject e : entities) {

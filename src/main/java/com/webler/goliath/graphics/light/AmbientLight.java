@@ -14,7 +14,7 @@ public class AmbientLight extends Component {
 
     @Override
     public void start() {
-        getEntity().getGame().getRenderer().add(this);
+        getGameObject().getGame().getRenderer().add(this);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class AmbientLight extends Component {
 
     @Override
     public void destroy() {
-        getEntity().getGame().getRenderer().remove(this);
+        getGameObject().getGame().getRenderer().remove(this);
     }
 
     public double getIntensity() {

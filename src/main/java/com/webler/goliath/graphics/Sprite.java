@@ -1,5 +1,7 @@
 package com.webler.goliath.graphics;
 
+import com.webler.goliath.utils.AssetPool;
+
 public class Sprite {
     private Texture tex;
     private float[] texCoords;
@@ -17,6 +19,10 @@ public class Sprite {
         };
     }
 
+    public Sprite() {
+        this(AssetPool.getTexture("goliath/images/square.png"));
+    }
+
     public Sprite(Sprite sprite) {
         this.tex = sprite.tex;
         this.texCoords = sprite.texCoords.clone();
@@ -27,13 +33,13 @@ public class Sprite {
     public void setRegion(int x, int y, int width, int height) {
         int texWidth = tex.getWidth();
         int texHeight = tex.getHeight();
-        texCoords[0] = (float)x / texWidth;
-        texCoords[1] = (float)y / texHeight;
+        texCoords[0] = (float)(x + 0.5) / texWidth;
+        texCoords[1] = (float)(y + 0.5) / texHeight;
         texCoords[2] = (float)(x + width) / texWidth;
-        texCoords[3] = (float)y / texHeight;
+        texCoords[3] = (float)(y + 0.5) / texHeight;
         texCoords[4] = (float)(x + width) / texWidth;
         texCoords[5] = (float)(y + height) / texHeight;
-        texCoords[6] = (float)x / texWidth;
+        texCoords[6] = (float)(x + 0.5) / texWidth;
         texCoords[7] = (float)(y + height) / texHeight;
     }
 

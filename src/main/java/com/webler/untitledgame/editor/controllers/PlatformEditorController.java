@@ -1,6 +1,7 @@
 package com.webler.untitledgame.editor.controllers;
 
 import com.webler.goliath.core.components.Transform;
+import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.widgets.Controls;
 import com.webler.untitledgame.editor.EditorComponent;
@@ -15,6 +16,7 @@ public class PlatformEditorController extends EditorController {
     public PlatformEditorController(EditorComponent editorComponent, Platform platform) {
         super(editorComponent);
         this.platform = platform;
+        this.color = Color.GRAY;
     }
 
     @Override

@@ -10,6 +10,8 @@ import com.webler.goliath.dialogs.DialogOption;
 import com.webler.goliath.dialogs.events.DialogEndedEvent;
 import com.webler.goliath.dialogs.events.DialogNextEvent;
 import com.webler.goliath.eventsystem.EventManager;
+import com.webler.goliath.exceptions.ResourceFormatException;
+import com.webler.goliath.exceptions.ResourceNotFoundException;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.canvas.Canvas;
 import com.webler.goliath.graphics.canvas.TextAlign;
@@ -52,7 +54,7 @@ public class DialogManager extends Component {
 
     public Dialog getDialog(String name) {
         if (!dialogs.containsKey(name)) {
-            throw new RuntimeException("No such dialog: " + name);
+            return new Dialog("<Dialog " + name + " does not exist>", "System");
         }
         return dialogs.get(name);
     }
@@ -60,7 +62,7 @@ public class DialogManager extends Component {
     public void loadDialogs(String resourceName) {
         InputStream is = ClassLoader.getSystemResourceAsStream(resourceName);
         if(is == null) {
-            throw new RuntimeException("Could not load resource path '" + resourceName + "'");
+            throw new ResourceNotFoundException("Could not load resource path '" + resourceName + "'");
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         try {
@@ -79,7 +81,7 @@ public class DialogManager extends Component {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ResourceFormatException("Resource '" + resourceName + "' could not be parsed:\n" + e.getMessage());
         }
 
     }
@@ -124,8 +126,8 @@ public class DialogManager extends Component {
     }
 
     private void drawOptionSelectMenu() {
-        UIElements ui = getEntity().getGame().getUiElements();
-        Canvas ctx = getEntity().getGame().getCanvas();
+        UIElements ui = getGameObject().getGame().getUiElements();
+        Canvas ctx = getGameObject().getGame().getCanvas();
         int w = ctx.getWidth(), h = ctx.getHeight();
 
         ui.padding.set(0);
@@ -178,8 +180,8 @@ public class DialogManager extends Component {
     }
 
     private void drawDialog() {
-        UIElements ui = getEntity().getGame().getUiElements();
-        Canvas ctx = getEntity().getGame().getCanvas();
+        UIElements ui = getGameObject().getGame().getUiElements();
+        Canvas ctx = getGameObject().getGame().getCanvas();
         int w = ctx.getWidth(), h = ctx.getHeight();
 
         Dialog dialog = getDialog(((DialogTextNode)currentNode).getDialogName());
@@ -209,7 +211,7 @@ public class DialogManager extends Component {
     }
 
     private void handleOptionSelect(DialogOption[] options, int selected) {
-        EventManager.dispatchEvent(new DialogNextEvent(currentDialog != null ? currentDialog.getEntity() : gameObject, options[selected].getDialogName()));
+        EventManager.dispatchEvent(new DialogNextEvent(currentDialog != null ? currentDialog.getGameObject() : gameObject, options[selected].getDialogName()));
         if(isNestedOption) {
             ((DialogOptionsNode)currentNode).selectOption(selected);
             nextDialog(currentNode.getNext());
@@ -225,7 +227,7 @@ public class DialogManager extends Component {
             if(currentNode.getType() == DialogNodeType.OPTIONS) {
                 openOptionSelecting(true);
             } else {
-                EventManager.dispatchEvent(new DialogNextEvent(currentDialog != null ? currentDialog.getEntity() : gameObject, ((DialogTextNode)currentNode).getDialogName()));
+                EventManager.dispatchEvent(new DialogNextEvent(currentDialog != null ? currentDialog.getGameObject() : gameObject, ((DialogTextNode)currentNode).getDialogName()));
                 state = State.TALKING;
             }
         } else {

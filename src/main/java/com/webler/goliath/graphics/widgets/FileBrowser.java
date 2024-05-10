@@ -1,6 +1,7 @@
 package com.webler.goliath.graphics.widgets;
 
 import imgui.ImGui;
+import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.type.ImString;
@@ -9,7 +10,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -17,6 +24,8 @@ import java.util.stream.Stream;
 
 public class FileBrowser {
     private static final String NAME = "FileBrowser";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+
     private static FileBrowser instance = null;
     private Path currentPath;
     private String searchText;
@@ -69,7 +78,9 @@ public class FileBrowser {
 
         resultPath = null;
 
-        ImGui.setNextWindowSize(300, 450, ImGuiCond.FirstUseEver);
+        ImGuiIO io = ImGui.getIO();
+        ImGui.setNextWindowSize(800, 600, ImGuiCond.FirstUseEver);
+        ImGui.setNextWindowPos(io.getDisplaySizeX() * 0.5f - 400, io.getDisplaySizeY() * 0.5f - 300, ImGuiCond.FirstUseEver);
 
         if(ImGui.beginPopupModal(NAME)) {
             if(ImGui.button("<")) {
@@ -94,17 +105,19 @@ public class FileBrowser {
             if (ImGui.beginListBox("##ListBox",
                     ImGui.getContentRegionAvailX(),
                     ImGui.getContentRegionAvailY() - (action == FileBrowserAction.SAVE ? 2.5f : 1.5f) * ImGui.getTextLineHeightWithSpacing())) {
+                ImGui.columns(4);
+                ImGui.text("Name");
+                ImGui.nextColumn();
+                ImGui.text("Last modified time");
+                ImGui.nextColumn();
+                ImGui.text("Type");
+                ImGui.nextColumn();
+                ImGui.text("Size");
+                ImGui.nextColumn();
                 for(int i = 0; i < files.size(); i++) {
-                    String fileName = files.get(i).getFileName().toString();
-                    boolean selected = currentIndex == i;
-                    if(ImGui.selectable(fileName, selected)) {
-                        currentIndex = i;
-                        openDirectory(Path.of(currentPath.toString(), fileName));
-                    }
-                    if(selected) {
-                        ImGui.setItemDefaultFocus();
-                    }
+                    drawFileItem(files, i);
                 }
+                ImGui.columns(1);
                 ImGui.endListBox();
             }
             ImGui.popID();
@@ -148,6 +161,52 @@ public class FileBrowser {
         return result;
     }
 
+    private void drawFileItem(List<Path> files, int idx) {
+        String fileName = files.get(idx).getFileName().toString();
+        Path filePath = Path.of(currentPath.toString(), fileName);
+        boolean selected = currentIndex == idx;
+        if(ImGui.selectable(fileName, selected)) {
+            currentIndex = idx;
+            openDirectory(filePath);
+        }
+        if(selected) {
+            ImGui.setItemDefaultFocus();
+        }
+        ImGui.nextColumn();
+
+        String lastModifiedTime = "";
+        String mimeType = "";
+        String size = "";
+        try {
+            BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
+
+            lastModifiedTime = formatDateTime(attr.lastModifiedTime());
+
+            if(attr.isRegularFile()) {
+                size = String.format("%.0f kB", Math.ceil(attr.size() / 1000.0));
+
+                try {
+                    String probeContentType = Files.probeContentType(filePath);
+                    if(probeContentType != null) {
+                        mimeType = probeContentType;
+                    }
+                } catch (IOException ignored) {
+                }
+            } else {
+                mimeType = "Folder";
+            }
+
+        } catch (IOException ignored) {
+        }
+
+        ImGui.text(lastModifiedTime);
+        ImGui.nextColumn();
+        ImGui.text(mimeType);
+        ImGui.nextColumn();
+        ImGui.text(size);
+        ImGui.nextColumn();
+    }
+
     private boolean setPathToSaveFile() {
         if(!fileNameText.isEmpty()) {
             resultPath = Path.of(instance.currentPath.toString(), instance.fileNameText);
@@ -166,7 +225,7 @@ public class FileBrowser {
 
     private List<Path> getFiles() {
         try(Stream<Path> files = Files.list(currentPath)) {
-            return files.collect(Collectors.toList());
+            return files.sorted(Comparator.naturalOrder()).collect(Collectors.toList());
         } catch (IOException e) {
             return new ArrayList<>();
         }
@@ -206,5 +265,15 @@ public class FileBrowser {
             setCurrentPath(path);
 
         }
+    }
+
+    private static String formatDateTime(FileTime fileTime) {
+
+        LocalDateTime localDateTime = fileTime
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        return localDateTime.format(DATE_FORMATTER);
     }
 }

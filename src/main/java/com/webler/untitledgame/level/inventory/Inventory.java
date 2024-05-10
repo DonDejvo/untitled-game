@@ -80,8 +80,8 @@ public class Inventory extends Component {
     }
 
     private void drawWindow() {
-        UIElements ui = getEntity().getGame().getUiElements();
-        Canvas ctx = getEntity().getGame().getCanvas();
+        UIElements ui = getGameObject().getGame().getUiElements();
+        Canvas ctx = getGameObject().getGame().getCanvas();
         int w = ctx.getWidth(), h = ctx.getHeight();
 
         ui.padding.set(h * 0.01f);

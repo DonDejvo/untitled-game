@@ -2,10 +2,14 @@ package com.webler.goliath.algorithm;
 
 public class Dijkstra {
     private static final int MAX_DISTANCE = 1000000;
+    private Vertex[] vertices;
+    private Edge[] edges;
     private VertexData[] vertexData;
     private int[][] edgeGrid;
 
     public void buildGraph(Vertex[] vertices, Edge[] edges, boolean directed) {
+        this.vertices = vertices;
+        this.edges = edges;
         edgeGrid = new int[vertices.length][vertices.length];
         for (int i = 0; i < vertices.length; i++) {
             for (int j = 0; j < vertices.length; j++) {
@@ -93,12 +97,20 @@ public class Dijkstra {
     }
 
     public void reset() {
-        for (int i = 0; i < vertexData.length; i++) {
-            vertexData[i].minDistance = MAX_DISTANCE;
-            vertexData[i].prev = null;
-            vertexData[i].visited = false;
-            vertexData[i].order = -1;
+        for (VertexData vertexDatum : vertexData) {
+            vertexDatum.minDistance = MAX_DISTANCE;
+            vertexDatum.prev = null;
+            vertexDatum.visited = false;
+            vertexDatum.order = -1;
         }
+    }
+
+    public Edge[] getEdges() {
+        return edges;
+    }
+
+    public Vertex[] getVertices() {
+        return vertices;
     }
 
     private int visitNearestVertex() {

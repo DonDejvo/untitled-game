@@ -1,5 +1,7 @@
 package com.webler.goliath.graphics;
 
+import com.webler.goliath.exceptions.ResourceFormatException;
+import com.webler.goliath.exceptions.ResourceNotFoundException;
 import imgui.ImFontAtlas;
 import imgui.ImFontConfig;
 import imgui.ImGui;
@@ -9,8 +11,11 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ImGuiLayer {
@@ -29,24 +34,26 @@ public class ImGuiLayer {
 
         ImGuiIO imGuiIO = ImGui.getIO();
 
-//        ImFontAtlas fontAtlas = imGuiIO.getFonts();
-//        ImFontConfig fontConfig = new ImFontConfig();
-//
-//        fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
-//        fontConfig.setPixelSnapH(true);
-//
-//        URL url = getClass().getClassLoader().getResource("assets/font/segoeui.ttf");
-//        if (url == null) {
-//            throw new IllegalStateException("Unable to find font atlas");
-//        }
-//        String fontPath = url.getPath().replaceFirst("/", "");
-//        fontAtlas.addFontFromFileTTF(fontPath, 32, fontConfig);
-//
-//        fontAtlas.build();
-//
-//        fontConfig.destroy();
+        ImFontAtlas fontAtlas = imGuiIO.getFonts();
+        ImFontConfig fontConfig = new ImFontConfig();
 
-        imGuiIO.setFontGlobalScale(2);
+        fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
+        fontConfig.setPixelSnapH(true);
+
+        InputStream is = ClassLoader.getSystemResourceAsStream("goliath/font/segoeui.ttf");
+        if (is == null) {
+            throw new ResourceNotFoundException("goliath/font/segoeui.ttf");
+        }
+        try {
+            byte[] bytes = is.readAllBytes();
+            fontAtlas.addFontFromMemoryTTF(bytes, 32, fontConfig);
+        } catch (IOException e) {
+            throw new ResourceFormatException(e.getMessage());
+        }
+
+        fontAtlas.build();
+
+        fontConfig.destroy();
 
         imGuiIO.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 

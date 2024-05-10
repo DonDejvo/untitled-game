@@ -2,6 +2,7 @@ package com.webler.goliath.core;
 
 import com.webler.goliath.Game;
 import com.webler.goliath.core.components.Transform;
+import com.webler.goliath.core.exceptions.ComponentException;
 import com.webler.goliath.eventsystem.EventManager;
 
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 public final class GameObject {
     private static final AtomicLong idsCounter = new AtomicLong(0);
@@ -66,7 +68,7 @@ public final class GameObject {
 
     public void addComponent(String name, Component c) {
         if(components.containsKey(name)) {
-            throw new RuntimeException("Entity already contains component with name " + name);
+            throw new ComponentException("Game object already contains component with name " + name);
         }
         c.setEntity(this);
         components.put(name, c);
@@ -76,16 +78,15 @@ public final class GameObject {
         return components.containsKey(name);
     }
 
-    // TODO: Store component class inside component ??, maybe use visitor pattern
     public <T extends Component> T getComponent(Class<T> cls, String name) {
         Component c = components.get(name);
         if(c == null) {
-            throw new RuntimeException("Entity " + this.name + " does not have component with name " + name + ".");
+            throw new ComponentException("Game object " + this.name + " does not have component with name " + name + ".");
         }
         try {
             return cls.cast(c);
         } catch (ClassCastException e) {
-            throw new RuntimeException(e);
+            throw new ComponentException("Component " + name + " does not implement " + cls.getName() + " interface.");
         }
     }
 
@@ -102,6 +103,6 @@ public final class GameObject {
     }
 
     private static String generateName() {
-        return "__entity__" + idsCounter.incrementAndGet();
+        return "__game_object__" + idsCounter.incrementAndGet();
     }
 }

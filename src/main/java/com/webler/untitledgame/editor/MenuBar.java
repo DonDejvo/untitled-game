@@ -1,11 +1,17 @@
 package com.webler.untitledgame.editor;
 
+import com.webler.goliath.input.Input;
 import com.webler.untitledgame.components.LevelObject;
 import com.webler.untitledgame.components.LevelObjectType;
 import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiKey;
+import imgui.flag.ImGuiKeyModFlags;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class MenuBar {
     private EditorComponent editor;
@@ -16,6 +22,17 @@ public class MenuBar {
     }
 
     private void createMenuFile() {
+        if(Input.keyPressed(GLFW_KEY_LEFT_CONTROL)) {
+            if(Input.keyBeginPress(GLFW_KEY_S)) {
+                editor.handleSave();
+            }
+            else if(Input.keyBeginPress(GLFW_KEY_O)) {
+                editor.handleOpen();
+            }
+            else if(Input.keyBeginPress(GLFW_KEY_P)) {
+                editor.handlePlay();
+            }
+        }
 
         if (ImGui.beginMenu("File")) {
             if (ImGui.menuItem("New")) {

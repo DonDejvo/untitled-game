@@ -2,7 +2,6 @@ package com.webler.goliath.core;
 
 import org.joml.Vector3d;
 
-// TODO: Add comments
 public abstract class Component {
     protected GameObject gameObject;
     public final Vector3d offset;
@@ -19,7 +18,7 @@ public abstract class Component {
 
     public void imgui() {}
 
-    public GameObject getEntity() {
+    public GameObject getGameObject() {
         return gameObject;
     }
 

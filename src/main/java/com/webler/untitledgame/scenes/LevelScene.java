@@ -36,6 +36,14 @@ public class LevelScene extends Scene {
         AssetPool.addSpritesheet("untitled-game/spritesheets/catgirls.png",
                 new Spritesheet(catgirlsTexture, 66, 86, 107, 12, 0, 0));
 
+        Texture houseTexture = AssetPool.getTexture("untitled-game/spritesheets/house_asset.png");
+        AssetPool.addSpritesheet("untitled-game/spritesheets/house_asset.png",
+                new Spritesheet(houseTexture, 48, 48, 31, 6, 16, 16));
+
+        Texture ghostTexture = AssetPool.getTexture("untitled-game/spritesheets/ghost.png");
+        AssetPool.addSpritesheet("untitled-game/spritesheets/ghost.png",
+                new Spritesheet(ghostTexture, 16, 16, 3, 3, 0, 0));
+
         GameObject cameraGameObject = new PerspectiveCameraPrefab(Math.PI / 3, 0.1, 1000).create(this);
         cameraGameObject.getComponent(Camera.class, "Camera").setBackgroundColor(Color.BLUE);
         add(cameraGameObject);

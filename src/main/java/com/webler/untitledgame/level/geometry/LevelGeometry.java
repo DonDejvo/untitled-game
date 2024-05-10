@@ -32,32 +32,6 @@ public class LevelGeometry extends Geometry {
         noise = new FastNoiseLite();
         noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
 
-        Spritesheet spritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
-
-        groundSprites = new Sprite[] {
-                spritesheet.getSprite(11),
-                spritesheet.getSprite(12),
-                spritesheet.getSprite(20),
-                spritesheet.getSprite(21),
-                spritesheet.getSprite(22),
-                spritesheet.getSprite(23),
-                spritesheet.getSprite(29),
-                spritesheet.getSprite(30),
-                spritesheet.getSprite(31),
-                spritesheet.getSprite(32),
-        };
-        wallSprites = new Sprite[] {
-                spritesheet.getSprite(42),
-                spritesheet.getSprite(51),
-                spritesheet.getSprite(43),
-                spritesheet.getSprite(52),
-                spritesheet.getSprite(44),
-                spritesheet.getSprite(53),
-        };
-        ceilingSprites = new Sprite[] {
-                spritesheet.getSprite(42)
-        };
-
         init();
     }
 
@@ -66,6 +40,51 @@ public class LevelGeometry extends Geometry {
 
         List<Platform> platforms = levelMap.getPlatforms();
         int globalCeiling = levelMap.ceiling;
+
+        switch (levelMap.environment) {
+            case DUNGEON: {
+                Spritesheet spritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
+
+                groundSprites = new Sprite[] {
+                        spritesheet.getSprite(11),
+                        spritesheet.getSprite(12),
+                        spritesheet.getSprite(20),
+                        spritesheet.getSprite(21),
+                        spritesheet.getSprite(22),
+                        spritesheet.getSprite(23),
+                        spritesheet.getSprite(29),
+                        spritesheet.getSprite(30),
+                        spritesheet.getSprite(31),
+                        spritesheet.getSprite(32),
+                };
+                wallSprites = new Sprite[] {
+                        spritesheet.getSprite(42),
+                        spritesheet.getSprite(51),
+                        spritesheet.getSprite(43),
+                        spritesheet.getSprite(52),
+                        spritesheet.getSprite(44),
+                        spritesheet.getSprite(53),
+                };
+                ceilingSprites = new Sprite[] {
+                        spritesheet.getSprite(42)
+                };
+                break;
+            }
+            case HOUSE: {
+                Spritesheet spritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/house_asset.png");
+
+                groundSprites = new Sprite[] {
+                        spritesheet.getSprite(13)
+                };
+                wallSprites = new Sprite[] {
+                        spritesheet.getSprite(14)
+                };
+                ceilingSprites = new Sprite[] {
+                        spritesheet.getSprite(12)
+                };
+                break;
+            }
+        }
 
         quads = new ArrayList<>();
 

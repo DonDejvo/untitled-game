@@ -2,6 +2,7 @@ package com.webler.goliath;
 
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.core.SceneParams;
+import com.webler.goliath.core.exceptions.SceneException;
 import com.webler.goliath.graphics.*;
 import com.webler.goliath.graphics.canvas.Canvas;
 import com.webler.goliath.graphics.components.Camera;
@@ -221,7 +222,7 @@ public class Game {
 
         Class<? extends Scene> SceneClass = registeredScenes.get(item.name);
         if(SceneClass == null) {
-            throw new RuntimeException("Scene " + item.name + " is not registered.");
+            throw new SceneException("Scene " + item.name + " is not registered.");
         }
         try {
             Scene newScene = SceneClass.getConstructor(Game.class).newInstance(this);
@@ -241,8 +242,9 @@ public class Game {
             canvas.start();
             newScene.start();
 
-        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SceneException(e.getMessage());
         }
     }
 

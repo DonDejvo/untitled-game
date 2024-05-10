@@ -35,6 +35,6 @@ public class ItemController extends Controller {
     protected void interact() {
         GameObject player = level.getPlayer();
         player.getComponent(PlayerController.class, "Controller").collect(itemName);
-        getEntity().getScene().remove(gameObject);
+        getGameObject().getScene().remove(gameObject);
     }
 }

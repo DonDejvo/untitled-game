@@ -15,6 +15,7 @@ import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.components.PathFinder;
 import com.webler.untitledgame.level.events.DoorOpened;
 import com.webler.untitledgame.level.inventory.Inventory;
+import org.joml.Quaterniond;
 import org.joml.Vector3d;
 
 import java.util.List;
@@ -93,6 +94,10 @@ public class PlayerController extends EntityController {
 
         friction = onGround ? 10 : 2.5;
         updatePhysics(dt);
+
+        Quaterniond q = new Quaterniond();
+        q.rotateY(yaw + Math.PI / 2);
+        gameObject.transform.rotation.set(q);
     }
 
     public GameObject getCompanion() {
@@ -200,9 +205,9 @@ public class PlayerController extends EntityController {
         if(gameObject != focusedObject) {
             Vector3d focusPosition = focusedObject.getComponent(Controller.class, "Controller").getFocusPosition();
 
-            camera.getEntity().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 1, 0));
+            camera.getGameObject().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 0.75, 0));
 
-            camera.direction.lerp(new Vector3d(focusPosition).sub(camera.getEntity().transform.position), Math.min(dt * 10, 1));
+            camera.direction.lerp(new Vector3d(focusPosition).sub(camera.getGameObject().transform.position), Math.min(dt * 10, 1));
         } else {
             updateCamera(dt);
         }
@@ -224,7 +229,7 @@ public class PlayerController extends EntityController {
         Vector3d direction = new Vector3d(1, 0, 0);
         direction.rotateY(yaw);
 
-        camera.getEntity().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 1, 0));
+        camera.getGameObject().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 0.75, 0));
         camera.direction.lerp(direction, Math.min(dt * 10, 1));
     }
 
@@ -235,7 +240,7 @@ public class PlayerController extends EntityController {
 
         for(GameObject object : focusableObjects) {
             Controller controller = object.getComponent(Controller.class, "Controller");
-            double distance = controller.getCenter().distance(camera.getEntity().transform.position);
+            double distance = controller.getCenter().distance(camera.getGameObject().transform.position);
             if(controller.isInFrontOfPlayer() && (newFocusedObject == null || distance < currentDistance)) {
                 newFocusedObject = object;
                 currentDistance = distance;

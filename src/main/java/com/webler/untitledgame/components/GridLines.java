@@ -25,7 +25,7 @@ public class GridLines extends Component {
         Camera camera = gameObject.getScene().getCamera();
 
         Rect viewport = camera.getViewport();
-        Vector3d cameraPos = camera.getEntity().transform.position;
+        Vector3d cameraPos = camera.getGameObject().transform.position;
 
         double halfVW = viewport.width * 0.5;
         double halfVH = viewport.height * 0.5;

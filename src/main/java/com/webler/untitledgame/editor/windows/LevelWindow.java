@@ -4,7 +4,9 @@ import com.webler.goliath.input.Input;
 import com.webler.goliath.math.Rect;
 import com.webler.untitledgame.editor.EditorComponent;
 import imgui.ImGui;
+import imgui.ImGuiIO;
 import imgui.ImVec2;
+import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiWindowFlags;
 
 public class LevelWindow {
@@ -21,11 +23,17 @@ public class LevelWindow {
     }
 
     public void imgui() {
+
+        ImGuiIO io = ImGui.getIO();
+
+        ImGui.setNextWindowSize(800, 600, ImGuiCond.FirstUseEver);
+        ImGui.setNextWindowPos(io.getDisplaySizeX() / 2 - 400, 60, ImGuiCond.FirstUseEver);
+
         ImGui.begin("Level", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
         ImGui.getWindowPos(position);
         ImGui.getWindowSize(size);
-        float gameWidth = editor.getEntity().getGame().getFramebuffer().getWidth();
-        float gameHeight = editor.getEntity().getGame().getFramebuffer().getHeight();
+        float gameWidth = editor.getGameObject().getGame().getFramebuffer().getWidth();
+        float gameHeight = editor.getGameObject().getGame().getFramebuffer().getHeight();
         float x, y, w, h;
 //        if(size.x / size.y > gameWidth / gameHeight) {
 //            w = size.x;
@@ -43,7 +51,7 @@ public class LevelWindow {
         levelViewport.width = w;
         levelViewport.height = h;
         ImGui.setCursorPos(x - position.x, y - position.y);
-        ImGui.imageButton(editor.getEntity().getGame().getFramebuffer().getTexId(),
+        ImGui.imageButton(editor.getGameObject().getGame().getFramebuffer().getTexId(),
                 w,
                 h,
                 0, 1, 1, 0);

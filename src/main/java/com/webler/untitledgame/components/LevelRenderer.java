@@ -33,8 +33,8 @@ public class LevelRenderer extends Component {
     public void update(double dt) {
         mesh.getModelMatrix().set(gameObject.transform.getMatrix());
         if(Input.keyPressed(GLFW_KEY_P)) {
-            GameObject levelObject = getEntity().getScene().getEntityByName("Level");
-            getEntity().getGame().playScene("LevelEditorScene", new LevelParams(levelObject.getComponent(Level.class, "Level").getPath()));
+            GameObject levelObject = getGameObject().getScene().getEntityByName("Level");
+            getGameObject().getGame().playScene("LevelEditorScene", new LevelParams(levelObject.getComponent(Level.class, "Level").getPath()));
         }
     }
 

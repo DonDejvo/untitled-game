@@ -97,12 +97,12 @@ public class EditorComponent extends Component {
 
         menuBar.imgui();
 
-        if(hierarchyWindowOpened) {
-            hierarchyWindow.imgui();
-        }
-
         if(levelWindowOpened) {
             levelWindow.imgui();
+        }
+
+        if(hierarchyWindowOpened) {
+            hierarchyWindow.imgui();
         }
 
         if(inspectorWindowOpened) {
@@ -151,7 +151,7 @@ public class EditorComponent extends Component {
         if(currentPath != null) {
             try {
                 saveLevel(currentPath);
-                getEntity().getGame().playScene("LevelScene", new LevelParams(currentPath));
+                getGameObject().getGame().playScene("LevelScene", new LevelParams(currentPath));
             } catch (LevelMapFormatException e) {
                 e.printStackTrace();
             }
@@ -188,36 +188,36 @@ public class EditorComponent extends Component {
     }
 
     public void addPlatform() {
-        Scene scene = getEntity().getScene();
-        int x = (int)(scene.getCamera().getEntity().transform.position.x / config.gridWidth());
-        int y = (int)(scene.getCamera().getEntity().transform.position.y / config.gridHeight());
+        Scene scene = getGameObject().getScene();
+        int x = (int)(scene.getCamera().getGameObject().transform.position.x / config.gridWidth());
+        int y = (int)(scene.getCamera().getGameObject().transform.position.y / config.gridHeight());
         GameObject platformGameObject = new PlatformPrefab(this,
                 new Platform(x, y, 1, 1, 0, level.getLevelMap().ceiling)).create(scene);
         scene.add(platformGameObject);
     }
 
     public void addSpotLight() {
-        Scene scene = getEntity().getScene();
-        double x = scene.getCamera().getEntity().transform.position.x / config.gridWidth();
-        double y = scene.getCamera().getEntity().transform.position.y / config.gridHeight();
+        Scene scene = getGameObject().getScene();
+        double x = scene.getCamera().getGameObject().transform.position.x / config.gridWidth();
+        double y = scene.getCamera().getGameObject().transform.position.y / config.gridHeight();
         GameObject spotLightGameObject = new LightPrefab(this,
                 new Light(x, y, 0.5, 5, 10, Color.WHITE)).create(scene);
         scene.add(spotLightGameObject);
     }
 
     public void addEntity(String name) {
-        Scene scene = getEntity().getScene();
-        double x = scene.getCamera().getEntity().transform.position.x / config.gridWidth();
-        double y = scene.getCamera().getEntity().transform.position.y / config.gridHeight();
+        Scene scene = getGameObject().getScene();
+        double x = scene.getCamera().getGameObject().transform.position.x / config.gridWidth();
+        double y = scene.getCamera().getGameObject().transform.position.y / config.gridHeight();
         GameObject entity = new EntityPrefab(this,
                 new Entity(name, x, y)).create(scene);
         scene.add(entity);
     }
 
     public void addDoor() {
-        Scene scene = getEntity().getScene();
-        int x = (int)(scene.getCamera().getEntity().transform.position.x / config.gridWidth());
-        int y = (int)(scene.getCamera().getEntity().transform.position.y / config.gridHeight());
+        Scene scene = getGameObject().getScene();
+        int x = (int)(scene.getCamera().getGameObject().transform.position.x / config.gridWidth());
+        int y = (int)(scene.getCamera().getGameObject().transform.position.y / config.gridHeight());
         GameObject door = new DoorPrefab(this,
                 new Door(x, y, Direction.DOWN)).create(scene);
         scene.add(door);
@@ -343,8 +343,8 @@ public class EditorComponent extends Component {
         mousePosition.set(worldMousePosition);
 
         if(Input.mouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-            camera.getEntity().transform.position.x -= mousePosition.x - mouseBeginPosition.x;
-            camera.getEntity().transform.position.y -= mousePosition.y - mouseBeginPosition.y;
+            camera.getGameObject().transform.position.x -= mousePosition.x - mouseBeginPosition.x;
+            camera.getGameObject().transform.position.y -= mousePosition.y - mouseBeginPosition.y;
         }
 
         GameObject hoveredGameObject = getHoveredGameObject();

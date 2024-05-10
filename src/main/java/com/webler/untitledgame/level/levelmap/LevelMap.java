@@ -24,11 +24,18 @@ public class LevelMap implements Serializable {
             "caffe_latte",
             "caffe_mocha",
             "cappuccino",
-            "vending_machine"
+            "vending_machine",
+            "pc_desk",
+            "drawer",
+            "cupboard",
+            "sink",
+            "ghost"
     };
     public static final String TAG = "levelmap";
     public int minX, minY, maxX, maxY;
     public int ceiling;
+    public Environment environment;
+
     private List<Platform> platforms;
     private List<Light> lights;
     private List<Entity> entities;
@@ -40,6 +47,7 @@ public class LevelMap implements Serializable {
         maxX = 0;
         maxY = 0;
         ceiling = 1;
+        environment = Environment.DUNGEON;
         platforms = new ArrayList<>();
         lights = new ArrayList<>();
         entities = new ArrayList<>();
@@ -127,6 +135,7 @@ public class LevelMap implements Serializable {
         element.setAttribute("max-x", Integer.toString(maxX));
         element.setAttribute("max-y", Integer.toString(maxY));
         element.setAttribute("ceiling", Integer.toString(ceiling));
+        element.setAttribute("environment", String.valueOf(environment));
 
         for (Platform platform : platforms) {
             Element platformElement = element.getOwnerDocument().createElement(Platform.TAG);
@@ -160,12 +169,15 @@ public class LevelMap implements Serializable {
         int maxX = Integer.parseInt(levelMapElement.getAttribute("max-x"));
         int maxY = Integer.parseInt(levelMapElement.getAttribute("max-y"));
         int ceiling = Integer.parseInt(levelMapElement.getAttribute("ceiling"));
+        String environmentAttr = levelMapElement.getAttribute("environment");
+        Environment environment = environmentAttr.isEmpty() ? Environment.HOUSE : Environment.valueOf(environmentAttr);
 
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
         this.ceiling = ceiling;
+        this.environment = environment;
 
         NodeList platformNodeList = levelMapElement.getElementsByTagName(Platform.TAG);
         for(int i = 0; i < platformNodeList.getLength(); ++i) {

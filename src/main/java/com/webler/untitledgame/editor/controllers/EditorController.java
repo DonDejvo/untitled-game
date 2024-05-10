@@ -1,7 +1,6 @@
 package com.webler.untitledgame.editor.controllers;
 
 import com.webler.goliath.core.Component;
-import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.DebugDraw;
@@ -13,9 +12,11 @@ import org.joml.Vector2d;
 
 public abstract class EditorController extends Component {
     protected EditorComponent editorComponent;
+    protected Color color;
 
     public EditorController(EditorComponent editorComponent) {
         this.editorComponent = editorComponent;
+        this.color = Color.WHITE;
     }
 
     public abstract void editorImgui();
@@ -40,12 +41,11 @@ public abstract class EditorController extends Component {
         synchronize();
         if(gameObject.hasComponent("Renderer")) {
             SpriteRenderer spriteRenderer = getComponent(SpriteRenderer.class, "Renderer");
-            spriteRenderer.setColor(isSelected() ? Color.ORANGE : Color.WHITE);
+            spriteRenderer.setColor(isSelected() ? Color.ORANGE : color);
             Rect boundingRect = spriteRenderer.getBoundingRect();
-            Color color = Color.YELLOW;
             DebugDraw.get().addRect(
                     new Vector2d(boundingRect.x + boundingRect.width / 2, boundingRect.y + boundingRect.height / 2),
-                    new Vector2d(boundingRect.width, boundingRect.height), color);
+                    new Vector2d(boundingRect.width, boundingRect.height), Color.YELLOW);
         }
     }
 
@@ -55,6 +55,6 @@ public abstract class EditorController extends Component {
     }
 
     private boolean isSelected() {
-        return editorComponent.getSelectedGameObject() == getEntity();
+        return editorComponent.getSelectedGameObject() == getGameObject();
     }
 }

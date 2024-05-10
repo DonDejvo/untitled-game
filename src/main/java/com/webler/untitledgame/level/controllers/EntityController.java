@@ -52,10 +52,20 @@ public abstract class EntityController extends Controller {
 
     protected void followPath() {
         Vertex[] path = pathFinder.getPath();
-        if(path == null || currentPathIdx >= path.length ||
+        if((!pathFinder.isSamePlatform() && (path == null || currentPathIdx >= path.length)) ||
                 gameObject.transform.position.distance(followTargetPos) < followTargetDistance) {
             acceleration.x = 0;
             acceleration.z = 0;
+            return;
+        }
+
+        if(pathFinder.isSamePlatform()) {
+            Vector3d direction = new Vector3d(followTargetPos.x, 0, followTargetPos.z)
+                    .sub(gameObject.transform.position)
+                    .normalize();
+
+            acceleration.x = direction.x * speed;
+            acceleration.z = direction.z * speed;
             return;
         }
 

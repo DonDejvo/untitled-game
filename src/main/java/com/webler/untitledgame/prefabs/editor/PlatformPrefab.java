@@ -21,7 +21,7 @@ public class PlatformPrefab implements Prefab {
 
     @Override
     public GameObject create(Scene scene) {
-        Sprite sprite = new Sprite(AssetPool.getTexture("untitled-game/images/platform.png"));
+        Sprite sprite = new Sprite();
         sprite.setWidth(editorComponent.getConfig().gridWidth());
         sprite.setHeight(editorComponent.getConfig().gridHeight());
         GameObject gameObject = new GameObject(scene);

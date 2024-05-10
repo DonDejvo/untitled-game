@@ -6,6 +6,7 @@ import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.editor.controllers.EditorController;
 import com.webler.untitledgame.level.levelmap.*;
 import imgui.ImGui;
+import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiTreeNodeFlags;
 
@@ -22,12 +23,15 @@ public class HierarchyWindow {
     }
 
     public void imgui() {
-        Scene scene = editor.getEntity().getScene();
+        Scene scene = editor.getGameObject().getScene();
         String levelName = editor.getCurrentPath() == null ?
                 "<Unsaved>" : Path.of(editor.getCurrentPath()).getFileName().toString();
         int i = 0;
 
-        ImGui.setNextWindowSize(300, 150, ImGuiCond.FirstUseEver);
+        ImGuiIO io = ImGui.getIO();
+
+        ImGui.setNextWindowSize(480, 720, ImGuiCond.FirstUseEver);
+        ImGui.setNextWindowPos(20, 60, ImGuiCond.FirstUseEver);
 
         ImGui.begin("Hierarchy");
 

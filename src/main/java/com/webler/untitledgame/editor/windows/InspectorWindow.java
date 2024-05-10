@@ -3,6 +3,7 @@ package com.webler.untitledgame.editor.windows;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.editor.controllers.EditorController;
 import imgui.ImGui;
+import imgui.ImGuiIO;
 import imgui.flag.ImGuiCond;
 
 public class InspectorWindow {
@@ -13,7 +14,11 @@ public class InspectorWindow {
     }
 
     public void imgui() {
-        ImGui.setNextWindowSize(300, 150, ImGuiCond.FirstUseEver);
+
+        ImGuiIO io = ImGui.getIO();
+
+        ImGui.setNextWindowSize(480, 720, ImGuiCond.FirstUseEver);
+        ImGui.setNextWindowPos(io.getDisplaySizeX() - 480 - 20, 60, ImGuiCond.FirstUseEver);
 
         ImGui.begin("Inspector");
         if(editor.getSelectedGameObject() != null) {
@@ -22,7 +27,7 @@ public class InspectorWindow {
             editorController.editorImgui();
             if(editorController.isRemovable()) {
                 if(ImGui.button("Remove")) {
-                    editor.getEntity().getScene().remove(editor.getSelectedGameObject());
+                    editor.getGameObject().getScene().remove(editor.getSelectedGameObject());
                     editor.selectGameObject(null);
                 }
             }

@@ -1,12 +1,13 @@
 package com.webler.goliath.graphics.components;
 
+import com.webler.goliath.animation.Animable;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Sprite;
 import com.webler.goliath.math.Rect;
 import org.joml.Vector3d;
 
-public class SpriteRenderer extends Component {
+public class SpriteRenderer extends Component implements Animable {
     private Sprite sprite;
     private int zIndex;
     private Color color;
@@ -67,5 +68,10 @@ public class SpriteRenderer extends Component {
         double width = gameObject.transform.scale.x * sprite.getWidth();
         double height = gameObject.transform.scale.y * sprite.getHeight();
         return new Rect(offsetPosition.x - width / 2, offsetPosition.y - height / 2, width, height);
+    }
+
+    @Override
+    public void setFrame(int x, int y, int frameWidth, int frameHeight) {
+        sprite.setRegion(x * frameWidth, y * frameHeight, frameWidth, frameHeight);
     }
 }
