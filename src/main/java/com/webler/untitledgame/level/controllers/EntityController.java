@@ -17,7 +17,6 @@ public abstract class EntityController extends Controller {
     protected double friction;
     protected double gravity;
     protected double bounciness;
-    protected double yaw, pitch;
     protected boolean onGround;
     protected double speed;
     private String[] collisionGroups;
@@ -33,8 +32,6 @@ public abstract class EntityController extends Controller {
         friction = 1;
         gravity = 25;
         bounciness = 0;
-        yaw = 0.0;
-        pitch = 0.0;
         onGround = false;
         this.speed = speed;
         this.collisionGroups = collisionGroups;
@@ -95,21 +92,22 @@ public abstract class EntityController extends Controller {
 
         acceleration.y = -gravity;
 
-        double frameFriction = Math.min(friction * dt, 1);
+        double frameFriction = friction * dt;
         Vector3d frameAcceleration = new Vector3d(acceleration).mul(dt);
         Vector3d decceleration = new Vector3d(velocity).mul(frameFriction, 0, frameFriction);
         velocity.add(frameAcceleration.sub(decceleration));
 
         Vector3d moveVec = new Vector3d(velocity).mul(dt);
-        int steps = (int)Math.ceil(moveVec.length() / 4);
-        Vector3d moveStep = moveVec.div(steps);
+        double stepDistance = 1.0;
+        int steps = (int)Math.ceil(moveVec.length() / stepDistance);
+        Vector3d moveStep = new Vector3d(moveVec).mul(1.0 / steps);
 
         for (int i = 0; i < steps; ++i) {
             Vector3d lastPosition = new Vector3d(gameObject.transform.position);
 
             gameObject.transform.position.x += moveStep.x;
 
-            if(collides()) {
+            if(collides(new Vector3d(1, 0, 0))) {
 
                 gameObject.transform.position.x = lastPosition.x;
                 velocity.x *= -bounciness;
@@ -119,7 +117,8 @@ public abstract class EntityController extends Controller {
 
             gameObject.transform.position.z += moveStep.z;
 
-            if(collides()) {
+            if(collides(new Vector3d(0, 0, 1))) {
+
                 gameObject.transform.position.z = lastPosition.z;
                 velocity.z *= -bounciness;
 
@@ -128,17 +127,22 @@ public abstract class EntityController extends Controller {
 
             gameObject.transform.position.y += moveStep.y;
 
-            if(collides()) {
+            if(collides(new Vector3d(0, 1, 0))) {
+
                 gameObject.transform.position.y = lastPosition.y;
                 onGround = velocity.y < 0;
-                velocity.y = 0;
+                if(velocity.y < -20) {
+                    velocity.y *= -bounciness;
+                } else {
+                    velocity.y = 0;
+                }
 
                 i = steps;
             }
         }
     }
 
-    private boolean collides() {
+    private boolean collides(Vector3d axis) {
 
         for (String collisionGroup : collisionGroups) {
             List<GameObject> objects = level.getObjectsByGroup(collisionGroup);
@@ -147,6 +151,7 @@ public abstract class EntityController extends Controller {
                     for (GameObject doorObject : objects) {
                         BoxCollider3D otherCollider = doorObject.getComponent(BoxCollider3D.class, "Collider");
                         if (collider.collidesWith(otherCollider)) {
+                            didCollidesWithEntity(doorObject);
                             return true;
                         }
                     }
@@ -155,7 +160,9 @@ public abstract class EntityController extends Controller {
                     for (GameObject checkedObject : objects) {
                         BoxCollider3D otherCollider = checkedObject.getComponent(BoxCollider3D.class, "Collider");
                         Vector2d otherPositionXY = new Vector2d(checkedObject.transform.position.x, checkedObject.transform.position.z);
-                        if (positionXY.distance(otherPositionXY) < (collider.getSize().x + otherCollider.getSize().x) * 0.5) {
+                        if (positionXY.distance(otherPositionXY) < (collider.getSize().x + otherCollider.getSize().x) * 0.5 &&
+                                Math.abs(gameObject.transform.position.y - checkedObject.transform.position.y) < (collider.getSize().y + otherCollider.getSize().y) * 0.5) {
+                            didCollidesWithEntity(checkedObject);
                             return true;
                         }
                     }
@@ -163,6 +170,16 @@ public abstract class EntityController extends Controller {
             }
         }
 
-        return level.isBlockAtBox(collider.getMin(), collider.getMax());
+        boolean collidesWithBlock = level.isBlockAtBox(collider.getMin(), collider.getMax());
+
+        if (collidesWithBlock) {
+            didCollides(axis);
+        }
+
+        return collidesWithBlock;
     }
+
+    protected void didCollides(Vector3d axis) {}
+
+    protected void didCollidesWithEntity(GameObject entity) {}
 }

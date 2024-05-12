@@ -98,7 +98,7 @@ public class Renderer {
             SpotLight spotLight = spotLights.get(i);
             Color lightColor = spotLight.getColor();
             spotLightVec[i * 3] = new Vector3d(spotLight.getGameObject().transform.position);
-            spotLightVec[i * 3 + 1] = new Vector3d(lightColor.r, lightColor.g, lightColor.b);
+            spotLightVec[i * 3 + 1] = new Vector3d(lightColor.r, lightColor.g, lightColor.b).mul(spotLight.getIntensity());
             spotLightVec[i * 3 + 2] = new Vector3d(spotLight.getRadiusMin(), spotLight.getRadiusMax(), 0);
         }
 
@@ -185,5 +185,9 @@ public class Renderer {
         fog.fogColor = Color.BLACK;
         fog.fogNear = 50;
         fog.fogFar = 100;
+    }
+
+    public Fog getFog() {
+        return fog;
     }
 }

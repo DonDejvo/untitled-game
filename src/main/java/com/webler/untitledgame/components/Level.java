@@ -23,6 +23,7 @@ import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.controllers.*;
 import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.level.levelmap.*;
+import com.webler.untitledgame.prefabs.level.GunPrefab;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
@@ -93,16 +94,20 @@ public class Level extends Component {
                 catgirlsSpritesheet.getSprite(1), new Vector2d(0.5, 0.75), 24));
         levelObjectRegistry.add(new LevelEntity("cat_girl_3", "Cat girl 3",
                 catgirlsSpritesheet.getSprite(2), new Vector2d(0.5, 0.75), 24));
-        levelObjectRegistry.add(new LevelEntity("pc_desk", "PC Desk",
-                houseSpritesheet.getSprite(6), new Vector2d(0.675, 0.675), 20));
-        levelObjectRegistry.add(new LevelEntity("drawer", "Drawer",
-                houseSpritesheet.getSprite(4), new Vector2d(0.675, 0.675), 20));
-        levelObjectRegistry.add(new LevelEntity("cupboard", "Cupboard",
-                houseSpritesheet.getSprite(2), new Vector2d(0.675, 0.675), 20));
-        levelObjectRegistry.add(new LevelEntity("sink", "Sink",
-                houseSpritesheet.getSprite(3), new Vector2d(0.675, 0.675), 20));
+//        levelObjectRegistry.add(new LevelEntity("pc_desk", "PC Desk",
+//                houseSpritesheet.getSprite(6), new Vector2d(0.675, 0.675), 20));
+//        levelObjectRegistry.add(new LevelEntity("drawer", "Drawer",
+//                houseSpritesheet.getSprite(4), new Vector2d(0.675, 0.675), 20));
+//        levelObjectRegistry.add(new LevelEntity("cupboard", "Cupboard",
+//                houseSpritesheet.getSprite(2), new Vector2d(0.675, 0.675), 20));
+//        levelObjectRegistry.add(new LevelEntity("sink", "Sink",
+//                houseSpritesheet.getSprite(3), new Vector2d(0.675, 0.675), 20));
         levelObjectRegistry.add(new LevelEntity("ghost", "Ghost",
                 ghostSpritesheet.getSprite(0), new Vector2d(0.75, 0.75), 24));
+        levelObjectRegistry.add(new LevelItem("ak47", "AK-47",
+                new Sprite(AssetPool.getTexture("untitled-game/images/Ak47.png")), new Vector2d(0.8, 0.5), 50, "", 999));
+        levelObjectRegistry.add(new LevelItem("shotgun", "Shotgun",
+                new Sprite(AssetPool.getTexture("untitled-game/images/shotgun.png")), new Vector2d(0.8, 0.5), 50, "", 999));
     }
 
     @Override
@@ -213,6 +218,10 @@ public class Level extends Component {
         createEntities();
         createLights();
 
+        buildGraph();
+    }
+
+    private void buildGraph() {
         List<Vertex> vertices = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
 
@@ -423,6 +432,9 @@ public class Level extends Component {
             go.addComponent("Bilboard", new Bilboard());
             scene.add(go);
         }
+
+        gameObject.getGame().getRenderer().getFog().fogNear = 20;
+        gameObject.getGame().getRenderer().getFog().fogFar = 40;
 
         GameObject ambientLightGameObject = new GameObject(scene);
         ambientLightGameObject.addComponent("AmbientLight", new AmbientLight(new Color(0.05, 0.05, 0.05)));

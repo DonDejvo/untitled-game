@@ -2,6 +2,7 @@ package com.webler.untitledgame.level.controllers;
 
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.GameObject;
+import com.webler.goliath.core.Scene;
 import com.webler.goliath.dialogs.DialogOption;
 import com.webler.goliath.dialogs.components.DialogManager;
 import com.webler.goliath.dialogs.events.DialogEndedEvent;
@@ -11,11 +12,13 @@ import com.webler.goliath.dialogs.nodes.DialogTextNode;
 import com.webler.goliath.eventsystem.listeners.EventHandler;
 import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.input.Input;
+import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.components.PathFinder;
-import com.webler.untitledgame.level.events.DoorOpened;
+import com.webler.untitledgame.level.events.DoorOpenedEvent;
+import com.webler.untitledgame.level.events.ItemSelectedEvent;
 import com.webler.untitledgame.level.inventory.Inventory;
-import org.joml.Quaterniond;
+import com.webler.untitledgame.prefabs.level.GunPrefab;
 import org.joml.Vector3d;
 
 import java.util.List;
@@ -24,23 +27,25 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends EntityController {
     private Camera camera;
-    private double rotationSpeed;
     private boolean canJump;
     private GameObject focusedObject;
     private State state;
     private Inventory inventory;
     private GameObject companion;
+    private GameObject gun;
+    private boolean shouldStopInteraction;
 
     public PlayerController(Level level, Camera camera, BoxCollider3D collider, Inventory inventory, PathFinder pathFinder) {
         super(level, collider, new String[]{ "npc", "fixed" }, pathFinder, 80);
         this.camera = camera;
         this.inventory = inventory;
         bounciness = 0;
-        rotationSpeed = 2.5;
         canJump = true;
         focusedObject = null;
-        state = State.IDLE;
+        state = State.PLAYING;
         companion = null;
+        gun = null;
+        shouldStopInteraction = false;
     }
 
     public GameObject getFocusedObject() {
@@ -59,6 +64,15 @@ public class PlayerController extends EntityController {
             }
             inventory.add(itemName);
         }
+    }
+
+    public void equipGun(String itemName) {
+        Scene scene = gameObject.getScene();
+        if(gun != null) {
+            gun.remove();
+        }
+        gun = new GunPrefab(level, itemName).create(scene);
+        scene.add(gun);
     }
 
     @Override
@@ -81,8 +95,8 @@ public class PlayerController extends EntityController {
     @Override
     public void update(double dt) {
         switch (state) {
-            case IDLE:
-                updateIdle(dt);
+            case PLAYING:
+                updatePlaying(dt);
                 break;
             case INTERACTING:
                 updateInteracting(dt);
@@ -91,13 +105,17 @@ public class PlayerController extends EntityController {
                 updateLookingInventory(dt);
                 break;
         }
+        updateGun();
 
-        friction = onGround ? 10 : 2.5;
+        if(shouldStopInteraction) {
+            state = State.PLAYING;
+            shouldStopInteraction = false;
+        }
+
+        Input.setCursorLocked(state == State.PLAYING);
+
+        friction = onGround ? 10 : 2;
         updatePhysics(dt);
-
-        Quaterniond q = new Quaterniond();
-        q.rotateY(yaw + Math.PI / 2);
-        gameObject.transform.rotation.set(q);
     }
 
     public GameObject getCompanion() {
@@ -126,9 +144,19 @@ public class PlayerController extends EntityController {
     }
 
     @EventHandler
-    public void onDoorOpened(DoorOpened event) {
+    public void onDoorOpened(DoorOpenedEvent event) {
         if(event.getDoor() == focusedObject) {
             stopInteraction();
+        }
+    }
+
+    @EventHandler
+    public void onItemSelected(ItemSelectedEvent event) {
+        switch (event.getItemName()) {
+            case "ak47", "shotgun": {
+                equipGun(event.getItemName());
+                break;
+            }
         }
     }
 
@@ -141,10 +169,10 @@ public class PlayerController extends EntityController {
     }
 
     private void stopInteraction() {
-        state = State.IDLE;
+        shouldStopInteraction = true;
     }
 
-    private void updateIdle(double dt) {
+    private void updatePlaying(double dt) {
         Vector3d moveVec = new Vector3d();
 
         if(Input.keyPressed(GLFW_KEY_W)) {
@@ -153,10 +181,10 @@ public class PlayerController extends EntityController {
         if(Input.keyPressed(GLFW_KEY_S)) {
             moveVec.x -= 1;
         }
-        if(Input.keyPressed(GLFW_KEY_Q)) {
+        if(Input.keyPressed(GLFW_KEY_A)) {
             moveVec.z -= 1;
         }
-        if(Input.keyPressed(GLFW_KEY_E)) {
+        if(Input.keyPressed(GLFW_KEY_D)) {
             moveVec.z += 1;
         }
         moveVec.mul(speed * (onGround ? 1 : 0.3));
@@ -165,12 +193,15 @@ public class PlayerController extends EntityController {
             moveVec.x *= 2;
         }
 
-        if(Input.keyPressed(GLFW_KEY_A)) {
-            yaw += rotationSpeed * dt;
-        }
-        if(Input.keyPressed(GLFW_KEY_D)) {
-            yaw -= rotationSpeed * dt;
-        }
+//        if(Input.keyPressed(GLFW_KEY_A)) {
+//            yaw += rotationSpeed * dt;
+//        }
+//        if(Input.keyPressed(GLFW_KEY_D)) {
+//            yaw -= rotationSpeed * dt;
+//        }
+
+        yaw += Input.mouseDeltaX() * -0.005;
+        pitch = MathUtils.clamp(pitch + Input.mouseDeltaY() * 0.005, -1.5, 1.5);
 
         moveVec.rotateY(yaw);
         acceleration.set(moveVec);
@@ -184,7 +215,7 @@ public class PlayerController extends EntityController {
             canJump = true;
         }
 
-        if(Input.keyBeginPress(GLFW_KEY_F)) {
+        if(Input.keyBeginPress(GLFW_KEY_E)) {
             startInteraction();
         }
 
@@ -219,18 +250,42 @@ public class PlayerController extends EntityController {
 
         if(Input.keyBeginPress(GLFW_KEY_TAB) || Input.keyBeginPress(GLFW_KEY_ESCAPE) || Input.keyBeginPress(GLFW_KEY_I)) {
             inventory.setOpened(false);
-            state = State.IDLE;
+            state = State.PLAYING;
         }
 
         updateCamera(dt);
     }
 
     private void updateCamera(double dt) {
-        Vector3d direction = new Vector3d(1, 0, 0);
-        direction.rotateY(yaw);
+        Vector3d direction = new Vector3d(0, 0, 1);
+        direction.rotateX(pitch);
+        direction.rotateY(yaw + Math.PI / 2);
 
         camera.getGameObject().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 0.75, 0));
-        camera.direction.lerp(direction, Math.min(dt * 10, 1));
+//        camera.direction.lerp(direction, Math.min(dt * 10, 1));
+        camera.direction.set(direction);
+    }
+
+    private void updateGun() {
+        if(gun != null) {
+
+            GunController gunController = gun.getComponent(GunController.class, "Controller");
+            if(Input.mouseButtonBeginPress(GLFW_MOUSE_BUTTON_LEFT)  && state == State.PLAYING) {
+                gunController.setShooting(true);
+            } else if(!Input.mouseButtonPress() || state != State.PLAYING) {
+                gunController.setShooting(false);
+            }
+
+            setGunPos();
+        }
+    }
+
+    private void setGunPos() {
+        GunController gunController = gun.getComponent(GunController.class, "Controller");
+        Vector3d pos = new Vector3d(gameObject.transform.position).add(new Vector3d(0, 0.25, 1).rotateY(yaw));
+        gun.transform.position.set(pos);
+        gunController.yaw = yaw;
+        gunController.pitch = pitch;
     }
 
     private void updateFocusedObject() {
@@ -250,6 +305,6 @@ public class PlayerController extends EntityController {
     }
 
     private enum State {
-        INTERACTING, IDLE, LOOKING_INVENTORY
+        INTERACTING, PLAYING, LOOKING_INVENTORY
     }
 }

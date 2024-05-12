@@ -7,12 +7,15 @@ import com.webler.untitledgame.components.Level;
 import org.joml.Vector3d;
 
 public abstract class Controller extends Component {
+    protected double yaw, pitch;
     protected Level level;
     protected BoxCollider3D collider;
 
     public Controller(Level level, BoxCollider3D collider) {
         this.level = level;
         this.collider = collider;
+        yaw = 0.0;
+        pitch = 0.0;
     }
 
     protected Vector3d getCenter() {
@@ -29,7 +32,7 @@ public abstract class Controller extends Component {
         Vector3d center = getCenter();
         Vector3d directionToObject = new Vector3d(center).sub(player.transform.position).normalize();
         double distance = player.transform.position.distance(center);
-        return distance > 2 && distance < 6 &&
+        return distance > 0.1 && distance < 5 &&
                 playerDirection.dot(directionToObject) > 0.9;
     }
 

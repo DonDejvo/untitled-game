@@ -11,7 +11,7 @@ import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.components.Level;
-import com.webler.untitledgame.level.events.DoorOpened;
+import com.webler.untitledgame.level.events.DoorOpenedEvent;
 import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.level.levelmap.Direction;
 import org.joml.Vector3d;
@@ -80,7 +80,7 @@ public class DoorController extends Controller {
 
         if(state == State.OPENED) {
             collider.setSize(new Vector3d(0, 0, 0));
-            EventManager.dispatchEvent(new DoorOpened(gameObject));
+            EventManager.dispatchEvent(new DoorOpenedEvent(gameObject));
         } else {
             collider.setSize(new Vector3d(4, 4, 4));
         }

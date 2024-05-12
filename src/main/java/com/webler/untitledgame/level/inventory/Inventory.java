@@ -1,6 +1,7 @@
 package com.webler.untitledgame.level.inventory;
 
 import com.webler.goliath.core.Component;
+import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Sprite;
 import com.webler.goliath.graphics.canvas.Canvas;
@@ -9,6 +10,7 @@ import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.components.LevelItem;
+import com.webler.untitledgame.level.events.ItemSelectedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -120,6 +122,7 @@ public class Inventory extends Component {
             ui.hoverBgColor = new Color(0.5, 0, 0, 1);
             if(ui.imageButton(sprite.getTexture().getTexId(), texCoords[0], texCoords[1], texCoords[4], texCoords[5], x * h * 0.1f, y * h * 0.1f, h * 0.08f, h * 0.08f)) {
                 hoveredItemIdx = y * numCols + x;
+                EventManager.dispatchEvent(new ItemSelectedEvent(gameObject, item.getLevelItem().getIdentifier()));
             }
             ui.hoverBgColor = prevHoverBgColor;
 
@@ -151,6 +154,10 @@ public class Inventory extends Component {
             ui.fontSize = h * 0.025f;
             ui.text(selectedItem.getLevelItem().getName(), h * 0.18f, h * 0.6f);
             ui.textBlock(selectedItem.getLevelItem().getDescription(), h * 0.18f, h * 0.6f + ui.lineHeight, h * 0.42f - ui.padding.x);
+
+            if(Input.keyBeginPress(GLFW_KEY_ENTER)) {
+                EventManager.dispatchEvent(new ItemSelectedEvent(gameObject, selectedItem.getLevelItem().getIdentifier()));
+            }
         }
 
         ui.end();

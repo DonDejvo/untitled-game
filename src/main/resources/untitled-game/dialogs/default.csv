@@ -3,7 +3,7 @@ system__learn_controls;System;Would you like to learn about the controls?
 player__no;;NO
 player__yes;;YES
 system__controls_move;System;Use WSAD to move player, hold SHIFT to run and use SPACE to jump.
-system__controls_interact;System;Focus an object by standing nearby and looking its direction. Press F to interact.
+system__controls_interact;System;Focus an object by standing nearby and looking its direction. Press E to interact.
 system__controls_inventory;System;Use I or TAB to open the inventory and use arrows or WSAD to move in the invetory.
 player__follow;;Follow me!
 player__stop_follow;;Wait here!

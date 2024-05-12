@@ -21,6 +21,8 @@ public class Sprite {
 
     public Sprite() {
         this(AssetPool.getTexture("goliath/images/square.png"));
+        width = 1;
+        height = 1;
     }
 
     public Sprite(Sprite sprite) {

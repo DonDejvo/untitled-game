@@ -233,13 +233,14 @@ public class Game {
                 canvas.destroy();
             }
 
+            Input.start(window);
+            canvas.start();
+
             newScene.init(item.params);
 
             currentScene = newScene;
             currentSceneName = item.name;
 
-            Input.start();
-            canvas.start();
             newScene.start();
 
         } catch (Exception e) {

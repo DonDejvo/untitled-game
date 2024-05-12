@@ -102,6 +102,10 @@ public final class GameObject {
         return game;
     }
 
+    public void remove() {
+        scene.remove(this);
+    }
+
     private static String generateName() {
         return "__game_object__" + idsCounter.incrementAndGet();
     }

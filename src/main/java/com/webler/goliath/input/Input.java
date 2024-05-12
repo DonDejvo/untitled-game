@@ -16,6 +16,8 @@ public class Input {
     private final boolean[] keyPressed;
     private final boolean[] keyBeginPress;
     private boolean captured;
+    private long window;
+    private boolean locked;
 
     private Input() {
         mouseButtonDown = 0;
@@ -24,6 +26,7 @@ public class Input {
         keyPressed = new boolean[GLFW_KEY_LAST + 1];
         keyBeginPress = new boolean[GLFW_KEY_LAST + 1];
         captured = false;
+        locked = false;
     }
 
     public static Input getInstance() {
@@ -33,10 +36,12 @@ public class Input {
         return instance;
     }
 
-    public static void start() {
+    public static void start(long window) {
         Input instance = getInstance();
+        instance.window = window;
         clear();
         instance.captured = false;
+        setCursorLocked(false);
     }
 
     public static void endFrame() {
@@ -165,5 +170,13 @@ public class Input {
 
     public static void setCaptured(boolean captured) {
         getInstance().captured = captured;
+    }
+
+    public static void setCursorLocked(boolean locked) {
+        Input instance = getInstance();
+        if(instance.locked != locked) {
+            instance.locked = locked;
+            glfwSetInputMode(instance.window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        }
     }
 }

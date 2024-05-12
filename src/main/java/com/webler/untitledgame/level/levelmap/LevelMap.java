@@ -25,11 +25,9 @@ public class LevelMap implements Serializable {
             "caffe_mocha",
             "cappuccino",
             "vending_machine",
-            "pc_desk",
-            "drawer",
-            "cupboard",
-            "sink",
-            "ghost"
+            "ghost",
+            "ak47",
+            "shotgun"
     };
     public static final String TAG = "levelmap";
     public int minX, minY, maxX, maxY;
