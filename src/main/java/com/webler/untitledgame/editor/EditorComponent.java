@@ -201,7 +201,7 @@ public class EditorComponent extends Component {
         double x = scene.getCamera().getGameObject().transform.position.x / config.gridWidth();
         double y = scene.getCamera().getGameObject().transform.position.y / config.gridHeight();
         GameObject spotLightGameObject = new LightPrefab(this,
-                new Light(x, y, 0.5, 5, 10, Color.WHITE)).create(scene);
+                new Light(x, y, 0.5, 5, 10, Color.WHITE, 1)).create(scene);
         scene.add(spotLightGameObject);
     }
 

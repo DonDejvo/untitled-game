@@ -47,6 +47,10 @@ public class LightEditorController extends EditorController {
         float[] color = light.color.toArray();
         Controls.colorPicker("color", color);
         light.color = Color.fromArray(color);
+
+        float[] intensity = {(float) light.intensity};
+        Controls.floatControl("intensity", intensity, 0.1f);
+        light.intensity = intensity[0];
     }
 
     @Override

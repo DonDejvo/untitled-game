@@ -47,10 +47,10 @@ public class ShellProjectileController extends ProjectileController{
             GameObject particle = new ParticlePrefab(level, 20, Math.random() * 0.4 + 0.4, particleSprite).create(scene);
             particle.transform.position.set(pos);
             if(hit) {
-                particle.transform.scale.set(0.2);
+                particle.transform.scale.set(0.4);
                 particle.getComponent(SpriteRenderer.class, "Renderer").setColor(new Color(0.3, 0.05, 0.15));
             } else {
-                particle.transform.scale.set(0.1);
+                particle.transform.scale.set(0.2);
                 particle.getComponent(SpriteRenderer.class, "Renderer").setColor(new Color(0.5, 0.35, 0.25));
             }
             scene.add(particle);

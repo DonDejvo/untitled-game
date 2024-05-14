@@ -8,14 +8,16 @@ public class Light implements Serializable {
     public double x, y, top;
     public double radiusMin, radiusMax;
     public Color color;
+    public double intensity;
 
-    public Light(double x, double y, double top, double radiusMin, double radiusMax, Color color) {
+    public Light(double x, double y, double top, double radiusMin, double radiusMax, Color color, double intensity) {
         this.x = x;
         this.y = y;
         this.top = top;
         this.radiusMin = radiusMin;
         this.radiusMax = radiusMax;
         this.color = color;
+        this.intensity = intensity;
     }
 
     public Light() {
@@ -29,6 +31,7 @@ public class Light implements Serializable {
         double radiusMin = Double.parseDouble(element.getAttribute("radius-min"));
         double radiusMax = Double.parseDouble(element.getAttribute("radius-max"));
         Color color = Color.fromString(element.getAttribute("color"));
+        double intensity = element.hasAttribute("intensity") ? Double.parseDouble(element.getAttribute("intensity")) : 1;
 
         this.x = x;
         this.y = y;
@@ -36,6 +39,7 @@ public class Light implements Serializable {
         this.radiusMin = radiusMin;
         this.radiusMax = radiusMax;
         this.color = color;
+        this.intensity = intensity;
     }
 
     @Override
@@ -46,5 +50,6 @@ public class Light implements Serializable {
         element.setAttribute("radius-min", Double.toString(radiusMin));
         element.setAttribute("radius-max", Double.toString(radiusMax));
         element.setAttribute("color", color.toString());
+        element.setAttribute("intensity", Double.toString(intensity));
     }
 }

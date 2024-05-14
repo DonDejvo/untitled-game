@@ -1,7 +1,9 @@
 package com.webler.untitledgame.level.controllers;
 
+import com.webler.goliath.audio.AudioManager;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
+import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.Projectile;
 import com.webler.untitledgame.prefabs.level.ProjectilePrefab;
@@ -18,5 +20,6 @@ public class AssaultRifleController extends GunController {
         GameObject projectile = new ProjectilePrefab(level, getProjectileType(), yaw, pitch).create(scene);
         projectile.transform.position.set(getProjectilePosition());
         scene.add(projectile);
+        AudioManager.play(AssetPool.getSound("untitled-game/sounds/gun.ogg").getBufferId());
     }
 }

@@ -5,6 +5,7 @@ import com.webler.goliath.Game;
 import com.webler.untitledgame.scenes.LevelEditorScene;
 import com.webler.untitledgame.scenes.LevelScene;
 import com.webler.untitledgame.scenes.LevelParams;
+import com.webler.untitledgame.scenes.TestScene;
 
 public class Main {
 
@@ -20,6 +21,7 @@ public class Main {
         Game game = new Game(config);
         game.registerScene(LevelScene.class);
         game.registerScene(LevelEditorScene.class);
+        game.registerScene(TestScene.class);
         game.run();
     }
 }

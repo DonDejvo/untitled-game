@@ -169,7 +169,7 @@ public class Renderer {
         spriteShader.unbind();
     }
 
-    public void destroy() {
+    public void clear() {
         for(Mesh mesh : meshes) {
             mesh.destroy();
         }

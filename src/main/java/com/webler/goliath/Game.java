@@ -1,5 +1,6 @@
 package com.webler.goliath;
 
+import com.webler.goliath.audio.AudioManager;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.core.SceneParams;
 import com.webler.goliath.core.exceptions.SceneException;
@@ -13,7 +14,6 @@ import com.webler.goliath.utils.AssetPool;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -93,6 +93,8 @@ public class Game {
 
         GL.createCapabilities();
 
+
+
         AssetPool.addBitmapFont("default", new BitmapFont(
                 new Spritesheet(
                         AssetPool.getTexture("goliath/font/pixfont-bold.png"),
@@ -112,6 +114,8 @@ public class Game {
 
         imGuiLayer.init();
         DebugDraw.get().start();
+
+        AudioManager.init();
 
         playScene(config.startScene(), config.startSceneParams());
     }
@@ -176,6 +180,7 @@ public class Game {
                 imGuiLayer.endFrame();
 
                 Input.endFrame();
+                AudioManager.endFrame();
             }
 
             while(!sceneChangeStack.isEmpty()) {
@@ -193,10 +198,11 @@ public class Game {
 
     private void destroy() {
         imGuiLayer.destroy();
-        renderer.destroy();
+        renderer.clear();
         DebugDraw.get().destroy();
         AssetPool.destroy();
         framebuffer.destroy();
+        AudioManager.destroy();
 
         Callbacks.glfwFreeCallbacks(window);
         GLFW.glfwDestroyWindow(window);
@@ -227,10 +233,12 @@ public class Game {
         try {
             Scene newScene = SceneClass.getConstructor(Game.class).newInstance(this);
 
+            AudioManager.clear();
+            renderer.clear();
+            canvas.clear();
+
             if(currentScene != null) {
                 currentScene.destroy();
-                renderer.destroy();
-                canvas.destroy();
             }
 
             Input.start(window);

@@ -2,6 +2,7 @@ package com.webler.goliath.utils;
 
 import com.webler.goliath.animation.Animation;
 import com.webler.goliath.animation.Frame;
+import com.webler.goliath.audio.Sound;
 import com.webler.goliath.exceptions.ResourceFormatException;
 import com.webler.goliath.exceptions.ResourceNotFoundException;
 import com.webler.goliath.graphics.Shader;
@@ -12,15 +13,13 @@ import com.webler.goliath.graphics.font.BitmapFont;
 import javax.imageio.ImageIO;
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AssetPool {
     private static final Map<String, Texture> textures = new HashMap<>();
     private static final Map<String, Shader> shaders = new HashMap<>();
+    private static final Map<String, Sound> sounds = new HashMap<>();
     private static final Map<String, Spritesheet> spritesheets = new HashMap<>();
     private static final Map<String, BitmapFont> bitmapFonts = new HashMap<>();
     private static final Map<String, Animation> animations = new HashMap<>();
@@ -57,6 +56,16 @@ public class AssetPool {
         shader.linkShader();
         shaders.put(key, shader);
         return shader;
+    }
+
+    public static Sound getSound(String resourceName) {
+        if(sounds.containsKey(resourceName)) {
+            return sounds.get(resourceName);
+        }
+        Sound sound = new Sound();
+        sound.load(resourceName);
+        sounds.put(resourceName, sound);
+        return sound;
     }
 
     public static Animation getAnimation(String resourceName) {
@@ -121,5 +130,6 @@ public class AssetPool {
     public static void destroy() {
         shaders.forEach(((s, shader) -> shader.destroy()));
         textures.forEach((s, texture) -> texture.destroy());
+        sounds.forEach((s, sound) -> sound.destroy());
     }
 }

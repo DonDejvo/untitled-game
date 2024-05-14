@@ -5,12 +5,9 @@ import static org.lwjgl.opengl.GL20.*;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Hashtable;
-
-import static org.lwjgl.stb.STBImage.*;
 
 public class Texture {
     private static final ComponentColorModel glAlphaColorModel = new ComponentColorModel(

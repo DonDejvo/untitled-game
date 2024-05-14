@@ -273,7 +273,7 @@ public class Canvas {
         return text.length() * fontSize * spritesheet.getSpriteWidth() / spritesheet.getSpriteHeight();
     }
 
-    public void destroy() {
+    public void clear() {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);

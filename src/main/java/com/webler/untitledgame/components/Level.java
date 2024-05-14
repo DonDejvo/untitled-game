@@ -4,6 +4,8 @@ import com.webler.goliath.algorithm.Dijkstra;
 import com.webler.goliath.algorithm.Edge;
 import com.webler.goliath.algorithm.Vertex;
 import com.webler.goliath.animation.components.Animator;
+import com.webler.goliath.audio.AudioManager;
+import com.webler.goliath.audio.SoundSource;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
@@ -219,6 +221,10 @@ public class Level extends Component {
         createLights();
 
         buildGraph();
+
+        SoundSource bgMusic = AudioManager.createSoundSource(true);
+        bgMusic.setBuffer(AssetPool.getSound("untitled-game/sounds/boss.ogg").getBufferId());
+        bgMusic.play();
     }
 
     private void buildGraph() {
@@ -424,6 +430,7 @@ public class Level extends Component {
             GameObject go = new GameObject(scene);
             go.transform.position.set(new Vector3d(light.x - levelMap.minX, light.top, light.y - levelMap.minY).mul(Level.TILE_SIZE));
             SpotLight spotLight = new SpotLight(new Color(light.color), light.radiusMin * Level.TILE_SIZE, light.radiusMax * Level.TILE_SIZE);
+            spotLight.setIntensity(light.intensity);
             go.addComponent("Light", spotLight);
             Sprite sprite = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png").getSprite(37);
             sprite.setWidth(1);
