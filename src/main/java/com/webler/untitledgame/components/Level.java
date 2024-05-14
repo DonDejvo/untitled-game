@@ -109,7 +109,7 @@ public class Level extends Component {
         levelObjectRegistry.add(new LevelItem("ak47", "AK-47",
                 new Sprite(AssetPool.getTexture("untitled-game/images/Ak47.png")), new Vector2d(0.8, 0.5), 50, "", 999));
         levelObjectRegistry.add(new LevelItem("shotgun", "Shotgun",
-                new Sprite(AssetPool.getTexture("untitled-game/images/shotgun.png")), new Vector2d(0.8, 0.5), 50, "", 999));
+                new Sprite(AssetPool.getTexture("untitled-game/images/Shotgun.png")), new Vector2d(0.8, 0.5), 50, "", 999));
     }
 
     @Override
