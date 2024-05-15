@@ -1,8 +1,12 @@
 package com.webler.goliath.colliders;
 
 import com.webler.goliath.core.Component;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.Vector3d;
 
+@Setter
+@Getter
 public class BoxCollider3D extends Component {
     private Vector3d size;
 
@@ -23,14 +27,6 @@ public class BoxCollider3D extends Component {
     @Override
     public void destroy() {
 
-    }
-
-    public Vector3d getSize() {
-        return size;
-    }
-
-    public void setSize(Vector3d size) {
-        this.size = size;
     }
 
     public Vector3d getCenter() {
@@ -55,5 +51,13 @@ public class BoxCollider3D extends Component {
         return (max.x - otherMin.x) * (min.x - otherMax.x) < 0 &&
                 (max.y - otherMin.y) * (min.y - otherMax.y) < 0 &&
                 (max.z - otherMin.z) * (min.z - otherMax.z) < 0;
+    }
+
+    public boolean contains(Vector3d point) {
+        Vector3d min = getMin();
+        Vector3d max = getMax();
+        return (max.x - point.x) * (min.x - point.x) < 0 &&
+                (max.y - point.y) * (min.y - point.y) < 0 &&
+                (max.z - point.z) * (min.z - point.z) < 0;
     }
 }

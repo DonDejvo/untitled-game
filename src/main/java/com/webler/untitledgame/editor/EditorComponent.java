@@ -22,6 +22,8 @@ import com.webler.untitledgame.prefabs.editor.EntityPrefab;
 import com.webler.untitledgame.prefabs.editor.PlatformPrefab;
 import com.webler.untitledgame.prefabs.editor.LightPrefab;
 import com.webler.untitledgame.scenes.LevelParams;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.Vector2d;
 import org.joml.Vector4d;
 
@@ -31,16 +33,26 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class EditorComponent extends Component {
     public static final String SELECTABLE_TAG = "selectable";
+    @Getter
     private Level level;
     private MenuBar menuBar;
     private HierarchyWindow hierarchyWindow;
     private LevelWindow levelWindow;
     private InspectorWindow inspectorWindow;
+    @Getter
     private EditorConfig config;
+    @Getter
     private String currentPath;
+    @Getter
     private GameObject selectedGameObject;
+    @Setter
+    @Getter
     private boolean hierarchyWindowOpened;
+    @Setter
+    @Getter
     private boolean levelWindowOpened;
+    @Setter
+    @Getter
     private boolean inspectorWindowOpened;
     private FileBrowserAction fileBrowserAction;
     private Vector2d mouseBeginPosition;
@@ -86,10 +98,6 @@ public class EditorComponent extends Component {
     @Override
     public void destroy() {
 
-    }
-
-    public Level getLevel() {
-        return level;
     }
 
     @Override
@@ -183,16 +191,12 @@ public class EditorComponent extends Component {
         fileBrowserAction = FileBrowserAction.SAVE;
     }
 
-    public String getCurrentPath() {
-        return currentPath;
-    }
-
     public void addPlatform() {
         Scene scene = getGameObject().getScene();
         int x = (int)(scene.getCamera().getGameObject().transform.position.x / config.gridWidth());
         int y = (int)(scene.getCamera().getGameObject().transform.position.y / config.gridHeight());
         GameObject platformGameObject = new PlatformPrefab(this,
-                new Platform(x, y, 1, 1, 0, level.getLevelMap().ceiling)).create(scene);
+                new Platform(x, y, 1, 1, 0, level.getLevelMap().getCeiling())).create(scene);
         scene.add(platformGameObject);
     }
 
@@ -223,40 +227,8 @@ public class EditorComponent extends Component {
         scene.add(door);
     }
 
-    public GameObject getSelectedGameObject() {
-        return selectedGameObject;
-    }
-
     public void selectGameObject(GameObject gameObject) {
         selectedGameObject = gameObject;
-    }
-
-    public boolean isHierarchyWindowOpened() {
-        return hierarchyWindowOpened;
-    }
-
-    public boolean isLevelWindowOpened() {
-        return levelWindowOpened;
-    }
-
-    public boolean isInspectorWindowOpened() {
-        return inspectorWindowOpened;
-    }
-
-    public void setHierarchyWindowOpened(boolean hierarchyWindowOpened) {
-        this.hierarchyWindowOpened = hierarchyWindowOpened;
-    }
-
-    public void setInspectorWindowOpened(boolean inspectorWindowOpened) {
-        this.inspectorWindowOpened = inspectorWindowOpened;
-    }
-
-    public void setLevelWindowOpened(boolean levelWindowOpened) {
-        this.levelWindowOpened = levelWindowOpened;
-    }
-
-    public EditorConfig getConfig() {
-        return config;
     }
 
     private void loadLevel(String fileName) throws LevelMapFormatException {
@@ -396,9 +368,9 @@ public class EditorComponent extends Component {
         int zIndex = 0;
         for(GameObject go : selectableObjects) {
             SpriteRenderer renderer = go.getComponent(SpriteRenderer.class, "Renderer");
-            if(renderer.getBoundingRect().contains(worldMousePosition) && (hoveredGameObject == null || zIndex <= renderer.getzIndex())) {
+            if(renderer.getBoundingRect().contains(worldMousePosition) && (hoveredGameObject == null || zIndex <= renderer.getZIndex())) {
                 hoveredGameObject = go;
-                zIndex = renderer.getzIndex();
+                zIndex = renderer.getZIndex();
             }
         }
         return hoveredGameObject;

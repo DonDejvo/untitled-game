@@ -1,16 +1,25 @@
 package com.webler.goliath.graphics;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Spritesheet {
+    @Getter
     private final Texture texture;
     private final List<Sprite> sprites;
+    @Getter
     private final int spriteWidth;
+    @Getter
     private final int spriteHeight;
+    @Getter
     private final int numSprites;
+    @Getter
     private final int spacing;
+    @Getter
     private final int cols;
+    @Getter
     private final int margin;
 
     public Spritesheet(Texture texture, int spriteWidth, int spriteHeight, int numSprites, int cols, int spacing, int margin) {
@@ -48,31 +57,4 @@ public class Spritesheet {
         return new Sprite(this.sprites.get(index));
     }
 
-    public int getNumSprites() {
-        return numSprites;
-    }
-
-    public int getCols() {
-        return cols;
-    }
-
-    public int getSpacing() {
-        return spacing;
-    }
-
-    public int getMargin() {
-        return margin;
-    }
-
-    public int getSpriteHeight() {
-        return spriteHeight;
-    }
-
-    public int getSpriteWidth() {
-        return spriteWidth;
-    }
-
-    public Texture getTexture() {
-        return texture;
-    }
 }

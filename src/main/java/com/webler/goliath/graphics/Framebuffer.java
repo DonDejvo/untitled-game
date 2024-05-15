@@ -1,12 +1,17 @@
 package com.webler.goliath.graphics;
 
+import lombok.Getter;
+
 import static org.lwjgl.opengl.GL30.*;
 
 public class Framebuffer {
+    @Getter
     private final int fbo;
     private final int rbo;
     private Texture tex;
+    @Getter
     private int width;
+    @Getter
     private int height;
 
     public Framebuffer(int width, int height) {
@@ -33,20 +38,8 @@ public class Framebuffer {
         glDeleteTextures(tex.getTexId());
     }
 
-    public int getFbo() {
-        return fbo;
-    }
-
     public int getTexId() {
         return tex.getTexId();
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public void setSize(int width, int height) {

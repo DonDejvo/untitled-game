@@ -4,6 +4,8 @@ import com.webler.goliath.Game;
 import com.webler.goliath.graphics.*;
 import com.webler.goliath.graphics.font.BitmapFont;
 import com.webler.goliath.utils.AssetPool;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.Matrix4d;
 import org.joml.Vector2f;
 
@@ -36,11 +38,17 @@ public class Canvas {
     private final float[] vertices;
     private Shader shader;
     private Texture defaultTexture;
+    @Setter
     private Color color;
+    @Setter
     private BitmapFont bitmapFont;
+    @Setter
     private float fontSize;
+    @Setter
+    @Getter
     private TextAlign textAlign;
     private Matrix4d projection;
+    @Getter
     private Vector2f translate;
     private Stack<Vector2f> translateStack;
     private List<DrawCall> drawCalls;
@@ -104,26 +112,6 @@ public class Canvas {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
 
         glBindVertexArray(0);
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public void setBitmapFont(BitmapFont bitmapFont) {
-        this.bitmapFont = bitmapFont;
-    }
-
-    public void setFontSize(float fontSize) {
-        this.fontSize = fontSize;
-    }
-
-    public void setTextAlign(TextAlign textAlign) {
-        this.textAlign = textAlign;
-    }
-
-    public TextAlign getTextAlign() {
-        return textAlign;
     }
 
     public void pushTranslate(float x, float y) {
@@ -262,10 +250,6 @@ public class Canvas {
 
     public int getHeight() {
         return game.getHeight();
-    }
-
-    public Vector2f getTranslate() {
-        return translate;
     }
 
     public float computeTextWidth(String text) {

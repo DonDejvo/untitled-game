@@ -1,5 +1,6 @@
 package com.webler.goliath.audio;
 
+import lombok.Getter;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBVorbisInfo;
 
@@ -12,6 +13,7 @@ import static com.webler.goliath.utils.IOUtil.ioResourceToByteBuffer;
 import static org.lwjgl.openal.AL10.*;
 import static org.lwjgl.stb.STBVorbis.*;
 
+@Getter
 public class Sound {
     private int bufferId;
 
@@ -53,10 +55,6 @@ public class Sound {
         stb_vorbis_close(decoder);
 
         return pcm;
-    }
-
-    public int getBufferId() {
-        return bufferId;
     }
 
     public void destroy() {

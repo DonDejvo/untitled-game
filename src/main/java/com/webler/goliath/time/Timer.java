@@ -2,10 +2,13 @@ package com.webler.goliath.time;
 
 import com.webler.goliath.core.Component;
 import com.webler.goliath.eventsystem.EventManager;
+import lombok.Getter;
 
 public class Timer extends Component {
     private double counter;
+    @Getter
     private double waitTime;
+    @Getter
     private boolean paused;
 
     public Timer() {
@@ -43,15 +46,8 @@ public class Timer extends Component {
         paused = true;
     }
 
-    public boolean isPaused() {
-        return paused;
-    }
-
     public double getRemainingTime() {
         return waitTime - counter;
     }
 
-    public double getWaitTime() {
-        return waitTime;
-    }
 }

@@ -1,7 +1,9 @@
 package com.webler.goliath.dialogs;
 
 import com.webler.goliath.dialogs.nodes.DialogNode;
+import lombok.Getter;
 
+@Getter
 public class DialogOption {
     private boolean repeat;
     private String dialogName;
@@ -13,15 +15,4 @@ public class DialogOption {
         this.node = node;
     }
 
-    public String getDialogName() {
-        return dialogName;
-    }
-
-    public DialogNode getNode() {
-        return node;
-    }
-
-    public boolean isRepeat() {
-        return repeat;
-    }
 }

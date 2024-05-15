@@ -179,6 +179,47 @@ public abstract class EntityController extends Controller {
         return collidesWithBlock;
     }
 
+    protected Vector3d raycast(Vector3d position, Vector3d direction, double maxDist, double step) {
+        double dist = 0;
+        Vector3d vec = new Vector3d(direction).normalize().mul(step);
+        Vector3d rayPosition = new Vector3d(position);
+        while(dist < maxDist) {
+            rayPosition = rayPosition.add(vec);
+            if(collidesPoint(rayPosition)) {
+                return rayPosition;
+            }
+            dist += step;
+        }
+        return null;
+    }
+
+    private boolean collidesPoint(Vector3d point) {
+        for (String collisionGroup : collisionGroups) {
+            List<GameObject> objects = level.getObjectsByGroup(collisionGroup);
+            if (objects != null) {
+                if (collisionGroup.equals("fixed")) {
+                    for (GameObject doorObject : objects) {
+                        BoxCollider3D otherCollider = doorObject.getComponent(BoxCollider3D.class, "Collider");
+                        if (otherCollider.contains(point)) {
+                            return true;
+                        }
+                    }
+                } else {
+                    Vector2d positionXY = new Vector2d(point.x, point.z);
+                    for (GameObject checkedObject : objects) {
+                        BoxCollider3D otherCollider = checkedObject.getComponent(BoxCollider3D.class, "Collider");
+                        Vector2d otherPositionXY = new Vector2d(checkedObject.transform.position.x, checkedObject.transform.position.z);
+                        if (positionXY.distance(otherPositionXY) < (otherCollider.getSize().x) * 0.5 &&
+                                Math.abs(point.y - checkedObject.transform.position.y) < (otherCollider.getSize().y) * 0.5) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return level.isBlockAtBox(point, point);
+    }
+
     protected void didCollides(Vector3d axis) {}
 
     protected void didCollidesWithEntity(GameObject entity) {}

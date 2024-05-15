@@ -7,6 +7,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Input {
     private static final int MOUSE_BUTTON_COUNT = 9;
     private static Input instance = null;
+    private double prevMouseX, prevMouseY;
     private double mouseX, mouseY;
     private double mouseDeltaX, mouseDeltaY;
     private double scrollX, scrollY;
@@ -42,6 +43,13 @@ public class Input {
         clear();
         instance.captured = false;
         setCursorLocked(false);
+    }
+
+    public static void beginFrame() {
+        instance.mouseDeltaX = instance.mouseX - instance.prevMouseX;
+        instance.mouseDeltaY = instance.mouseY - instance.prevMouseY;
+        instance.prevMouseX = instance.mouseX;
+        instance.prevMouseY = instance.mouseY;
     }
 
     public static void endFrame() {
@@ -87,9 +95,6 @@ public class Input {
             clear();
             return;
         }
-
-        instance.mouseDeltaX = xpos - instance.mouseX;
-        instance.mouseDeltaY = ypos - instance.mouseY;
 
         instance.mouseX = xpos;
         instance.mouseY = ypos;
@@ -178,5 +183,11 @@ public class Input {
             instance.locked = locked;
             glfwSetInputMode(instance.window, GLFW_CURSOR, locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
         }
+//        if(locked) {
+//            int[] width = new int[1];
+//            int[] height = new int[1];
+//            glfwGetWindowSize(instance.window, width, height);
+//            glfwSetCursorPos(instance.window, (double) width[0] /2, (double) height[0] /2);
+//        }
     }
 }

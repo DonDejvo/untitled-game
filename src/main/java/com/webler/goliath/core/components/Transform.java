@@ -1,12 +1,14 @@
 package com.webler.goliath.core.components;
 
 import com.webler.goliath.core.Component;
+import lombok.Getter;
 import org.joml.*;
 
 public class Transform extends Component {
     public final Vector3d position;
     public final Quaterniond rotation;
     public final Vector3d scale;
+    @Getter
     private final Matrix4d matrix;
 
     public Transform() {
@@ -45,7 +47,4 @@ public class Transform extends Component {
                 .scale(scale);
     }
 
-    public Matrix4d getMatrix() {
-        return matrix;
-    }
 }

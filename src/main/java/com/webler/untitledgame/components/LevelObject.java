@@ -1,14 +1,21 @@
 package com.webler.untitledgame.components;
 
 import com.webler.goliath.graphics.Sprite;
+import lombok.Getter;
 import org.joml.Vector2d;
 
 public abstract class LevelObject {
+    @Getter
     private LevelObjectType type;
+    @Getter
     private String identifier;
+    @Getter
     private String name;
+    @Getter
     private Sprite sprite;
+    @Getter
     private Vector2d scale;
+    @Getter
     private int zIndex;
 
     public LevelObject(LevelObjectType type, String identifier, String name, Sprite sprite, Vector2d scale, int zIndex) {
@@ -18,29 +25,5 @@ public abstract class LevelObject {
         this.sprite = sprite;
         this.scale = scale;
         this.zIndex = zIndex;
-    }
-
-    public LevelObjectType getType() {
-        return type;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Sprite getSprite() {
-        return sprite;
-    }
-
-    public Vector2d getScale() {
-        return scale;
-    }
-
-    public int getZIndex() {
-        return zIndex;
     }
 }

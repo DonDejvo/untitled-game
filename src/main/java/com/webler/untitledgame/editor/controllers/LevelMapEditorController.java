@@ -27,20 +27,20 @@ public class LevelMapEditorController extends EditorController {
         ImGui.text(this.toString());
         LevelMap levelMap = level.getLevelMap();
 
-        int[] top = {levelMap.ceiling};
+        int[] top = {levelMap.getCeiling()};
         Controls.intControl("Ceiling", top, 0.1f, 1, 100);
-        levelMap.ceiling = top[0];
+        levelMap.setCeiling(top[0]);
 
         String[] environments = Arrays.stream(Environment.values()).map(Enum::toString).toArray(String[]::new);
         int selectedEnvironmentIndex = 0;
         for (int i = 0; i < environments.length; ++i) {
-            if(environments[i].equals(levelMap.environment.toString())) {
+            if(environments[i].equals(levelMap.getEnvironment().toString())) {
                 selectedEnvironmentIndex = i;
             }
         }
         ImInt selectedEnvironment = new ImInt(selectedEnvironmentIndex);
         Controls.comboBox("environment", selectedEnvironment, environments);
-        levelMap.environment = Environment.valueOf(environments[selectedEnvironment.get()]);
+        levelMap.setEnvironment(Environment.valueOf(environments[selectedEnvironment.get()]));
     }
 
     @Override

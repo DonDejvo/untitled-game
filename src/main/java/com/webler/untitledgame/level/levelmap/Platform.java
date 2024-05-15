@@ -1,15 +1,14 @@
 package com.webler.untitledgame.level.levelmap;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.w3c.dom.Element;
 
+@Setter
+@Getter
 public class Platform implements Serializable {
     public static final String TAG = "platform";
-    public int x;
-    public int y;
-    public int width;
-    public int height;
-    public int top;
-    public int ceiling;
+    private int x, y, width, height, top, ceiling;
 
     public Platform(int x, int y, int width, int height, int top, int ceiling) {
         this.x = x;

@@ -2,6 +2,7 @@ package com.webler.goliath.graphics;
 import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.exceptions.ResourceFormatException;
 import com.webler.goliath.exceptions.ResourceNotFoundException;
+import lombok.Getter;
 import org.joml.*;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
     private static final Logger log = Logger.getLogger(Shader.class.getName());
+    @Getter
     private int program;
     private final String vertexSource;
     private final String fragmentSource;
@@ -106,10 +108,6 @@ public class Shader {
             log.severe(glGetShaderInfoLog(shader));
         }
         return shader;
-    }
-
-    public int getProgram() {
-        return program;
     }
 
     public void bind() {

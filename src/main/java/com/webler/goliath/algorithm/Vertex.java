@@ -1,5 +1,8 @@
 package com.webler.goliath.algorithm;
 
+import lombok.Getter;
+
+@Getter
 public class Vertex {
     private int id;
 
@@ -7,7 +10,4 @@ public class Vertex {
         this.id = id;
     }
 
-    public int getId() {
-        return id;
-    }
 }

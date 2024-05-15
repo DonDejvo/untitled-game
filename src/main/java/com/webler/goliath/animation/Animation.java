@@ -1,5 +1,8 @@
 package com.webler.goliath.animation;
 
+import lombok.Getter;
+
+@Getter
 public class Animation {
     private String name;
     private int frameWidth, frameHight;
@@ -12,19 +15,4 @@ public class Animation {
         this.frames = frames;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Frame[] getFrames() {
-        return frames;
-    }
-
-    public int getFrameWidth() {
-        return frameWidth;
-    }
-
-    public int getFrameHight() {
-        return frameHight;
-    }
 }

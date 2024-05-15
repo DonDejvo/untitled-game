@@ -23,32 +23,32 @@ public class PlatformEditorController extends EditorController {
     public void editorImgui() {
         ImGui.text(this.toString());
 
-        int[] x = {platform.x};
+        int[] x = {platform.getX()};
         Controls.intControl("x", x, 0.1f);
-        platform.x = x[0];
+        platform.setX(x[0]);
 
-        int[] y = {platform.y};
+        int[] y = {platform.getY()};
         Controls.intControl("y", y, 0.1f);
-        platform.y = y[0];
+        platform.setY(y[0]);
 
-        int[] width = {platform.width};
+        int[] width = {platform.getWidth()};
         Controls.intControl("width", width, 0.1f);
-        platform.width = width[0];
+        platform.setWidth(width[0]);
 
-        int[] height = {platform.height};
+        int[] height = {platform.getHeight()};
         Controls.intControl("height", height, 0.1f);
-        platform.height = height[0];
+        platform.setHeight(height[0]);
 
-        int[] top = {platform.top};
+        int[] top = {platform.getTop()};
         Controls.intControl("top", top, 0.1f, 0, 50);
-        platform.top = top[0];
-        if(platform.ceiling < platform.top + 1) {
-            platform.ceiling = platform.top + 1;
+        platform.setTop(top[0]);
+        if(platform.getCeiling() < platform.getTop() + 1) {
+            platform.setCeiling(platform.getTop() + 1);
         }
 
-        int[] ceiling = {platform.ceiling};
-        Controls.intControl("ceiling", ceiling, 0.1f, platform.top + 1, 100);
-        platform.ceiling = ceiling[0];
+        int[] ceiling = {platform.getCeiling()};
+        Controls.intControl("ceiling", ceiling, 0.1f, platform.getTop() + 1, 100);
+        platform.setCeiling(ceiling[0]);
     }
 
     @Override
@@ -59,24 +59,24 @@ public class PlatformEditorController extends EditorController {
     @Override
     public void synchronize() {
         SpriteRenderer renderer = getComponent(SpriteRenderer.class, "Renderer");
-        renderer.setzIndex(platform.top);
-        gameObject.transform.position.set(platform.x * editorComponent.getConfig().gridWidth(), platform.y * editorComponent.getConfig().gridHeight(), 0);
-        gameObject.transform.scale.set(platform.width, platform.height, 1);
+        renderer.setzIndex(platform.getTop());
+        gameObject.transform.position.set(platform.getX() * editorComponent.getConfig().gridWidth(), platform.getY() * editorComponent.getConfig().gridHeight(), 0);
+        gameObject.transform.scale.set(platform.getWidth(), platform.getHeight(), 1);
         renderer.getSprite().setRegion(0, 0,
-                platform.width * renderer.getSprite().getTexture().getWidth(),
-                platform.height * renderer.getSprite().getTexture().getHeight());
+                platform.getWidth() * renderer.getSprite().getTexture().getWidth(),
+                platform.getHeight() * renderer.getSprite().getTexture().getHeight());
     }
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        platform.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth()));
-        platform.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight()));
+        platform.setX((int) (Math.floor(0.5 + (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth())));
+        platform.setY((int) (Math.floor(0.5 + (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight())));
     }
 
     @Override
     public void scale(Transform transform, Vector2d start, Vector2d vector) {
-        platform.width = Math.max((int)(transform.scale.x + Math.floor(0.5 + vector.x / editorComponent.getConfig().gridWidth())), 1);
-        platform.height = Math.max((int)(transform.scale.y + Math.floor(0.5 + vector.y / editorComponent.getConfig().gridHeight())), 1);
+        platform.setWidth(Math.max((int) (transform.scale.x + Math.floor(0.5 + vector.x / editorComponent.getConfig().gridWidth())), 1));
+        platform.setHeight(Math.max((int) (transform.scale.y + Math.floor(0.5 + vector.y / editorComponent.getConfig().gridHeight())), 1));
     }
 
     @Override
@@ -86,6 +86,6 @@ public class PlatformEditorController extends EditorController {
 
     @Override
     public String toString() {
-        return "Platform [x=" + platform.x + ", y=" + platform.y + "]";
+        return "Platform [x=" + platform.getX() + ", y=" + platform.getY() + "]";
     }
 }

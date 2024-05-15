@@ -1,12 +1,16 @@
 package com.webler.untitledgame.level.levelmap;
 
 import com.webler.goliath.graphics.Color;
+import lombok.Getter;
+import lombok.Setter;
 import org.w3c.dom.Element;
 
+@Setter
+@Getter
 public class Entity implements Serializable{
     public static final String TAG = "entity";
-    public String name;
-    public double x, y;
+    private String name;
+    private double x, y;
 
     public Entity(String name, double x, double y) {
         this.name = name;

@@ -1,14 +1,18 @@
 package com.webler.untitledgame.level.levelmap;
 
 import com.webler.goliath.graphics.Color;
+import lombok.Getter;
+import lombok.Setter;
 import org.w3c.dom.Element;
 
+@Setter
+@Getter
 public class Light implements Serializable {
     public static final String TAG = "light";
-    public double x, y, top;
-    public double radiusMin, radiusMax;
-    public Color color;
-    public double intensity;
+    private double x, y, top;
+    private double radiusMin, radiusMax;
+    private Color color;
+    private double intensity;
 
     public Light(double x, double y, double top, double radiusMin, double radiusMax, Color color, double intensity) {
         this.x = x;

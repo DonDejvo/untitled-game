@@ -4,6 +4,7 @@ import com.webler.goliath.algorithm.Dijkstra;
 import com.webler.goliath.algorithm.Vertex;
 import com.webler.goliath.core.Component;
 import com.webler.untitledgame.level.levelmap.Platform;
+import lombok.Getter;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
@@ -11,6 +12,7 @@ import java.util.Arrays;
 
 public class PathFinder extends Component {
     private Level level;
+    @Getter
     private Vertex[] path;
     private boolean isSamePlatform;
 
@@ -56,10 +58,6 @@ public class PathFinder extends Component {
                 }
             }
         }
-    }
-
-    public Vertex[] getPath() {
-        return path;
     }
 
     public boolean isSamePlatform() {

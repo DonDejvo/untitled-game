@@ -4,6 +4,7 @@ import com.webler.goliath.Game;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.core.exceptions.ComponentException;
 import com.webler.goliath.eventsystem.EventManager;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +15,11 @@ import java.util.logging.Logger;
 
 public final class GameObject {
     private static final AtomicLong idsCounter = new AtomicLong(0);
+    @Getter
     private final Game game;
+    @Getter
     private final Scene scene;
+    @Getter
     private final String name;
     private final Map<String, Component> components;
     public final Transform transform;
@@ -88,18 +92,6 @@ public final class GameObject {
         } catch (ClassCastException e) {
             throw new ComponentException("Component " + name + " does not implement " + cls.getName() + " interface.");
         }
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public Game getGame() {
-        return game;
     }
 
     public void remove() {

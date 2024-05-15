@@ -4,7 +4,7 @@ import com.webler.goliath.core.Component;
 import org.joml.Matrix3d;
 import org.joml.Vector3d;
 
-public class Bilboard extends Component {
+public class Billboard extends Component {
 
     @Override
     public void start() {

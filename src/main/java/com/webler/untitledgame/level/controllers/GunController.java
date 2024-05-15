@@ -1,24 +1,31 @@
 package com.webler.untitledgame.level.controllers;
 
-import com.webler.goliath.core.GameObject;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.level.Projectile;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 
 public abstract class GunController extends Controller {
+    @Getter
+    private String itemName;
     private double reloadTime;
     private double reloadCounter;
+    @Getter
     private Projectile projectileType;
     private State state;
+    @Setter
     private boolean shooting;
     private Vector2d centerOffset;
+    @Getter
     private Vector2d projectileOffset;
 
-    public GunController(Level level, double reloadTime, Projectile projectileType, Vector2d centerOffset, Vector2d projectileOffset) {
+    public GunController(Level level, String itemName, double reloadTime, Projectile projectileType, Vector2d centerOffset, Vector2d projectileOffset) {
         super(level, null);
+        this.itemName = itemName;
         this.reloadTime = reloadTime;
         this.reloadCounter = reloadTime;
         this.projectileType = projectileType;
@@ -56,14 +63,6 @@ public abstract class GunController extends Controller {
     @Override
     public void destroy() {
 
-    }
-
-    public Projectile getProjectileType() {
-        return projectileType;
-    }
-
-    public void setShooting(boolean value) {
-        shooting = value;
     }
 
     abstract protected void shoot();

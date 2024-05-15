@@ -1,16 +1,20 @@
 package com.webler.goliath.graphics;
 
 import com.webler.goliath.utils.AssetPool;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class Sprite {
-    private Texture tex;
+    private Texture texture;
     private float[] texCoords;
     private int width, height;
 
-    public Sprite(Texture tex) {
-        this.width = tex.getWidth();
-        this.height = tex.getHeight();
-        this.tex = tex;
+    public Sprite(Texture texture) {
+        this.width = texture.getWidth();
+        this.height = texture.getHeight();
+        this.texture = texture;
         texCoords = new float[] {
                 0, 0,
                 1, 0,
@@ -26,15 +30,15 @@ public class Sprite {
     }
 
     public Sprite(Sprite sprite) {
-        this.tex = sprite.tex;
+        this.texture = sprite.texture;
         this.texCoords = sprite.texCoords.clone();
         this.width = sprite.width;
         this.height = sprite.height;
     }
 
     public void setRegion(int x, int y, int width, int height) {
-        int texWidth = tex.getWidth();
-        int texHeight = tex.getHeight();
+        int texWidth = texture.getWidth();
+        int texHeight = texture.getHeight();
         texCoords[0] = (float)(x + 0.5) / texWidth;
         texCoords[1] = (float)(y + 0.5) / texHeight;
         texCoords[2] = (float)(x + width) / texWidth;
@@ -45,35 +49,4 @@ public class Sprite {
         texCoords[7] = (float)(y + height) / texHeight;
     }
 
-    public float[] getTexCoords() {
-        return texCoords;
-    }
-
-    public void setTexCoords(float[] texCoords) {
-        this.texCoords = texCoords;
-    }
-
-    public Texture getTexture() {
-        return tex;
-    }
-
-    public void setTexture(Texture tex) {
-        this.tex = tex;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
 }

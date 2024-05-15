@@ -5,11 +5,18 @@ import com.webler.goliath.core.Component;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Sprite;
 import com.webler.goliath.math.Rect;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.Vector3d;
 
 public class SpriteRenderer extends Component implements Animable {
+    @Setter
+    @Getter
     private Sprite sprite;
+    @Getter
     private int zIndex;
+    @Setter
+    @Getter
     private Color color;
     public double angle;
 
@@ -35,32 +42,12 @@ public class SpriteRenderer extends Component implements Animable {
         gameObject.getGame().getRenderer().remove(this);
     }
 
-    public Sprite getSprite() {
-        return sprite;
-    }
-
-    public void setSprite(Sprite sprite) {
-        this.sprite = sprite;
-    }
-
-    public int getzIndex() {
-        return zIndex;
-    }
-
     public void setzIndex(int zIndex) {
         if(this.zIndex != zIndex) {
             this.zIndex = zIndex;
             gameObject.getGame().getRenderer().remove(this);
             gameObject.getGame().getRenderer().add(this);
         }
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     public Rect getBoundingRect() {

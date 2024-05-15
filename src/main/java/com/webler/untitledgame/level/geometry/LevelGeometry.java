@@ -39,9 +39,9 @@ public class LevelGeometry extends Geometry {
         LevelMap levelMap = level.getLevelMap();
 
         List<Platform> platforms = levelMap.getPlatforms();
-        int globalCeiling = levelMap.ceiling;
+        int globalCeiling = levelMap.getCeiling();
 
-        switch (levelMap.environment) {
+        switch (levelMap.getEnvironment()) {
             case DUNGEON: {
                 Spritesheet spritesheet = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png");
 
@@ -91,12 +91,12 @@ public class LevelGeometry extends Geometry {
         //addCeiling(levelMap.getWidth(), levelMap.getHeight(), globalCeiling);
 
         for(Platform platform : platforms) {
-            float x1 = (platform.x - levelMap.minX);
-            float x2 = (platform.x - levelMap.minX + platform.width);
-            float y1 = (platform.y - levelMap.minY);
-            float y2 = (platform.y - levelMap.minY + platform.height);
-            float top = (float) platform.top;
-            float ceiling = (float) platform.ceiling;
+            float x1 = (platform.getX() - levelMap.getMinX());
+            float x2 = (platform.getX() - levelMap.getMinX() + platform.getWidth());
+            float y1 = (platform.getY() - levelMap.getMinY());
+            float y2 = (platform.getY() - levelMap.getMinY() + platform.getHeight());
+            float top = (float) platform.getTop();
+            float ceiling = (float) platform.getCeiling();
 
             if(top < globalCeiling) {
                 addGround(x1, y1, x2, y2, top);

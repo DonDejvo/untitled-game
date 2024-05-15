@@ -1,5 +1,6 @@
 package com.webler.goliath.graphics;
 
+import lombok.Getter;
 import org.joml.*;
 
 import static org.lwjgl.opengl.GL20.*;
@@ -20,7 +21,9 @@ public class Mesh {
     private int vao;
     private int vbo;
     private int ebo;
+    @Getter
     private final Matrix4d modelMatrix;
+    @Getter
     private final Vector4d color;
 
     public Mesh(Geometry geometry) {
@@ -101,11 +104,4 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public Matrix4d getModelMatrix() {
-        return modelMatrix;
-    }
-
-    public Vector4d getColor() {
-        return color;
-    }
 }

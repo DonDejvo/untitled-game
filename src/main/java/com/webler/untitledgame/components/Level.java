@@ -15,7 +15,7 @@ import com.webler.goliath.dialogs.components.DialogManager;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.Sprite;
 import com.webler.goliath.graphics.Spritesheet;
-import com.webler.goliath.graphics.components.Bilboard;
+import com.webler.goliath.graphics.components.Billboard;
 import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.geometry.Cube;
@@ -25,7 +25,7 @@ import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.level.controllers.*;
 import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.level.levelmap.*;
-import com.webler.untitledgame.prefabs.level.GunPrefab;
+import lombok.Getter;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
@@ -35,12 +35,16 @@ import java.util.stream.Collectors;
 
 public class Level extends Component {
     public static final int TILE_SIZE = 4;
+    @Getter
     private final LevelMap levelMap;
     private GridItem[][] grid;
+    @Getter
     private String path;
+    @Getter
     private GameObject player;
     private final Map<String, List<GameObject>> objectGroups;
     private final List<LevelObject> levelObjectRegistry;
+    @Getter
     private final Dijkstra dijkstra;
 
     public Level() {
@@ -127,10 +131,6 @@ public class Level extends Component {
 
     }
 
-    public LevelMap getLevelMap() {
-        return levelMap;
-    }
-
     public void load(String fileName) throws LevelMapFormatException {
         levelMap.clear();
         levelMap.load(fileName);
@@ -141,10 +141,6 @@ public class Level extends Component {
     public void save(String fileName) throws LevelMapFormatException {
         levelMap.save(fileName);
         path = fileName;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     public int getBlockTop(int x, int y) {
@@ -224,7 +220,7 @@ public class Level extends Component {
 
         SoundSource bgMusic = AudioManager.createSoundSource(true);
         bgMusic.setBuffer(AssetPool.getSound("untitled-game/sounds/boss.ogg").getBufferId());
-        bgMusic.play();
+        //bgMusic.play();
     }
 
     private void buildGraph() {
@@ -301,39 +297,31 @@ public class Level extends Component {
         dijkstra.buildGraph(vertices.toArray(new Vertex[0]), edges.toArray(new Edge[0]), true);
     }
 
-    public GameObject getPlayer() {
-        return player;
-    }
-
-    public Dijkstra getDijkstra() {
-        return dijkstra;
-    }
-
     private void buildGrid() {
         int mapWidth = levelMap.getWidth();
         int mapHeight = levelMap.getHeight();
         grid = new GridItem[mapHeight][mapWidth];
         for (int i = 0; i < mapHeight; i++) {
             for (int j = 0; j < mapWidth; j++) {
-                grid[i][j] = new GridItem(-1, levelMap.ceiling);
+                grid[i][j] = new GridItem(-1, levelMap.getCeiling());
             }
         }
         for(Platform platform : levelMap.getPlatforms()) {
             int x1, x2, y1, y2;
-            x1 = platform.x - levelMap.minX;
-            x2 = x1 + platform.width - 1;
-            y1 = platform.y - levelMap.minY;
-            y2 = y1 + platform.height- 1;
+            x1 = platform.getX() - levelMap.getMinX();
+            x2 = x1 + platform.getWidth() - 1;
+            y1 = platform.getY() - levelMap.getMinY();
+            y2 = y1 + platform.getHeight() - 1;
 
             for(int y = y1; y <= y2; ++y) {
                 for(int x = x1; x <= x2; ++x) {
                     GridItem gridItem = grid[y][x];
-                    if(gridItem.top <= platform.top) {
-                        gridItem.top = platform.top;
+                    if(gridItem.top <= platform.getTop()) {
+                        gridItem.top = platform.getTop();
                         gridItem.platform = platform;
                     }
-                    if(gridItem.ceiling >= platform.ceiling) {
-                        gridItem.ceiling = platform.ceiling;
+                    if(gridItem.ceiling >= platform.getCeiling()) {
+                        gridItem.ceiling = platform.getCeiling();
                     }
                 }
             }
@@ -344,10 +332,10 @@ public class Level extends Component {
         Scene scene = getGameObject().getScene();
         List<Entity> entities = levelMap.getEntities();
         for (Entity entity : entities) {
-            LevelObject levelObject = getRegisteredObject(entity.name);
+            LevelObject levelObject = getRegisteredObject(entity.getName());
             GameObject go = new GameObject(scene);
-            double y = getBlockTop((int)Math.floor(entity.x - levelMap.minX), (int)Math.floor(entity.y - levelMap.minY));
-            Vector3d position = new Vector3d(entity.x - levelMap.minX, y, entity.y - levelMap.minY).mul(Level.TILE_SIZE);
+            double y = getBlockTop((int)Math.floor(entity.getX() - levelMap.getMinX()), (int)Math.floor(entity.getY() - levelMap.getMinY()));
+            Vector3d position = new Vector3d(entity.getX() - levelMap.getMinX(), y, entity.getY() - levelMap.getMinY()).mul(Level.TILE_SIZE);
             go.transform.position.set(position);
             Sprite sprite = new Sprite(levelObject.getSprite());
             sprite.setWidth((int)(Level.TILE_SIZE * levelObject.getScale().x));
@@ -355,11 +343,11 @@ public class Level extends Component {
             SpriteRenderer renderer = new SpriteRenderer(sprite, -1);
             PathFinder pathFinder = new PathFinder(this);
             go.addComponent("PathFinder", pathFinder);
-            if(!entity.name.equals("player")) {
+            if(!entity.getName().equals("player")) {
                 go.addComponent("Renderer", renderer);
-                go.addComponent("Bilboard", new Bilboard());
+                go.addComponent("Bilboard", new Billboard());
             }
-            switch (entity.name) {
+            switch (entity.getName()) {
                 case "player": {
                     player = go;
                     BoxCollider3D collider = new BoxCollider3D(new Vector3d(1.5, 3, 1.5));
@@ -415,7 +403,7 @@ public class Level extends Component {
             }
             if(levelObject.getType() == LevelObjectType.ITEM) {
                 go.transform.scale.set(0.5);
-                go.addComponent("Controller", new ItemController(this, entity.name));
+                go.addComponent("Controller", new ItemController(this, entity.getName()));
                 go.transform.position.y += sprite.getHeight() * levelObject.getScale().y;
             }
 
@@ -428,15 +416,15 @@ public class Level extends Component {
         List<Light> lights = levelMap.getLights();
         for (Light light : lights) {
             GameObject go = new GameObject(scene);
-            go.transform.position.set(new Vector3d(light.x - levelMap.minX, light.top, light.y - levelMap.minY).mul(Level.TILE_SIZE));
-            SpotLight spotLight = new SpotLight(new Color(light.color), light.radiusMin * Level.TILE_SIZE, light.radiusMax * Level.TILE_SIZE);
-            spotLight.setIntensity(light.intensity);
+            go.transform.position.set(new Vector3d(light.getX() - levelMap.getMinX(), light.getTop(), light.getY() - levelMap.getMinY()).mul(Level.TILE_SIZE));
+            SpotLight spotLight = new SpotLight(new Color(light.getColor()), light.getRadiusMin() * Level.TILE_SIZE, light.getRadiusMax() * Level.TILE_SIZE);
+            spotLight.setIntensity(light.getIntensity());
             go.addComponent("Light", spotLight);
             Sprite sprite = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png").getSprite(37);
             sprite.setWidth(1);
             sprite.setHeight(1);
             go.addComponent("Renderer", new SpriteRenderer(sprite, -1));
-            go.addComponent("Bilboard", new Bilboard());
+            go.addComponent("Bilboard", new Billboard());
             scene.add(go);
         }
 
@@ -456,9 +444,9 @@ public class Level extends Component {
             MeshRenderer renderer = new MeshRenderer(new Cube(AssetPool.getTexture("untitled-game/images/door.png").getTexId()));
             renderer.offset.x = 0.5;
             doorGameObject.addComponent("Renderer", renderer);
-            double y = getBlockTop((door.x - levelMap.minX), (door.y - levelMap.minY));
-            Vector3d position = new Vector3d(door.x - levelMap.minX + 0.5, y + 0.5, door.y - levelMap.minY + 0.5);
-            switch (door.direction) {
+            double y = getBlockTop((door.getX() - levelMap.getMinX()), (door.getY() - levelMap.getMinY()));
+            Vector3d position = new Vector3d(door.getX() - levelMap.getMinX() + 0.5, y + 0.5, door.getY() - levelMap.getMinY() + 0.5);
+            switch (door.getDirection()) {
                 case LEFT:
                     position.z += 0.5;
                     break;
@@ -477,7 +465,7 @@ public class Level extends Component {
             BoxCollider3D collider = new BoxCollider3D(new Vector3d(4, 4, 4));
             collider.offset.x = 0.5;
             doorGameObject.addComponent("Collider", collider);
-            doorGameObject.addComponent("Controller", new DoorController(this, collider, door.direction));
+            doorGameObject.addComponent("Controller", new DoorController(this, collider, door.getDirection()));
             scene.add(doorGameObject);
         }
     }

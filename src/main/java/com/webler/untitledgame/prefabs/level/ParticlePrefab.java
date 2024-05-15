@@ -4,7 +4,7 @@ import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.graphics.Sprite;
-import com.webler.goliath.graphics.components.Bilboard;
+import com.webler.goliath.graphics.components.Billboard;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.prefabs.Prefab;
 import com.webler.untitledgame.components.Level;
@@ -32,7 +32,7 @@ public class ParticlePrefab implements Prefab {
         go.addComponent("Collider", collider);
         go.addComponent("Controller", new ParticleController(level, collider, speed, lifetime, direction));
         go.addComponent("Renderer", new SpriteRenderer(sprite, -1));
-        go.addComponent("Bilboard", new Bilboard());
+        go.addComponent("Bilboard", new Billboard());
         return go;
     }
 }

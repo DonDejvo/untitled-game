@@ -10,8 +10,8 @@ import com.webler.untitledgame.prefabs.level.ProjectilePrefab;
 import org.joml.Vector2d;
 
 public class ShotgunController extends GunController{
-    public ShotgunController(Level level) {
-        super(level, 1.0, Projectile.SHELL, new Vector2d(2, -0.4), new Vector2d(3, 0.0));
+    public ShotgunController(Level level, String itemName) {
+        super(level, itemName, 0.8, Projectile.SHELL, new Vector2d(2, -0.4), new Vector2d(3, 0.0));
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.webler.goliath.graphics.font.BitmapFont;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.utils.AssetPool;
+import lombok.Getter;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
@@ -26,17 +27,22 @@ public class Game {
     private static final String charset = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
     private final Config config;
     private long window;
+    @Getter
     private int width, height;
     private final String title;
     private final Map<String, Class<? extends Scene>> registeredScenes;
     private Scene currentScene;
+    @Getter
     private String currentSceneName;
+    @Getter
     private Renderer renderer;
-    private boolean cursorLocked;
     private ImGuiLayer imGuiLayer;
+    @Getter
     private Framebuffer framebuffer;
     private final Stack<SceneChangeItem> sceneChangeStack;
+    @Getter
     private Canvas canvas;
+    @Getter
     private UIElements uiElements;
 
     public Game(Config config) {
@@ -46,7 +52,6 @@ public class Game {
         height = config.windowHeight();
         title = config.title();
         registeredScenes = new HashMap<>();
-        cursorLocked = false;
         sceneChangeStack = new Stack<>();
     }
 
@@ -153,6 +158,7 @@ public class Game {
 
                 DebugDraw.get().beginFrame();
                 canvas.beginFrame();
+                Input.beginFrame();
 
                 currentScene.update(dt);
 
@@ -255,34 +261,6 @@ public class Game {
             e.printStackTrace();
             throw new SceneException(e.getMessage());
         }
-    }
-
-    public Renderer getRenderer() {
-        return renderer;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public String getCurrentSceneName() {
-        return currentSceneName;
-    }
-
-    public Framebuffer getFramebuffer() {
-        return framebuffer;
-    }
-
-    public Canvas getCanvas() {
-        return canvas;
-    }
-
-    public UIElements getUiElements() {
-        return uiElements;
     }
 
     private static class SceneChangeItem {

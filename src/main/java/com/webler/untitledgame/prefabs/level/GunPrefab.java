@@ -31,11 +31,11 @@ public class GunPrefab implements Prefab {
         go.addComponent("Renderer", renderer);
         switch (levelObject.getIdentifier()) {
             case "ak47": {
-                go.addComponent("Controller", new AssaultRifleController(level));
+                go.addComponent("Controller", new AssaultRifleController(level, levelObject.getIdentifier()));
                 break;
             }
             case "shotgun": {
-                go.addComponent("Controller", new ShotgunController(level));
+                go.addComponent("Controller", new ShotgunController(level, levelObject.getIdentifier()));
                 break;
             }
         }

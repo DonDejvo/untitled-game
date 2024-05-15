@@ -2,12 +2,14 @@ package com.webler.goliath.dialogs.components;
 
 import com.webler.goliath.core.Component;
 import com.webler.goliath.dialogs.DialogOption;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DialogComponent extends Component {
     private DialogManager dialogManager;
+    @Getter
     private List<DialogOption> options;
 
     public DialogComponent(DialogManager dialogManager) {
@@ -21,10 +23,6 @@ public class DialogComponent extends Component {
 
     public void removeOption(DialogOption option) {
         options.remove(option);
-    }
-
-    public List<DialogOption> getOptions() {
-        return options;
     }
 
     public void play() {

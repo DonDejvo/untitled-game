@@ -25,24 +25,24 @@ public class DoorEditorController extends EditorController {
     public void editorImgui() {
         ImGui.text(this.toString());
 
-        int[] x = {door.x};
+        int[] x = {door.getX()};
         Controls.intControl("x", x, 0.1f);
-        door.x = x[0];
+        door.setX(x[0]);
 
-        int[] y = {door.y};
+        int[] y = {door.getY()};
         Controls.intControl("y", y, 0.1f);
-        door.y = y[0];
+        door.setY(y[0]);
 
         String[] directions = Arrays.stream(Direction.values()).map(Enum::toString).toArray(String[]::new);
         int selectedDirectionIndex = 0;
         for (int i = 0; i < directions.length; ++i) {
-            if(directions[i].equals(door.direction.toString())) {
+            if(directions[i].equals(door.getDirection().toString())) {
                 selectedDirectionIndex = i;
             }
         }
         ImInt selectedDirection = new ImInt(selectedDirectionIndex);
         Controls.comboBox("direction", selectedDirection, directions);
-        door.direction = Direction.valueOf(directions[selectedDirection.get()]);
+        door.setDirection(Direction.valueOf(directions[selectedDirection.get()]));
     }
 
     @Override
@@ -52,13 +52,13 @@ public class DoorEditorController extends EditorController {
 
     @Override
     public void synchronize() {
-        gameObject.transform.position.set(door.x * editorComponent.getConfig().gridWidth(), door.y * editorComponent.getConfig().gridHeight(), 0);
+        gameObject.transform.position.set(door.getX() * editorComponent.getConfig().gridWidth(), door.getY() * editorComponent.getConfig().gridHeight(), 0);
     }
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        door.x = (int)(Math.floor(0.5 + (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth()));
-        door.y = (int)(Math.floor(0.5 + (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight()));
+        door.setX((int) (Math.floor(0.5 + (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth())));
+        door.setY((int) (Math.floor(0.5 + (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight())));
     }
 
     @Override
@@ -73,6 +73,6 @@ public class DoorEditorController extends EditorController {
 
     @Override
     public String toString() {
-        return "Door [x=" + door.x + ", y=" + door.y + "]";
+        return "Door [x=" + door.getX() + ", y=" + door.getY() + "]";
     }
 }

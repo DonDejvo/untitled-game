@@ -3,15 +3,20 @@ package com.webler.goliath.core;
 import com.webler.goliath.Game;
 import com.webler.goliath.core.exceptions.SceneException;
 import com.webler.goliath.graphics.components.Camera;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
 public abstract class Scene {
+    @Getter
     private final Game game;
     private final List<GameObject> entities;
     private final LinkedList<GameObject> pendingEntities;
     private final LinkedList<GameObject> entitiesToRemove;
     private boolean running;
+    @Setter
+    @Getter
     private Camera camera;
 
     public Scene(Game game) {
@@ -91,18 +96,6 @@ public abstract class Scene {
 
     public void draw() {
         game.getFramebuffer().blitFramebuffer(game.getWidth(), game.getHeight());
-    }
-
-    public Camera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
-
-    public Game getGame() {
-        return game;
     }
 
     public List<GameObject> getEntitiesByTag(String tag) {

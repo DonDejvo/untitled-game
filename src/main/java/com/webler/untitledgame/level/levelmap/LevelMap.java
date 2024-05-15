@@ -1,5 +1,7 @@
 package com.webler.untitledgame.level.levelmap;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -30,9 +32,15 @@ public class LevelMap implements Serializable {
             "shotgun"
     };
     public static final String TAG = "levelmap";
-    public int minX, minY, maxX, maxY;
-    public int ceiling;
-    public Environment environment;
+    @Setter
+    @Getter
+    private int minX, minY, maxX, maxY;
+    @Setter
+    @Getter
+    private int ceiling;
+    @Setter
+    @Getter
+    private Environment environment;
 
     private List<Platform> platforms;
     private List<Light> lights;
@@ -61,10 +69,10 @@ public class LevelMap implements Serializable {
 
     public void addPlatform(Platform platform) {
         platforms.add(platform);
-        if(platform.x < minX) minX = platform.x;
-        if(platform.y < minY) minY = platform.y;
-        if(platform.x + platform.width - 1 > maxX) maxX = platform.x + platform.width - 1;
-        if(platform.y + platform.height - 1 > maxY) maxY = platform.y + platform.height - 1;
+        if(platform.getX() < minX) minX = platform.getX();
+        if(platform.getY() < minY) minY = platform.getY();
+        if(platform.getX() + platform.getWidth() - 1 > maxX) maxX = platform.getX() + platform.getWidth() - 1;
+        if(platform.getY() + platform.getHeight() - 1 > maxY) maxY = platform.getY() + platform.getHeight() - 1;
     }
 
     public void addLight(Light light) {
@@ -74,13 +82,13 @@ public class LevelMap implements Serializable {
     public void addEntity(Entity entity) throws LevelMapFormatException {
         boolean isValid = false;
         for (String s : ENTITIES) {
-            if (entity.name.equals(s)) {
+            if (entity.getName().equals(s)) {
                 isValid = true;
                 break;
             }
         }
         if(!isValid) {
-            throw new LevelMapFormatException("Entity name contains invalid value: " + entity.name);
+            throw new LevelMapFormatException("Entity name contains invalid value: " + entity.getName());
         }
         entities.add(entity);
     }

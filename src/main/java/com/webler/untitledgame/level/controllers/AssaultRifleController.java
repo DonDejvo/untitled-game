@@ -10,8 +10,8 @@ import com.webler.untitledgame.prefabs.level.ProjectilePrefab;
 import org.joml.Vector2d;
 
 public class AssaultRifleController extends GunController {
-    public AssaultRifleController(Level level) {
-        super(level, 0.2, Projectile.NAIL, new Vector2d(1.5, -0.05), new Vector2d(2.5, 0.2));
+    public AssaultRifleController(Level level, String itemName) {
+        super(level, itemName, 0.15, Projectile.NAIL, new Vector2d(1.5, -0.05), new Vector2d(2.5, 0.2));
     }
 
     @Override

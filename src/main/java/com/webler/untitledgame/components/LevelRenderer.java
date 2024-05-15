@@ -2,10 +2,14 @@ package com.webler.untitledgame.components;
 
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
+import com.webler.goliath.graphics.Color;
+import com.webler.goliath.graphics.DebugDraw;
 import com.webler.goliath.graphics.Mesh;
 import com.webler.goliath.input.Input;
 import com.webler.untitledgame.level.geometry.LevelGeometry;
+import com.webler.untitledgame.level.levelmap.LevelMap;
 import com.webler.untitledgame.scenes.LevelParams;
+import org.joml.Vector3d;
 import org.joml.Vector4d;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
@@ -33,8 +37,7 @@ public class LevelRenderer extends Component {
     public void update(double dt) {
         mesh.getModelMatrix().set(gameObject.transform.getMatrix());
         if(Input.keyPressed(GLFW_KEY_P)) {
-            GameObject levelObject = getGameObject().getScene().getEntityByName("Level");
-            getGameObject().getGame().playScene("LevelEditorScene", new LevelParams(levelObject.getComponent(Level.class, "Level").getPath()));
+            getGameObject().getGame().playScene("LevelEditorScene", new LevelParams(level.getPath()));
         }
     }
 

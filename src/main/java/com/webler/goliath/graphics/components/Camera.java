@@ -3,10 +3,14 @@ package com.webler.goliath.graphics.components;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.math.Rect;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.*;
 
 public abstract class Camera extends Component {
+    @Getter
     protected final Matrix4d viewMatrix;
+    @Getter
     protected final Matrix4d projectionMatrix;
     public final Vector3d direction;
     protected final Vector3d up;
@@ -14,7 +18,10 @@ public abstract class Camera extends Component {
     protected int viewportWidth;
     protected int viewportHeight;
     protected Matrix4d PVMatrix;
+    @Getter
     protected Matrix4d inversePVMatrix;
+    @Setter
+    @Getter
     private Color backgroundColor;
 
     public Camera(int viewportWidth, int viewportHeight) {
@@ -42,20 +49,8 @@ public abstract class Camera extends Component {
 
     public abstract void updateProjection();
 
-    public Matrix4d getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
-    public Matrix4d getViewMatrix() {
-        return viewMatrix;
-    }
-
     public Matrix4d getPVMatrix() {
         return new Matrix4d(PVMatrix);
-    }
-
-    public Matrix4d getInversePVMatrix() {
-        return inversePVMatrix;
     }
 
     public void setViewport(int width, int height) {
@@ -101,11 +96,4 @@ public abstract class Camera extends Component {
         return new Vector2d(v.x, v.y);
     }
 
-    public Color getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(Color backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
 }

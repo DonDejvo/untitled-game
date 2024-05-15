@@ -1,5 +1,8 @@
 package com.webler.goliath.algorithm;
 
+import lombok.Getter;
+
+@Getter
 public class Edge {
     private int source, target;
     private int weight;
@@ -10,15 +13,4 @@ public class Edge {
         this.weight = weight;
     }
 
-    public int getSource() {
-        return source;
-    }
-
-    public int getTarget() {
-        return target;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
 }

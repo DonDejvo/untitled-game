@@ -5,10 +5,15 @@ import com.webler.goliath.graphics.Geometry;
 import com.webler.goliath.utils.AssetPool;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.graphics.Mesh;
+import lombok.Getter;
+import lombok.Setter;
 
 public class MeshRenderer extends Component {
     private Mesh mesh;
+    @Setter
+    @Getter
     private Color color;
+    @Getter
     private final Geometry geometry;
 
     public MeshRenderer(Geometry geometry) {
@@ -34,15 +39,4 @@ public class MeshRenderer extends Component {
         gameObject.getGame().getRenderer().remove(mesh);
     }
 
-    public Geometry getGeometry() {
-        return geometry;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
 }

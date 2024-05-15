@@ -1,8 +1,10 @@
 package com.webler.goliath.core;
 
+import lombok.Getter;
 import org.joml.Vector3d;
 
 public abstract class Component {
+    @Getter
     protected GameObject gameObject;
     public final Vector3d offset;
 
@@ -17,10 +19,6 @@ public abstract class Component {
     public abstract void destroy();
 
     public void imgui() {}
-
-    public GameObject getGameObject() {
-        return gameObject;
-    }
 
     public void setEntity(GameObject gameObject) {
         this.gameObject = gameObject;

@@ -4,6 +4,7 @@ import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.math.Rect;
+import lombok.Getter;
 import org.joml.Matrix4d;
 import org.joml.Vector4d;
 
@@ -35,6 +36,7 @@ public class SpriteBatch {
     private int ebo;
     private final List<SpriteRenderer> spriteRenderers;
     private final List<DrawCall> drawCalls;
+    @Getter
     private final int zIndex;
 
     public SpriteBatch(int zIndex) {
@@ -164,10 +166,6 @@ public class SpriteBatch {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);
-    }
-
-    public int getzIndex() {
-        return zIndex;
     }
 
     public boolean isFull() {

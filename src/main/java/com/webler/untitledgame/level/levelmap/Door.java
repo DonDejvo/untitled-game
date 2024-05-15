@@ -1,12 +1,15 @@
 package com.webler.untitledgame.level.levelmap;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.w3c.dom.Element;
 
+@Setter
+@Getter
 public class Door implements Serializable {
     public static final String TAG = "door";
-    public int x;
-    public int y;
-    public Direction direction;
+    private int x, y;
+    private Direction direction;
 
     public Door(int x, int y, Direction direction) {
         this.x = x;

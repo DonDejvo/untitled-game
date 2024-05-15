@@ -4,6 +4,7 @@ import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.graphics.light.AmbientLight;
 import com.webler.goliath.graphics.light.SpotLight;
 import com.webler.goliath.utils.AssetPool;
+import lombok.Getter;
 import org.joml.Matrix4d;
 import org.joml.Vector3d;
 
@@ -18,6 +19,7 @@ public class Renderer {
     private final List<SpriteBatch> spriteBatches;
     private final List<AmbientLight> ambientLights;
     private final List<SpotLight> spotLights;
+    @Getter
     private Fog fog;
     public boolean fogOn = false;
     public boolean lightOn = false;
@@ -41,13 +43,13 @@ public class Renderer {
     public void add(SpriteRenderer spriteRenderer) {
         boolean added = false;
         for(SpriteBatch batch : spriteBatches) {
-            if(!batch.isFull() && batch.getzIndex() == spriteRenderer.getzIndex()) {
+            if(!batch.isFull() && batch.getZIndex() == spriteRenderer.getZIndex()) {
                 batch.add(spriteRenderer);
                 added = true;
             }
         }
         if(!added) {
-            SpriteBatch batch = createBatch(spriteRenderer.getzIndex());
+            SpriteBatch batch = createBatch(spriteRenderer.getZIndex());
             batch.add(spriteRenderer);
         }
     }
@@ -65,7 +67,7 @@ public class Renderer {
         SpriteBatch spriteBatch = new SpriteBatch(zIndex);
         spriteBatches.add(spriteBatch);
         spriteBatch.start();
-        spriteBatches.sort(Comparator.comparingInt(SpriteBatch::getzIndex));
+        spriteBatches.sort(Comparator.comparingInt(SpriteBatch::getZIndex));
         return spriteBatch;
     }
 
@@ -158,7 +160,7 @@ public class Renderer {
         for(SpriteBatch spriteBatch : spriteBatches) {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            if(spriteBatch.getzIndex() == -1) {
+            if(spriteBatch.getZIndex() == -1) {
                 glEnable(GL_DEPTH_TEST);
             } else {
                 glDisable(GL_DEPTH_TEST);
@@ -187,7 +189,4 @@ public class Renderer {
         fog.fogFar = 100;
     }
 
-    public Fog getFog() {
-        return fog;
-    }
 }

@@ -23,7 +23,7 @@ public class EntityPrefab implements Prefab {
 
     @Override
     public GameObject create(Scene scene) {
-        LevelObject levelObject = editorComponent.getLevel().getRegisteredObject(entity.name);
+        LevelObject levelObject = editorComponent.getLevel().getRegisteredObject(entity.getName());
         int tileWidth = editorComponent.getConfig().gridWidth();
         int tileHeight = editorComponent.getConfig().gridHeight();
         GameObject go = new GameObject(scene);

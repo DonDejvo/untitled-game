@@ -10,6 +10,9 @@ import com.webler.goliath.dialogs.events.DialogNextEvent;
 import com.webler.goliath.dialogs.nodes.DialogOptionsNode;
 import com.webler.goliath.dialogs.nodes.DialogTextNode;
 import com.webler.goliath.eventsystem.listeners.EventHandler;
+import com.webler.goliath.graphics.Color;
+import com.webler.goliath.graphics.DebugDraw;
+import com.webler.goliath.graphics.canvas.Canvas;
 import com.webler.goliath.graphics.components.Camera;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.math.MathUtils;
@@ -19,18 +22,24 @@ import com.webler.untitledgame.level.events.DoorOpenedEvent;
 import com.webler.untitledgame.level.events.ItemSelectedEvent;
 import com.webler.untitledgame.level.inventory.Inventory;
 import com.webler.untitledgame.prefabs.level.GunPrefab;
+import lombok.Getter;
+import lombok.Setter;
 import org.joml.Vector3d;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends EntityController {
     private Camera camera;
     private boolean canJump;
+    @Getter
     private GameObject focusedObject;
     private State state;
     private Inventory inventory;
+    @Setter
+    @Getter
     private GameObject companion;
     private GameObject gun;
     private boolean shouldStopInteraction;
@@ -46,10 +55,6 @@ public class PlayerController extends EntityController {
         companion = null;
         gun = null;
         shouldStopInteraction = false;
-    }
-
-    public GameObject getFocusedObject() {
-        return focusedObject;
     }
 
     public void collect(String itemName) {
@@ -68,11 +73,18 @@ public class PlayerController extends EntityController {
 
     public void equipGun(String itemName) {
         Scene scene = gameObject.getScene();
+        boolean isSame = false;
         if(gun != null) {
+            GunController gunController = gun.getComponent(GunController.class, "Controller");
+            isSame = gunController.getItemName().equals(itemName);
             gun.remove();
         }
-        gun = new GunPrefab(level, itemName).create(scene);
-        scene.add(gun);
+        if(!isSame) {
+            gun = new GunPrefab(level, itemName).create(scene);
+            scene.add(gun);
+        } else {
+            gun = null;
+        }
     }
 
     @Override
@@ -116,14 +128,6 @@ public class PlayerController extends EntityController {
 
         friction = onGround ? 10 : 2;
         updatePhysics(dt);
-    }
-
-    public GameObject getCompanion() {
-        return companion;
-    }
-
-    public void setCompanion(GameObject companion) {
-        this.companion = companion;
     }
 
     @Override
@@ -173,6 +177,14 @@ public class PlayerController extends EntityController {
     }
 
     private void updatePlaying(double dt) {
+
+        if(gun != null) {
+            Canvas canvas = gameObject.getGame().getCanvas();
+            canvas.setColor(Color.WHITE);
+            canvas.rect((float) canvas.getWidth() / 2 - 16, (float) canvas.getHeight() / 2 - 1, 32, 2);
+            canvas.rect((float) canvas.getWidth() / 2 - 1, (float) canvas.getHeight() / 2 - 16, 2, 32);
+        }
+
         Vector3d moveVec = new Vector3d();
 
         if(Input.keyPressed(GLFW_KEY_W)) {
@@ -264,6 +276,30 @@ public class PlayerController extends EntityController {
         camera.getGameObject().transform.position.set(new Vector3d(gameObject.transform.position).add(0, 0.75, 0));
 //        camera.direction.lerp(direction, Math.min(dt * 10, 1));
         camera.direction.set(direction);
+
+        if(gun != null) {
+            gun.transform.position.set(gameObject.transform.position);
+            gun.transform.position.add(new Vector3d(0, 0.25, 1).rotateY(yaw));
+
+            GunController gunController = gun.getComponent(GunController.class, "Controller");
+            Vector3d rayHitPos = raycast(camera.getGameObject().transform.position, direction, 50, 0.5);
+
+            if(rayHitPos != null) {
+                double rayLength = rayHitPos.distance(camera.getGameObject().transform.position);
+                double minRayLength = 8;
+
+                Vector3d gunDirection = new Vector3d(rayHitPos).sub(gunController.getProjectilePosition().sub(new Vector3d(direction).mul(Math.max(minRayLength - rayLength, 0)))).normalize();
+                gunController.yaw = Math.atan2(-gunDirection.z, gunDirection.x);
+                gunController.pitch = Math.asin(-gunDirection.y);
+
+                DebugDraw.get().addLine(new Vector3d(rayHitPos.x - 1, rayHitPos.y, rayHitPos.z), new Vector3d(rayHitPos.x + 1, rayHitPos.y, rayHitPos.z), Color.YELLOW);
+                DebugDraw.get().addLine(new Vector3d(rayHitPos.x, rayHitPos.y - 1, rayHitPos.z), new Vector3d(rayHitPos.x, rayHitPos.y + 1, rayHitPos.z), Color.YELLOW);
+                DebugDraw.get().addLine(new Vector3d(rayHitPos.x, rayHitPos.y, rayHitPos.z - 1), new Vector3d(rayHitPos.x, rayHitPos.y, rayHitPos.z + 1), Color.YELLOW);
+            } else {
+                gunController.yaw = yaw;
+                gunController.pitch = pitch;
+            }
+        }
     }
 
     private void updateGun() {
@@ -275,17 +311,7 @@ public class PlayerController extends EntityController {
             } else if(!Input.mouseButtonPress() || state != State.PLAYING) {
                 gunController.setShooting(false);
             }
-
-            setGunPos();
         }
-    }
-
-    private void setGunPos() {
-        GunController gunController = gun.getComponent(GunController.class, "Controller");
-        Vector3d pos = new Vector3d(gameObject.transform.position).add(new Vector3d(0, 0.25, 1).rotateY(yaw));
-        gun.transform.position.set(pos);
-        gunController.yaw = yaw;
-        gunController.pitch = pitch;
     }
 
     private void updateFocusedObject() {

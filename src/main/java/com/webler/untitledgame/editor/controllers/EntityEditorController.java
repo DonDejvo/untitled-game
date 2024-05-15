@@ -22,13 +22,13 @@ public class EntityEditorController extends EditorController {
     public void editorImgui() {
         ImGui.text(this.toString());
 
-        float[] x = {(float) entity.x};
+        float[] x = {(float) entity.getX()};
         Controls.floatControl("x", x, 0.1f);
-        entity.x = x[0];
+        entity.setX(x[0]);
 
-        float[] y = {(float) entity.y};
+        float[] y = {(float) entity.getY()};
         Controls.floatControl("y", y, 0.1f);
-        entity.y = y[0];
+        entity.setY(y[0]);
     }
 
     @Override
@@ -38,13 +38,13 @@ public class EntityEditorController extends EditorController {
 
     @Override
     public void synchronize() {
-        gameObject.transform.position.set(entity.x * editorComponent.getConfig().gridWidth(), entity.y * editorComponent.getConfig().gridHeight(), 0);
+        gameObject.transform.position.set(entity.getX() * editorComponent.getConfig().gridWidth(), entity.getY() * editorComponent.getConfig().gridHeight(), 0);
     }
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        entity.x = (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth();
-        entity.y = (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight();
+        entity.setX((transform.position.x + vector.x) / editorComponent.getConfig().gridWidth());
+        entity.setY((transform.position.y + vector.y) / editorComponent.getConfig().gridHeight());
     }
 
     @Override
@@ -59,6 +59,6 @@ public class EntityEditorController extends EditorController {
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s [x=%.3f, y=%.3f]", entity.name, entity.x, entity.y);
+        return String.format(Locale.US, "%s [x=%.3f, y=%.3f]", entity.getName(), entity.getX(), entity.getY());
     }
 }

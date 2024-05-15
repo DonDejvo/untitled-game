@@ -24,33 +24,33 @@ public class LightEditorController extends EditorController {
     public void editorImgui() {
         ImGui.text(this.toString());
 
-        float[] x = {(float) light.x};
+        float[] x = {(float) light.getX()};
         Controls.floatControl("x", x, 0.1f);
-        light.x = x[0];
+        light.setX(x[0]);
 
-        float[] y = {(float) light.y};
+        float[] y = {(float) light.getY()};
         Controls.floatControl("y", y, 0.1f);
-        light.y = y[0];
+        light.setY(y[0]);
 
-        float[] top = {(float) light.top};
+        float[] top = {(float) light.getTop()};
         Controls.floatControl("top", top, 0.1f);
-        light.top = top[0];
+        light.setTop(top[0]);
 
-        float[] radiusMin = {(float) light.radiusMin};
+        float[] radiusMin = {(float) light.getRadiusMin()};
         Controls.floatControl("radius min", radiusMin, 0.1f);
-        light.radiusMin = radiusMin[0];
+        light.setRadiusMin(radiusMin[0]);
 
-        float[] radiusMax = {(float) light.radiusMax};
+        float[] radiusMax = {(float) light.getRadiusMax()};
         Controls.floatControl("radius max", radiusMax, 0.1f);
-        light.radiusMax = radiusMax[0];
+        light.setRadiusMax(radiusMax[0]);
 
-        float[] color = light.color.toArray();
+        float[] color = light.getColor().toArray();
         Controls.colorPicker("color", color);
-        light.color = Color.fromArray(color);
+        light.setColor(Color.fromArray(color));
 
-        float[] intensity = {(float) light.intensity};
+        float[] intensity = {(float) light.getIntensity()};
         Controls.floatControl("intensity", intensity, 0.1f);
-        light.intensity = intensity[0];
+        light.setIntensity(intensity[0]);
     }
 
     @Override
@@ -60,13 +60,13 @@ public class LightEditorController extends EditorController {
 
     @Override
     public void synchronize() {
-        gameObject.transform.position.set(light.x * editorComponent.getConfig().gridWidth(), light.y * editorComponent.getConfig().gridHeight(), 0);
+        gameObject.transform.position.set(light.getX() * editorComponent.getConfig().gridWidth(), light.getY() * editorComponent.getConfig().gridHeight(), 0);
     }
 
     @Override
     public void move(Transform transform, Vector2d start, Vector2d vector) {
-        light.x = (transform.position.x + vector.x) / editorComponent.getConfig().gridWidth();
-        light.y = (transform.position.y + vector.y) / editorComponent.getConfig().gridHeight();
+        light.setX((transform.position.x + vector.x) / editorComponent.getConfig().gridWidth());
+        light.setY((transform.position.y + vector.y) / editorComponent.getConfig().gridHeight());
     }
 
     @Override
@@ -80,6 +80,6 @@ public class LightEditorController extends EditorController {
 
     @Override
     public String toString() {
-        return String.format(Locale.US, "Spotlight [x=%.3f, y=%.3f]", light.x, light.y);
+        return String.format(Locale.US, "Spotlight [x=%.3f, y=%.3f]", light.getX(), light.getY());
     }
 }

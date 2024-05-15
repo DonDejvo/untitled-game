@@ -1,5 +1,7 @@
 package com.webler.goliath.graphics;
 
+import lombok.Getter;
+
 import static org.lwjgl.opengl.GL20.*;
 
 import java.awt.*;
@@ -9,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Hashtable;
 
+@Getter
 public class Texture {
     private static final ComponentColorModel glAlphaColorModel = new ComponentColorModel(
             ColorSpace.getInstance(ColorSpace.CS_sRGB),
@@ -49,10 +52,6 @@ public class Texture {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
     }
 
-    public int getTexId() {
-        return texId;
-    }
-
     @Override
     public boolean equals(Object obj) {
         return false;
@@ -65,14 +64,6 @@ public class Texture {
     @Override
     public int hashCode() {
         return texId;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
     }
 
     public void destroy() {

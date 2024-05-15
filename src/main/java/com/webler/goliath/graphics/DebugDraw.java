@@ -35,7 +35,7 @@ public class DebugDraw {
     }
 
     public void start() {
-        shader = AssetPool.get().getShader("goliath/shaders/lines.glsl");
+        shader = AssetPool.getShader("goliath/shaders/lines.glsl");
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 

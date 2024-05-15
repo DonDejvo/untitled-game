@@ -1,8 +1,12 @@
 package com.webler.goliath.algorithm;
 
+import lombok.Getter;
+
 public class Dijkstra {
     private static final int MAX_DISTANCE = 1000000;
+    @Getter
     private Vertex[] vertices;
+    @Getter
     private Edge[] edges;
     private VertexData[] vertexData;
     private int[][] edgeGrid;
@@ -103,14 +107,6 @@ public class Dijkstra {
             vertexDatum.visited = false;
             vertexDatum.order = -1;
         }
-    }
-
-    public Edge[] getEdges() {
-        return edges;
-    }
-
-    public Vertex[] getVertices() {
-        return vertices;
     }
 
     private int visitNearestVertex() {
