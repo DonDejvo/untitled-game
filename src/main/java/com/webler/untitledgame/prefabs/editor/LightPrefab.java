@@ -11,14 +11,21 @@ import com.webler.untitledgame.editor.controllers.LightEditorController;
 import com.webler.untitledgame.level.levelmap.Light;
 
 public class LightPrefab implements Prefab {
-    private Light light;
-    private EditorComponent editorComponent;
+    private final Light light;
+    private final EditorComponent editorComponent;
 
     public LightPrefab(EditorComponent editorComponent, Light light) {
         this.editorComponent = editorComponent;
         this.light = light;
     }
 
+    /**
+    * Creates a GameObject that can be used to interact with the game. You can use this to create an instance of your game object without needing to create a new instance of the Scene you are using.
+    * 
+    * @param scene - The Scene to create the game object in.
+    * 
+    * @return The game object that can be used to interact with the game object without needing to create a new Scene
+    */
     @Override
     public GameObject create(Scene scene) {
         Sprite sprite = AssetPool.getSpritesheet("untitled-game/spritesheets/tileset.png").getSprite(37);

@@ -7,12 +7,10 @@ system__controls_interact;System;Focus an object by standing nearby and looking 
 system__controls_inventory;System;Use I or TAB to open the inventory and use arrows or WSAD to move in the invetory.
 player__follow;;Follow me!
 player__stop_follow;;Wait here!
-cat_girl__follow;Cat Girl;Yes, I make you great companion, Master!
-cat_girl__stop_follow;Cat Girl;I stay here until you come back, Master!
+npc__follow;Knight;Sure, let's go!
+npc__stop_follow;Knight;Alright, I'll wait here.
 player__whats_up;;What's up?
-cat_girl__whats_up_1;Cat Girl;Thanks for your bravery and willingness to help others, Master!
-cat_girl__whats_up_2;Cat Girl;I cherish all these moments we spend together, Master!
-cat_girl__whats_up_3;Cat Girl;You will save the world, I have strong belief in you, Master!
-cat_girl__whats_up_4;Cat Girl;I am ready to do anything to make you happy, Master!
+knight__whats_up_1;Knight;We have had brighter days but the order is still standing.
+knight__whats_up_2;Knight;Sometimes I have bad feelings about the darkness surrounding us.
 player__give_coffee;;Here, take a coffee.
-cat_girl__take_coffee;Cat Girl;Thank you so much! I could fall in love with you, Master!
+npc__take_coffee;Knight;Thanks. Cup of coffee always brings a new life.

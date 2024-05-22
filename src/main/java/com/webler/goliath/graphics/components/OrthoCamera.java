@@ -6,6 +6,9 @@ public class OrthoCamera extends Camera{
         super(viewportWidth, viewportHeight);
     }
 
+    /**
+    * Updates the projection matrix to reflect the size of the game object. This is called when the viewport size changes
+    */
     @Override
     public void updateProjection() {
         double halfWidth = viewportWidth * 0.5 / getGameObject().transform.scale.x;

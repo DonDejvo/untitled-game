@@ -18,13 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VendingMachineController extends NpcController {
-    private List<LevelItem> sellingItems;
+    private final List<LevelItem> sellingItems;
 
     public VendingMachineController(Level level, BoxCollider3D collider, DialogComponent dialogComponent, PathFinder pathFinder) {
         super(level, collider, dialogComponent, pathFinder, 0);
         sellingItems = new ArrayList<>();
     }
 
+    /**
+    * Called when the player starts. This is where we get the selling items and ask the player to sell
+    */
     @Override
     public void start() {
         super.start();
@@ -44,13 +47,21 @@ public class VendingMachineController extends NpcController {
         dialogManager.addDialog("vm__no_gold", new Dialog("I don't have enough gold."));
     }
 
+    /**
+    * Called when a dialog is clicked. This is the place where you can select an item and sell it
+    * 
+    * @param event - The event that triggered
+    */
     @EventHandler
+    @SuppressWarnings("unused")
     public void onDialogNext(DialogNextEvent event) {
+        // This method is called when the event is triggered by the game object.
         if(event.getGameObject() != gameObject) return;
 
         PlayerController playerController = level.getPlayer().getComponent(PlayerController.class, "Controller");
 
         for(LevelItem item : sellingItems) {
+            // Buy the player s buying the item
             if(event.getDialogName().equals("vm__sell_" + item.getIdentifier())) {
                 playerController.buy(item.getIdentifier(), item.getPrice());
             }
@@ -59,6 +70,9 @@ public class VendingMachineController extends NpcController {
         initDialogs();
     }
 
+    /**
+    * Initializes dialogs for selling items. This is called by level. init () and can be overridden to provide custom
+    */
     @Override
     protected void initDialogs() {
         GameObject player = level.getPlayer();
@@ -72,5 +86,16 @@ public class VendingMachineController extends NpcController {
                     new DialogTextNode(inventory.getItemCount("gold") >= item.getPrice() ?
                             "vm__sell_" + item.getIdentifier() : "vm__no_gold", null)));
         }
+    }
+
+    /**
+    * Returns the name of this vending machine. Note that this is not the same as the human - readable name of the virtual machine.
+    * 
+    * 
+    * @return the name of this vending machine as a String ( may be empty but never null ). If you want to have more than one virtual machine use #getVend ()
+    */
+    @Override
+    public String getName() {
+        return "Vending Machine";
     }
 }

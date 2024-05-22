@@ -14,8 +14,12 @@ public class ShotgunController extends GunController{
         super(level, itemName, 0.8, Projectile.SHELL, new Vector2d(2, -0.4), new Vector2d(3, 0.0));
     }
 
+    /**
+    * Shoots the projectile. This is called every time the player tries to spawn a new projectile
+    */
     @Override
     protected void shoot() {
+        // This method creates 5 projectiles and adds a projectile prefab to the game.
         for(int i = 0; i < 5; ++i) {
             double yawOffset = (Math.random() * 2 - 1) * 0.1;
             double pitchOffset = (Math.random() * 2 - 1) * 0.1;

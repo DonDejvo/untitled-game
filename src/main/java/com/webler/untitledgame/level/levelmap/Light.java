@@ -27,6 +27,11 @@ public class Light implements Serializable {
     public Light() {
     }
 
+    /**
+    * Deserializes the object from XML. This is used to deserialize the attributes that are part of the Shape2D
+    * 
+    * @param element - XML element that contains the
+    */
     @Override
     public void deserialize(Element element) {
         double top = Double.parseDouble(element.getAttribute("top"));
@@ -46,6 +51,11 @@ public class Light implements Serializable {
         this.intensity = intensity;
     }
 
+    /**
+    * Serializes this object to XML. This is used to create XML elements that are used for rendering. The attributes of this object are : top x y radius - min radius - max color intensity
+    * 
+    * @param element - XML element to serialize this object to. Must not be null
+    */
     @Override
     public void serialize(Element element) {
         element.setAttribute("top", Double.toString(top));

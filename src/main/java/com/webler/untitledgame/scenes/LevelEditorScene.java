@@ -4,17 +4,13 @@ import com.webler.goliath.Game;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.core.SceneParams;
-import com.webler.goliath.graphics.Spritesheet;
-import com.webler.goliath.graphics.Texture;
 import com.webler.goliath.graphics.components.*;
-import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.components.GridLines;
 import com.webler.untitledgame.components.Level;
 import com.webler.untitledgame.editor.Dockspace;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.editor.EditorConfig;
 import com.webler.untitledgame.editor.controllers.LevelMapEditorController;
-import imgui.ImGui;
 
 public class LevelEditorScene extends Scene {
     Dockspace dockspace;
@@ -23,25 +19,14 @@ public class LevelEditorScene extends Scene {
         super(game);
     }
 
+    /**
+    * Called when the scene is initialized. This is where you can set up your scene by calling setSceneParams
+    * 
+    * @param params - parameters to initialize the
+    */
     @Override
     public void init(SceneParams params) {
         LevelParams levelParams = (LevelParams) params;
-
-        Texture tilesTexture = AssetPool.getTexture("untitled-game/spritesheets/tileset.png");
-        AssetPool.addSpritesheet("untitled-game/spritesheets/tileset.png",
-                new Spritesheet(tilesTexture, 16, 16, 70, 9, 2, 2));
-
-        Texture catgirlsTexture = AssetPool.getTexture("untitled-game/spritesheets/catgirls.png");
-        AssetPool.addSpritesheet("untitled-game/spritesheets/catgirls.png",
-                new Spritesheet(catgirlsTexture, 66, 86, 107, 12, 0, 0));
-
-        Texture houseTexture = AssetPool.getTexture("untitled-game/spritesheets/house_asset.png");
-        AssetPool.addSpritesheet("untitled-game/spritesheets/house_asset.png",
-                new Spritesheet(houseTexture, 48, 48, 31, 6, 16, 16));
-
-        Texture ghostTexture = AssetPool.getTexture("untitled-game/spritesheets/ghost.png");
-        AssetPool.addSpritesheet("untitled-game/spritesheets/ghost.png",
-                new Spritesheet(ghostTexture, 16, 16, 3, 3, 0, 0));
 
         GameObject cameraGameObject = new GameObject(this, "Camera");
         Camera camera = new OrthoCamera(1920, 1080);
@@ -64,6 +49,9 @@ public class LevelEditorScene extends Scene {
 
 
 
+    /**
+    * Called when the user presses the imgui button. Opens the image UI and updates the view
+    */
     @Override
     public void imgui() {
         dockspace.begin();
@@ -71,6 +59,9 @@ public class LevelEditorScene extends Scene {
         dockspace.end();
     }
 
+    /**
+    * Draws the graph. This is called by the DrawingManager to indicate that it is ready to draw
+    */
     @Override
     public void draw() {}
 }

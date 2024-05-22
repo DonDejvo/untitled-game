@@ -5,20 +5,26 @@ import com.webler.goliath.core.Scene;
 import com.webler.goliath.graphics.Sprite;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.prefabs.Prefab;
-import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.editor.controllers.PlatformEditorController;
 import com.webler.untitledgame.level.levelmap.Platform;
 
 public class PlatformPrefab implements Prefab {
-    private Platform platform;
-    private EditorComponent editorComponent;
+    private final Platform platform;
+    private final EditorComponent editorComponent;
 
     public PlatformPrefab(EditorComponent editorComponent, Platform platform) {
         this.editorComponent = editorComponent;
         this.platform = platform;
     }
 
+    /**
+    * Creates the game object. This is called by the editor when it is created. It will create a Sprite and add it to the scene
+    * 
+    * @param scene - The scene to add the GameObject to
+    * 
+    * @return The GameObject that was created for the editor's game object and the sprite renderer to be added
+    */
     @Override
     public GameObject create(Scene scene) {
         Sprite sprite = new Sprite();

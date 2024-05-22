@@ -45,14 +45,29 @@ public class SpriteBatch {
         drawCalls = new ArrayList<>();
     }
 
+    /**
+    * Adds a SpriteRenderer to the list of SpriteRenderers. This is useful for adding custom SpriteRenderer instances that are specific to the game.
+    * 
+    * @param spriteRenderer - The SpriteRenderer to add to the
+    */
     public void add(SpriteRenderer spriteRenderer) {
         spriteRenderers.add(spriteRenderer);
     }
 
+    /**
+    * Removes a SpriteRenderer from the list. This will return true if the SpriteRenderer was removed false otherwise.
+    * 
+    * @param spriteRenderer - The SpriteRenderer to remove.
+    * 
+    * @return True if the SpriteRenderer was removed false otherwise ( since there is no way to determine if the SpriteRenderer was in the list
+    */
     public boolean remove(SpriteRenderer spriteRenderer) {
         return spriteRenderers.remove(spriteRenderer);
     }
 
+    /**
+    * Initializes the OpenGL state. This is called by the start method of the SpriteRenderer. You can call it any time you want to start drawing
+    */
     public void start() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
@@ -84,7 +99,9 @@ public class SpriteBatch {
                 0, 2, 3
         };
         int[] indices = new int[MAX_SPRITES * 6];
+        // This method is used to store the indices of the index cache.
         for (int i = 0; i < MAX_SPRITES; ++i) {
+            // Set the indices of the indices in the cache.
             for(int j = 0; j < indexCache.length; ++j) {
                 indices[i * 6 + j] = indexCache[j] + i * 4;
             }
@@ -98,34 +115,44 @@ public class SpriteBatch {
     }
 
     // TODO: Do only if needed
+    /**
+    * Initializes the buffers. This is called by Scene#begin ( Graphics ) and Scene#end () to ensure that buffers are initialized
+    */
     public void initBuffers() {
 
         drawCalls.clear();
 
+        // Returns true if there are no sprite renderers.
         if(spriteRenderers.isEmpty()) return;
 
         ArrayList<SpriteRenderer> visibleRenderers = getVisibleRenderers();
 
         float[] vertices = new float[visibleRenderers.size() * 4 * VERT_SIZE];
 
+        // Draw all the visible renderers.
         for(int i = 0; i < visibleRenderers.size(); ++i) {
             SpriteRenderer spriteRenderer = visibleRenderers.get(i);
             Sprite sprite = spriteRenderer.getSprite();
 
-            float[] positions = getPositions(spriteRenderer, sprite);
+            float[] positions = getPositions(spriteRenderer);
             float[] uvs = sprite.getTexCoords();
             float[] color = spriteRenderer.getColor().toArray();
+            // Copy all the vertices and uvs from the vertices and color.
             for(int j = 0; j < 4; ++j) {
+                // Set the position of the vertices in the graph.
                 for(int k = 0; k < POS_SIZE; ++k) {
                     vertices[(i * 4 + j) * VERT_SIZE + POS_OFFSET + k] = positions[j * POS_SIZE + k];
                 }
+                // Set the vertices of the vertex.
                 for(int k = 0; k < UV_SIZE; ++k) {
                     vertices[(i * 4 + j) * VERT_SIZE + UV_OFFSET + k] = uvs[j * UV_SIZE + k];
                 }
                 System.arraycopy(color, 0, vertices, (i * 4 + j) * VERT_SIZE + COLOR_OFFSET, COLOR_SIZE);
             }
 
+            // Add a DrawCall to the drawCalls list.
             if(i == visibleRenderers.size() - 1 || !sprite.getTexture().equals(visibleRenderers.get(i + 1).getSprite().getTexture())) {
+                // Add a DrawCall to the drawCalls list.
                 if(drawCalls.isEmpty()) {
                     drawCalls.add(new DrawCall(0, (i + 1) * 6, sprite.getTexture().getTexId()));
                 } else {
@@ -141,6 +168,9 @@ public class SpriteBatch {
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
     }
 
+    /**
+    * Renders the VAO. This is called by OpenGL every frame to render the vertex data to the screen
+    */
     public void render() {
         initBuffers();
 
@@ -162,21 +192,37 @@ public class SpriteBatch {
         glBindVertexArray(0);
     }
 
+    /**
+    * Destroys OpenGL resources. This is called by #destroy ( GLContext ) when the context is no longer needed
+    */
     public void destroy() {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);
     }
 
+    /**
+    * Returns true if the queue is full. This is used to determine if we should try to render a new tile or not.
+    * 
+    * 
+    * @return whether or not the queue is full or not ( true or false ). Note that false is returned if there are too many sprites
+    */
     public boolean isFull() {
         return spriteRenderers.size() == MAX_SPRITES;
     }
 
+    /**
+    * Returns a list of SpriteRenderers that are visible to the camera. The list is sorted by Z - order and the Sprite's texture ID is used as the key to the array list.
+    * 
+    * 
+    * @return An ArrayList of SpriteRenderer that are visible to the camera sorted by Z - order and the Sprite's texture ID
+    */
     private ArrayList<SpriteRenderer> getVisibleRenderers() {
         Camera camera = spriteRenderers.get(0).getGameObject().getScene().getCamera();
 
         ArrayList<SpriteRenderer> visibleRenderers = new ArrayList<>(spriteRenderers);
 
+        // Returns a list of visible renderers.
         if(zIndex == -1) {
             visibleRenderers.sort((a, b) -> {
                 double distToCam1 = a.getOffsetPosition().distance(camera.getGameObject().transform.position);
@@ -196,7 +242,12 @@ public class SpriteBatch {
         return visibleRenderers;
     }
 
-    private float[] getPositions(SpriteRenderer spriteRenderer, Sprite sprite) {
+    /**
+    * Returns the positions of the sprites. This is used to calculate the world coordinates of the sprites.
+    * 
+    * @param spriteRenderer - The SpriteRenderer to calculate the positions
+    */
+    private float[] getPositions(SpriteRenderer spriteRenderer) {
         Transform transform = spriteRenderer.getGameObject().transform;
         Matrix4d mat = new Matrix4d(transform.getMatrix());
         mat.translate(spriteRenderer.offset);
@@ -207,6 +258,7 @@ public class SpriteBatch {
                 new Vector4d(-0.5, -0.5, 0, 1)
         };
         float[] vertices = new float[POS_SIZE * positions.length];
+        // Set the position of the sprite.
         for (int i = 0; i < positions.length; ++i) {
             positions[i].x *= spriteRenderer.getSprite().getWidth();
             positions[i].y *= spriteRenderer.getSprite().getHeight();

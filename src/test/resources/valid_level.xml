@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<levelmap ceiling="10">
+    <platform x="1" y="2" width="3" height="4" top="0" ceiling="5"/>
+</levelmap>

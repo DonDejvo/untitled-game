@@ -14,6 +14,9 @@ public class AssaultRifleController extends GunController {
         super(level, itemName, 0.15, Projectile.NAIL, new Vector2d(1.5, -0.05), new Vector2d(2.5, 0.2));
     }
 
+    /**
+    * Shoots the projectile to the game object. This is called by the GameObject#shoot
+    */
     @Override
     protected void shoot() {
         Scene scene = getGameObject().getScene();

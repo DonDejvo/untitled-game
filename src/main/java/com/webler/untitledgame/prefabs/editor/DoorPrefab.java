@@ -12,14 +12,21 @@ import com.webler.untitledgame.level.levelmap.Door;
 
 public class DoorPrefab implements Prefab {
 
-    private Door door;
-    private EditorComponent editorComponent;
+    private final Door door;
+    private final EditorComponent editorComponent;
 
     public DoorPrefab(EditorComponent editorComponent, Door door) {
         this.editorComponent = editorComponent;
         this.door = door;
     }
 
+    /**
+    * Creates the door and adds it to the scene. This is called by the editor when it is created
+    * 
+    * @param scene - The scene to add the door to
+    * 
+    * @return The game object that was created for the door to be played in the editor or null if there was
+    */
     @Override
     public GameObject create(Scene scene) {
         Sprite sprite = new Sprite(AssetPool.getTexture("untitled-game/images/door.png"));

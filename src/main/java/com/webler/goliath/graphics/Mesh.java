@@ -33,6 +33,9 @@ public class Mesh {
         init();
     }
 
+    /**
+    * Initializes OpenGL state. Called by #create () to initialize the OpenGL state before drawing is started
+    */
     private void init() {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
@@ -66,24 +69,18 @@ public class Mesh {
         glBindVertexArray(0);
     }
 
-    public void initBuffers() {
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, geometry.getVertices(), GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, geometry.getIndices(), GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
-    }
-
+    /**
+    * Destroys OpenGL resources. This is called by #destroy ( GLContext ) when the context is no longer needed
+    */
     public void destroy() {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(vbo);
         glDeleteBuffers(ebo);
     }
 
+    /**
+    * Renders the geometry to the VAO. This is called by GLUT every frame to render the geometry
+    */
     public void render() {
         glBindVertexArray(vao);
 

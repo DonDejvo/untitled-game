@@ -36,7 +36,7 @@ uniform sampler2D u_tex;
 uniform vec4 u_color;
 
 #ifdef LIGHT_ON
-uniform vec3 u_spot_lights[192];
+uniform vec3 u_spot_lights[64 * 3];
 uniform int u_spot_lights_count;
 uniform vec3 u_ambient_color;
 #endif

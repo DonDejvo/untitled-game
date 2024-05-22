@@ -25,21 +25,35 @@ public class Transform extends Component {
         matrix = new Matrix4d();
     }
 
+    /**
+    * Called when the game starts. This is where we update the matrix to reflect the changes in the world
+    */
     @Override
     public void start() {
         updateMatrix();
     }
 
+    /**
+    * Updates the matrix. This is called every frame during the update loop. The matrix is updated by calling updateMatrix ()
+    * 
+    * @param dt - time since the last
+    */
     @Override
     public void update(double dt) {
         updateMatrix();
     }
 
+    /**
+    * Called when the component is no longer needed. This is the place to do any cleanup that needs to be done
+    */
     @Override
     public void destroy() {
 
     }
 
+    /**
+    * Updates the transformation matrix to reflect the current position rotation and scale. This is called by the constructor to ensure that the matrix is up to date
+    */
     public void updateMatrix() {
         matrix.identity()
                 .translate(position)

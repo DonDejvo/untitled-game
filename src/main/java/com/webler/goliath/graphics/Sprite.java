@@ -36,6 +36,14 @@ public class Sprite {
         this.height = sprite.height;
     }
 
+    /**
+    * Sets the region of this texture. This is useful for drawing textures that are part of a larger texture than the texture used to draw the texture.
+    * 
+    * @param x - The x coordinate of the region to set.
+    * @param y - The y coordinate of the region to set.
+    * @param width - The width of the region to set. Must be greater than 0.
+    * @param height - The height of the region to set. Must be greater than 0
+    */
     public void setRegion(int x, int y, int width, int height) {
         int texWidth = texture.getWidth();
         int texHeight = texture.getHeight();

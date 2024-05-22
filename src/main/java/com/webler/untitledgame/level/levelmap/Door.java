@@ -19,6 +19,11 @@ public class Door implements Serializable {
 
     public Door() {}
 
+    /**
+    * Deserializes the object from XML. This is used to deserialize the direction of the robot when it is in the middle of a move
+    * 
+    * @param element - XML element containing the
+    */
     @Override
     public void deserialize(Element element) {
         int x = Integer.parseInt(element.getAttribute("x"));
@@ -30,6 +35,11 @@ public class Door implements Serializable {
         this.direction = direction;
     }
 
+    /**
+    * Serializes this object to XML. This is used to add attributes to the XML element that are required for drawing the object
+    * 
+    * @param element - XML element to serialize
+    */
     @Override
     public void serialize(Element element) {
         element.setAttribute("x", String.valueOf(x));

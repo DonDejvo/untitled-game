@@ -2,24 +2,23 @@ package com.webler.untitledgame.editor;
 
 import com.webler.goliath.Game;
 import imgui.ImGui;
-import imgui.ImGuiIO;
-import imgui.ImGuiViewport;
 import imgui.flag.ImGuiCond;
-import imgui.flag.ImGuiDockNodeFlags;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
-import imgui.internal.ImGuiDockNode;
 import imgui.type.ImBoolean;
 
 public class Dockspace {
-    private Game game;
-    private String title;
+    private final Game game;
+    private final String title;
 
     public Dockspace(String title, Game game) {
         this.game = game;
         this.title = title;
     }
 
+    /**
+    * Start the ImGui window. This is called when the user presses Enter in the window's title
+    */
     public void begin() {
         int windowFlags = ImGuiWindowFlags.MenuBar;
 
@@ -42,6 +41,9 @@ public class Dockspace {
         ImGui.dockSpace(dockSpaceId);
     }
 
+    /**
+    * Ends the execution of the program. This is called by ImGui#end () and should be used as a place to do things like closing the file
+    */
     public void end() {
         ImGui.end();
     }

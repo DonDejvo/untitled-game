@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class Vertex {
-    private int id;
+    private final int id;
 
     public Vertex(int id) {
         this.id = id;

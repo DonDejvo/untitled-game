@@ -1,6 +1,5 @@
 package com.webler.untitledgame.level.levelmap;
 
-import com.webler.goliath.graphics.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.w3c.dom.Element;
@@ -21,6 +20,11 @@ public class Entity implements Serializable{
     public Entity() {
     }
 
+    /**
+    * Deserializes the object from XML. This is used to deserialize the data that was saved with #save ()
+    * 
+    * @param element - XML element to deserialize
+    */
     @Override
     public void deserialize(Element element) {
         String name = element.getAttribute("name");
@@ -32,6 +36,11 @@ public class Entity implements Serializable{
         this.y = y;
     }
 
+    /**
+    * Serializes this object to XML. This is used to create XML elements that are used for debugging purposes such as printing the results of an object's query.
+    * 
+    * @param element - XML element to serialize to. Must not be null
+    */
     @Override
     public void serialize(Element element) {
         element.setAttribute("name", name);

@@ -8,11 +8,13 @@ import imgui.ImGuiIO;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiWindowFlags;
+import lombok.Getter;
 
 public class LevelWindow {
-    private EditorComponent editor;
-    private ImVec2 position;
-    private ImVec2 size;
+    private final EditorComponent editor;
+    private final ImVec2 position;
+    private final ImVec2 size;
+    @Getter
     private Rect levelViewport;
 
     public LevelWindow(EditorComponent editor) {
@@ -22,6 +24,9 @@ public class LevelWindow {
         levelViewport = new Rect(0, 0, 1, 1);
     }
 
+    /**
+    * Method to show ImGui in main window. This method is called by editor. onGUI ()
+    */
     public void imgui() {
 
         ImGuiIO io = ImGui.getIO();
@@ -60,7 +65,4 @@ public class LevelWindow {
         ImGui.end();
     }
 
-    public Rect getLevelViewport() {
-        return levelViewport;
-    }
 }

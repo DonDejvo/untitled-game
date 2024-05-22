@@ -13,6 +13,9 @@ public class PerspectiveCamera extends Camera {
         this.far = far;
     }
 
+    /**
+    * Updates the projection matrix to reflect the view frustum. This is called by Camera#setView ( Camera )
+    */
     @Override
     public void updateProjection() {
         projectionMatrix.identity()

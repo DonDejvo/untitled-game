@@ -32,16 +32,31 @@ public class Framebuffer {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    /**
+    * Destroys OpenGL resources associated with this Framebuffer and its textures. This is called by GL_DETACH
+    */
     public void destroy() {
         glDeleteFramebuffers(fbo);
         glDeleteRenderbuffers(rbo);
         glDeleteTextures(tex.getTexId());
     }
 
+    /**
+    * Returns the texture ID associated with this Texture. Note that this will return 0 if there is no texture associated with this Texture.
+    * 
+    * 
+    * @return the texture ID associated with this Texture or - 1 if there is no texture associated with this Texture or if the texture is
+    */
     public int getTexId() {
         return tex.getTexId();
     }
 
+    /**
+    * Sets the size of this Framebuffer. This is called by OpenGL when the size of this Framebuffer changes.
+    * 
+    * @param width - The new width of this Framebuffer. Must be greater than 0.
+    * @param height - The new height of this Framebuffer. Must be greater than 0
+    */
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
@@ -61,6 +76,12 @@ public class Framebuffer {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    /**
+    * Blits the framebuffer to the screen. This is useful for drawing a portion of the screen on a per - frame basis.
+    * 
+    * @param dstWidth - the width of the framebuffer to be blitted to. It must be greater than or equal to 0 and less than or equal to #getWidth ().
+    * @param dstHeight - the height of the framebuffer to be blitted to
+    */
     public void blitFramebuffer(int dstWidth, int dstHeight) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

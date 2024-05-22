@@ -22,16 +22,25 @@ public class Quad extends Geometry {
         };
     }
 
+    /**
+    * Returns the vertices of the polygon. This is a copy of the array returned by #getVertices ()
+    */
     @Override
     public float[] getVertices() {
         return vertices;
     }
 
+    /**
+    * Returns the indices of the elements. This is a copy of the indices array that can be manipulated
+    */
     @Override
     public int[] getIndices() {
         return indices;
     }
 
+    /**
+    * Returns an array of DrawCalls that this Drawable can draw. The order of the array is undefined and may change
+    */
     @Override
     public DrawCall[] getDrawCalls() {
         return drawCalls;

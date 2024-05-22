@@ -1,8 +1,11 @@
 package com.webler.goliath.dialogs;
 
+import lombok.Getter;
+
+@Getter
 public class Dialog {
-    private String text;
-    private String title;
+    private final String text;
+    private final String title;
 
     public Dialog(String text, String title) {
         this.text = text;
@@ -14,11 +17,4 @@ public class Dialog {
         this.title = "";
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public String getTitle() {
-        return title;
-    }
 }

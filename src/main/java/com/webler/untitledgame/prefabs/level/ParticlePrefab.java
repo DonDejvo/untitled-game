@@ -12,10 +12,10 @@ import com.webler.untitledgame.level.controllers.ParticleController;
 import org.joml.Vector3d;
 
 public class ParticlePrefab implements Prefab {
-    private Level level;
-    private double speed;
-    private double lifetime;
-    private Sprite sprite;
+    private final Level level;
+    private final double speed;
+    private final double lifetime;
+    private final Sprite sprite;
 
     public ParticlePrefab(Level level, double speed, double lifetime, Sprite sprite) {
         this.level = level;
@@ -24,6 +24,13 @@ public class ParticlePrefab implements Prefab {
         this.sprite = sprite;
     }
 
+    /**
+    * Creates a GameObject that will be used to interact with the Particle. You can override this method to create your own game objects.
+    * 
+    * @param scene - The scene to create the game object in.
+    * 
+    * @return The game object that will be used to interact with the Particle. Note that this is an instance of the Scene class
+    */
     @Override
     public GameObject create(Scene scene) {
         GameObject go = new GameObject(scene);

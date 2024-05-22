@@ -7,6 +7,6 @@ import org.joml.Vector3d;
 public class NailProjectileController extends ShellProjectileController {
     public NailProjectileController(Level level, BoxCollider3D collider, Vector3d direction) {
         super(level, collider, direction);
-        speed = 50;
+        speed = 100;
     }
 }

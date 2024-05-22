@@ -21,6 +21,11 @@ public class Sound {
         bufferId = -1;
     }
 
+    /**
+    * Loads Vorbis data into OpenAL. This is a convenience method for #readVorbis ( String shortBuffer )
+    * 
+    * @param resourceName - Name of resource to
+    */
     public void load(String resourceName) {
         bufferId = alGenBuffers();
 
@@ -31,6 +36,15 @@ public class Sound {
         }
     }
 
+    /**
+    * Reads and returns PCM data from vorbis file. This is a helper method for #read ( String ) that allows to pass in information about the stream to stb_vorbis_open_memory () and #stb_vorbis_get_samples_short_interleaved ().
+    * 
+    * @param resourceName - name of the resource to read from.
+    * @param bufferSize - size of the buffer to use. Must be greater than 0.
+    * @param info - STBVorbisInfo to fill with information.
+    * 
+    * @return ShortBuffer containing the audio data read from the vorbis file. It is big enough to hold 16 - bit values
+    */
     private static ShortBuffer readVorbis(String resourceName, int bufferSize, STBVorbisInfo info) {
         ByteBuffer vorbis;
         try {
@@ -41,6 +55,7 @@ public class Sound {
 
         IntBuffer error   = BufferUtils.createIntBuffer(1);
         long      decoder = stb_vorbis_open_memory(vorbis, error, null);
+        // Open Ogg Vorbis file. If decoder is 0 throw RuntimeException.
         if (decoder == 0) {
             throw new RuntimeException("Failed to open Ogg Vorbis file. Error: " + error.get(0));
         }
@@ -57,6 +72,9 @@ public class Sound {
         return pcm;
     }
 
+    /**
+    * Destroys the OpenAL buffer. This is a no - op if there is no OpenAL buffer
+    */
     public void destroy() {
         alDeleteBuffers(bufferId);
     }

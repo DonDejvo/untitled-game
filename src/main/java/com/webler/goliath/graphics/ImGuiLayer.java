@@ -18,13 +18,18 @@ public class ImGuiLayer {
     private final ImGuiImplGl3 imGuiImplGl3;
     private final ImGuiImplGlfw imGuiImplGlfw;
     private final long window;
+    private final String defaultFontPath;
 
     public ImGuiLayer(long window) {
         this.window = window;
         imGuiImplGl3 = new ImGuiImplGl3();
         imGuiImplGlfw = new ImGuiImplGlfw();
+        defaultFontPath = "goliath/font/segoeui.ttf";
     }
 
+    /**
+    * Initialize ImGui. This is called from GL context initialization and can be used to set up the OpenGL state
+    */
     public void init() {
         ImGui.createContext();
 
@@ -36,15 +41,17 @@ public class ImGuiLayer {
         fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
         fontConfig.setPixelSnapH(true);
 
-        InputStream is = ClassLoader.getSystemResourceAsStream("goliath/font/segoeui.ttf");
+        InputStream is = ClassLoader.getSystemResourceAsStream(defaultFontPath);
+        // Returns the font path.
         if (is == null) {
-            throw new ResourceNotFoundException("goliath/font/segoeui.ttf");
+            throw new ResourceNotFoundException(defaultFontPath);
         }
         try {
             byte[] bytes = is.readAllBytes();
             fontAtlas.addFontFromMemoryTTF(bytes, 32, fontConfig);
         } catch (IOException e) {
-            throw new ResourceFormatException(e.getMessage());
+            e.printStackTrace(System.err);
+            throw new ResourceFormatException(defaultFontPath, "Could not load font at " + defaultFontPath);
         }
 
         fontAtlas.build();
@@ -57,15 +64,22 @@ public class ImGuiLayer {
         imGuiImplGl3.init("#version 330 core");
     }
 
+    /**
+    * Begin a new frame. This is called by GLFW when it has finished drawing the frame ( s )
+    */
     public void beginFrame() {
         imGuiImplGlfw.newFrame();
         ImGui.newFrame();
     }
 
+    /**
+    * Called by ImGui to end the frame. This is the same as render () but does not call glBegin
+    */
     public void endFrame() {
         ImGui.render();
         imGuiImplGl3.renderDrawData(ImGui.getDrawData());
 
+        // This method will update the current context and render the current window.
         if (ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
             final long backupWindowPtr = GLFW.glfwGetCurrentContext();
             ImGui.updatePlatformWindows();
@@ -74,6 +88,9 @@ public class ImGuiLayer {
         }
     }
 
+    /**
+    * Destroy the OpenGL context. This is called when the window is no longer needed and should not be called
+    */
     public void destroy() {
         imGuiImplGl3.dispose();
         imGuiImplGlfw.dispose();

@@ -3,24 +3,29 @@ package com.webler.untitledgame.prefabs.editor;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.graphics.Sprite;
-import com.webler.goliath.graphics.Spritesheet;
 import com.webler.goliath.graphics.components.SpriteRenderer;
 import com.webler.goliath.prefabs.Prefab;
-import com.webler.goliath.utils.AssetPool;
 import com.webler.untitledgame.components.LevelObject;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.editor.controllers.EntityEditorController;
 import com.webler.untitledgame.level.levelmap.Entity;
 
 public class EntityPrefab implements Prefab {
-    private Entity entity;
-    private EditorComponent editorComponent;
+    private final Entity entity;
+    private final EditorComponent editorComponent;
 
     public EntityPrefab(EditorComponent editorComponent, Entity entity) {
         this.editorComponent = editorComponent;
         this.entity = entity;
     }
 
+    /**
+    * Creates a GameObject that can be used to interact with the entity. This is called by the Scene#create ( Scene ) method.
+    * 
+    * @param scene - The scene to create the game object in.
+    * 
+    * @return The game object that can be interacted with the entity in the Scene#create ( Scene ) method
+    */
     @Override
     public GameObject create(Scene scene) {
         LevelObject levelObject = editorComponent.getLevel().getRegisteredObject(entity.getName());
