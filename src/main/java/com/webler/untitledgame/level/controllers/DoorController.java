@@ -7,13 +7,14 @@ import com.webler.goliath.dialogs.nodes.DialogTextNode;
 import com.webler.goliath.dialogs.components.DialogManager;
 import com.webler.goliath.eventsystem.EventManager;
 import com.webler.goliath.graphics.Color;
+import com.webler.goliath.graphics.DebugDraw;
 import com.webler.goliath.graphics.components.MeshRenderer;
 import com.webler.goliath.input.Input;
 import com.webler.goliath.math.MathUtils;
-import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.level.Level;
 import com.webler.untitledgame.level.events.DoorOpenedEvent;
 import com.webler.untitledgame.level.inventory.Inventory;
-import com.webler.untitledgame.level.levelmap.Direction;
+import com.webler.untitledgame.level.enums.Direction;
 import lombok.Getter;
 import org.joml.Vector3d;
 
@@ -63,7 +64,7 @@ public class DoorController extends Controller {
     * @return true if the player has an inventory key false otherwise ( in which case the player will be closed )
     */
     @Override
-    protected boolean interact() {
+    public boolean interact() {
         // Close the inventory and open the dialog if it is closed.
         if(state == State.CLOSED) {
             GameObject player = level.getPlayer();
@@ -113,7 +114,7 @@ public class DoorController extends Controller {
             collider.setSize(new Vector3d(0, 0, 0));
             EventManager.dispatchEvent(new DoorOpenedEvent(gameObject));
         } else {
-            collider.setSize(new Vector3d(4, 4, 4));
+            collider.setSize(new Vector3d(4, 12, 4));
         }
 
         // This method updates the open state to open or closed.
@@ -138,6 +139,9 @@ public class DoorController extends Controller {
         MeshRenderer renderer = getComponent(MeshRenderer.class, "Renderer");
         renderer.setColor(isFocused() ? new Color(1, 1, 1) : new Color(0.5, 0.5, 0.5));
 
+        if(level.isDebug()) {
+            DebugDraw.get().addBox(collider.getCenter(), collider.getSize(), Color.RED);
+        }
 //        Vector3d offsetPosition = renderer.getOffsetPosition();
 //        DebugDraw.get().addLine(new Vector3d(0, -0.5, 0).add(offsetPosition),
 //                new Vector3d(0, 0.5, 0).add(offsetPosition), Color.YELLOW);
@@ -183,7 +187,7 @@ public class DoorController extends Controller {
     * @return the center of the component in world coordinates ( relative to the view's top - left corner )
     */
     @Override
-    protected Vector3d getCenter() {
+    public Vector3d getCenter() {
         Component renderer = getComponent(Component.class, "Renderer");
         return renderer.getOffsetPosition();
     }

@@ -38,33 +38,33 @@ public class HierarchyWindow {
         // This method is called by the main method to display the tree.
         if(ImGui.treeNode(levelName)) {
             imguiLevelObjectNode(scene.getEntityByName("Editor"), i++);
+            List<GameObject> platformGameObjects = scene.getEntitiesByTag(Platform.TAG);
             // This method is called by the main method to display the game objects in the scene.
-            if(ImGui.treeNode("Platforms")) {
-                List<GameObject> platformGameObjects = scene.getEntitiesByTag(Platform.TAG);
+            if(ImGui.treeNode("Platforms (" + platformGameObjects.size() + ")")) {
                 for(GameObject platformGameObject : platformGameObjects) {
                     imguiLevelObjectNode(platformGameObject, i++);
                 }
                 ImGui.treePop();
             }
+            List<GameObject> lightGameObjects = scene.getEntitiesByTag(Light.TAG);
             // This method is called by the main loop to display the light objects.
-            if(ImGui.treeNode("Lights")) {
-                List<GameObject> lightGameObjects = scene.getEntitiesByTag(Light.TAG);
+            if(ImGui.treeNode("Lights (" + lightGameObjects.size() + ")")) {
                 for(GameObject lightGameObject : lightGameObjects) {
                     imguiLevelObjectNode(lightGameObject, i++);
                 }
                 ImGui.treePop();
             }
+            List<GameObject> entityGameObjects = scene.getEntitiesByTag(Entity.TAG);
             // This method is called by the main method to display the game objects in the tree.
-            if(ImGui.treeNode("Entities")) {
-                List<GameObject> entityGameObjects = scene.getEntitiesByTag(Entity.TAG);
+            if(ImGui.treeNode("Entities (" + entityGameObjects.size() + ")")) {
                 for(GameObject entityGameObject : entityGameObjects) {
                     imguiLevelObjectNode(entityGameObject, i++);
                 }
                 ImGui.treePop();
             }
+            List<GameObject> doorGameObjects = scene.getEntitiesByTag(Door.TAG);
             // This method is called by the DoorManager to display the doors.
-            if(ImGui.treeNode("Doors")) {
-                List<GameObject> doorGameObjects = scene.getEntitiesByTag(Door.TAG);
+            if(ImGui.treeNode("Doors (" + doorGameObjects.size() + ")")) {
                 for(GameObject doorGameObject : doorGameObjects) {
                     imguiLevelObjectNode(doorGameObject, i++);
                 }

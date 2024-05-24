@@ -3,12 +3,15 @@ package com.webler.untitledgame.level.controllers;
 import com.webler.goliath.colliders.BoxCollider3D;
 import com.webler.goliath.core.Component;
 import com.webler.goliath.core.GameObject;
-import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.level.Level;
+import com.webler.untitledgame.level.controllers.entity.PlayerController;
+import com.webler.untitledgame.level.widgets.HPBar;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 
 public abstract class Controller extends Component {
-    protected double yaw, pitch;
+    public double yaw;
+    public double pitch;
     protected Level level;
     protected BoxCollider3D collider;
 
@@ -25,7 +28,7 @@ public abstract class Controller extends Component {
     * 
     * @return The center of the object in world coordinates ( Vector3d ). Note that it is a reference to the GameObject
     */
-    protected Vector3d getCenter() {
+    public Vector3d getCenter() {
         return gameObject.transform.position;
     }
 
@@ -35,7 +38,7 @@ public abstract class Controller extends Component {
     * 
     * @return true if the player is in front of the player false otherwise. Note that it's a good idea to call this in a synchronized
     */
-    protected boolean isInFrontOfPlayer() {
+    public boolean isInFrontOfPlayer() {
         GameObject player = level.getPlayer();
 
         Vector3d playerDirection = new Vector3d(1, 0, 0);
@@ -55,7 +58,7 @@ public abstract class Controller extends Component {
     * 
     * @return true if the dialog should be interacted with false otherwise ( usually by returning false ). Subclasses should override this method in order to return true
     */
-    protected boolean interact() {
+    public boolean interact() {
         return false;
     }
 
@@ -92,4 +95,12 @@ public abstract class Controller extends Component {
     * @return the name of this entity or null if there is no name ( for example if this entity is a group
     */
     public abstract String getName();
+
+    public HPBar getHPBar() {
+        return null;
+    }
+
+    public boolean receiveDamage(int damage) {
+        return false;
+    }
 }

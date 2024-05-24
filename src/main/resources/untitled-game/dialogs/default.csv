@@ -2,9 +2,9 @@ door__no_key;;I need a key.
 system__learn_controls;System;Would you like to learn about the controls?
 player__no;;NO
 player__yes;;YES
-system__controls_move;System;Use WSAD to move player, hold SHIFT to run and use SPACE to jump.
+system__controls_move;System;Use WSAD to move player, hold SHIFT to run and use ALT to jump.
 system__controls_interact;System;Focus an object by standing nearby and looking its direction. Press E to interact.
-system__controls_inventory;System;Use I or TAB to open the inventory and use arrows or WSAD to move in the invetory.
+system__controls_inventory;System;Press I or TAB to open the inventory and use arrows or WSAD to move in the invetory.
 player__follow;;Follow me!
 player__stop_follow;;Wait here!
 npc__follow;Knight;Sure, let's go!
@@ -14,3 +14,4 @@ knight__whats_up_1;Knight;We have had brighter days but the order is still stand
 knight__whats_up_2;Knight;Sometimes I have bad feelings about the darkness surrounding us.
 player__give_coffee;;Here, take a coffee.
 npc__take_coffee;Knight;Thanks. Cup of coffee always brings a new life.
+system__controls_gun;System;Press ENTER to (un)equip a gun from the inventory. Press SPACE to (un)equip the last used gun.

@@ -1,8 +1,8 @@
 package com.webler.untitledgame.editor;
 
 import com.webler.goliath.input.Input;
-import com.webler.untitledgame.components.LevelObject;
-import com.webler.untitledgame.components.LevelObjectType;
+import com.webler.untitledgame.level.objects.LevelObject;
+import com.webler.untitledgame.level.enums.LevelObjectType;
 import imgui.ImGui;
 
 import java.util.List;

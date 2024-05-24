@@ -8,8 +8,9 @@ import com.webler.goliath.graphics.canvas.Canvas;
 import com.webler.goliath.graphics.canvas.TextAlign;
 import com.webler.goliath.graphics.ui.UIElements;
 import com.webler.goliath.input.Input;
-import com.webler.untitledgame.components.Level;
-import com.webler.untitledgame.components.LevelItem;
+import com.webler.untitledgame.level.Level;
+import com.webler.untitledgame.level.events.ItemUnselectedEvent;
+import com.webler.untitledgame.level.objects.LevelItem;
 import com.webler.untitledgame.level.events.ItemSelectedEvent;
 
 import java.util.HashMap;
@@ -131,11 +132,13 @@ public class Inventory extends Component {
         int x = 0;
         int y = 0;
 
+        int entriesCount = entries.size();
+
         // This method is used to determine the index of the key that is pressed.
         if((Input.keyBeginPress(GLFW_KEY_UP) || Input.keyBeginPress(GLFW_KEY_W)) && hoveredItemIdx >= numCols)
             hoveredItemIdx -= numCols;
         // This method is used to determine the index of the item in the list of keys.
-        else if((Input.keyBeginPress(GLFW_KEY_DOWN) || Input.keyBeginPress(GLFW_KEY_S)) && hoveredItemIdx % entries.size() < entries.size() - numCols)
+        else if((Input.keyBeginPress(GLFW_KEY_DOWN) || Input.keyBeginPress(GLFW_KEY_S)) && entriesCount != 0 && hoveredItemIdx % entriesCount < entriesCount - numCols)
             hoveredItemIdx += numCols;
         // This method is used to determine the index of the item in the hovered list.
         else if(Input.keyBeginPress(GLFW_KEY_LEFT) || Input.keyBeginPress(GLFW_KEY_A))
@@ -146,14 +149,14 @@ public class Inventory extends Component {
 
         // Returns the index of the hovered item in the list.
         while(hoveredItemIdx < 0) {
-            hoveredItemIdx += entries.size();
+            hoveredItemIdx += entriesCount;
         }
 
         for(Map.Entry<String, Integer> entry : entries) {
             InventoryItem item = new InventoryItem((LevelItem) level.getRegisteredObject(entry.getKey()));
 
             // hover next button if the item is hovered.
-            if (hoveredItemIdx % entries.size() == y * numCols + x) {
+            if (hoveredItemIdx % entriesCount == y * numCols + x) {
                 ui.hoverNextButton();
             }
 
@@ -178,7 +181,7 @@ public class Inventory extends Component {
             ctx.setTextAlign(prevTextAlign);
 
             // Select the item that is hovered by the item.
-            if(hoveredItemIdx % entries.size() == y * numCols + x) {
+            if(hoveredItemIdx % entriesCount == y * numCols + x) {
                 selectedItem = new InventoryItem((LevelItem) level.getRegisteredObject(entry.getKey()));
             }
 
@@ -202,8 +205,10 @@ public class Inventory extends Component {
             ui.textBlock(selectedItem.levelItem().getDescription(), h * 0.18f, h * 0.6f + ui.lineHeight, h * 0.42f - ui.padding.x);
 
             // This method is called when the user presses the key ENTER.
-            if(Input.keyBeginPress(GLFW_KEY_ENTER)) {
+            if(Input.keyBeginPress(GLFW_KEY_ENTER) || Input.keyBeginPress(GLFW_KEY_E)) {
                 EventManager.dispatchEvent(new ItemSelectedEvent(gameObject, selectedItem.levelItem().getIdentifier()));
+            } else if(Input.keyBeginPress(GLFW_KEY_Q)) {
+                EventManager.dispatchEvent(new ItemUnselectedEvent(gameObject, selectedItem.levelItem().getIdentifier()));
             }
         }
 

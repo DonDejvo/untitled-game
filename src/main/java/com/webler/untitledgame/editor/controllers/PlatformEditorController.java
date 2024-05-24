@@ -9,7 +9,7 @@ import com.webler.goliath.math.MathUtils;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.Platform;
 import com.webler.untitledgame.level.levelmap.Serializable;
-import com.webler.untitledgame.prefabs.editor.PlatformPrefab;
+import com.webler.untitledgame.editor.prefabs.PlatformPrefab;
 import org.joml.Vector2d;
 import org.joml.Vector3d;
 

@@ -1,6 +1,7 @@
 package com.webler.untitledgame.level.levelmap;
 
 import com.webler.goliath.graphics.Color;
+import com.webler.untitledgame.level.enums.Environment;
 import com.webler.untitledgame.level.exceptions.LevelMapFormatException;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,6 +53,8 @@ public class LevelMap implements Serializable {
     private double ambientIntensity;
     @Setter
     private double cameraX, cameraY;
+    @Setter
+    private double soundVolume;
 
     private final List<Platform> platforms;
     private final List<Light> lights;
@@ -72,15 +75,13 @@ public class LevelMap implements Serializable {
         environment = Environment.DUNGEON;
         cameraX = 0;
         cameraY = 0;
+        soundVolume = 0.5;
         platforms = new ArrayList<>();
         lights = new ArrayList<>();
         entities = new ArrayList<>();
         doors = new ArrayList<>();
     }
 
-    /**
-    * Clears all data stored in this Scene. This is useful when you want to re - use a Scene
-    */
     /**
     * Clears all data stored in this Scene. This is useful when you want to re - use a Scene
     */
@@ -91,11 +92,6 @@ public class LevelMap implements Serializable {
         doors.clear();
     }
 
-    /**
-    * Adds a platform to the game. This is called by the platform when it is added to the game
-    * 
-    * @param platform - The platform to add
-    */
     /**
     * Adds a platform to the screen. This is called by the platform when it is added to the screen
     * 
@@ -221,6 +217,7 @@ public class LevelMap implements Serializable {
         element.setAttribute("ambient-intensity", Double.toString(ambientIntensity));
         element.setAttribute("camera-x", Double.toString(cameraX));
         element.setAttribute("camera-y", Double.toString(cameraY));
+        element.setAttribute("sound-volume", Double.toString(soundVolume));
 
         for (Platform platform : platforms) {
             Element platformElement = element.getOwnerDocument().createElement(Platform.TAG);
@@ -267,6 +264,7 @@ public class LevelMap implements Serializable {
         double intensity =levelMapElement.hasAttribute("ambient-intensity") ? Double.parseDouble(levelMapElement.getAttribute("ambient-intensity")) : 0.05;
         double cameraX = levelMapElement.hasAttribute("camera-x") ? Double.parseDouble(levelMapElement.getAttribute("camera-x")) : 0;
         double cameraY = levelMapElement.hasAttribute("camera-y") ? Double.parseDouble(levelMapElement.getAttribute("camera-y")) : 0;
+        double soundVolume = levelMapElement.hasAttribute("sound-volume") ? Double.parseDouble(levelMapElement.getAttribute("sound-volume")) : 0.5;
 
 //        this.minX = minX;
 //        this.minY = minY;
@@ -281,6 +279,7 @@ public class LevelMap implements Serializable {
         this.ambientIntensity = intensity;
         this.cameraX = cameraX;
         this.cameraY = cameraY;
+        this.soundVolume = soundVolume;
 
         NodeList platformNodeList = levelMapElement.getElementsByTagName(Platform.TAG);
         // Creates a new Platform object from the list of platforms.

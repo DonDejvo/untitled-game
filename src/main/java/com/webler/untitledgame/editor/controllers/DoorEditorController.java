@@ -4,10 +4,10 @@ import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.widgets.Controls;
 import com.webler.untitledgame.editor.EditorComponent;
-import com.webler.untitledgame.level.levelmap.Direction;
+import com.webler.untitledgame.level.enums.Direction;
 import com.webler.untitledgame.level.levelmap.Door;
 import com.webler.untitledgame.level.levelmap.Serializable;
-import com.webler.untitledgame.prefabs.editor.DoorPrefab;
+import com.webler.untitledgame.editor.prefabs.DoorPrefab;
 import imgui.type.ImInt;
 import org.joml.Vector2d;
 

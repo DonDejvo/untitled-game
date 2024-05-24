@@ -110,10 +110,35 @@ public class DebugDraw {
         double top = position.y - size.y * 0.5;
         double right = position.x + size.x * 0.5;
         double bottom = position.y + size.y * 0.5;
+
         addLine(new Vector3d(left, top, 0), new Vector3d(right, top, 0), color);
         addLine(new Vector3d(left, bottom, 0), new Vector3d(right, bottom, 0), color);
         addLine(new Vector3d(left, top, 0), new Vector3d(left, bottom, 0), color);
         addLine(new Vector3d(right, bottom, 0), new Vector3d(right, top, 0), color);
+    }
+
+    public void addBox(Vector3d position, Vector3d size, Color color) {
+        double left = position.x - size.x * 0.5;
+        double top = position.y - size.y * 0.5;
+        double right = position.x + size.x * 0.5;
+        double bottom = position.y + size.y * 0.5;
+        double near = position.z + size.z * 0.5;
+        double far = position.z - size.z * 0.5;
+
+        addLine(new Vector3d(left, top, near), new Vector3d(right, top, near), color);
+        addLine(new Vector3d(left, bottom, near), new Vector3d(right, bottom, near), color);
+        addLine(new Vector3d(left, top, near), new Vector3d(left, bottom, near), color);
+        addLine(new Vector3d(right, bottom, near), new Vector3d(right, top, near), color);
+
+        addLine(new Vector3d(left, top, far), new Vector3d(right, top, far), color);
+        addLine(new Vector3d(left, bottom, far), new Vector3d(right, bottom, far), color);
+        addLine(new Vector3d(left, top, far), new Vector3d(left, bottom, far), color);
+        addLine(new Vector3d(right, bottom, far), new Vector3d(right, top, far), color);
+
+        addLine(new Vector3d(left, top, near), new Vector3d(left, top, far), color);
+        addLine(new Vector3d(right, top, near), new Vector3d(right, top, far), color);
+        addLine(new Vector3d(right, bottom, near), new Vector3d(right, bottom, far), color);
+        addLine(new Vector3d(left, bottom, near), new Vector3d(left, bottom, far), color);
     }
 
     /**

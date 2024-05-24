@@ -4,9 +4,9 @@ import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.components.Transform;
 import com.webler.goliath.graphics.Color;
 import com.webler.goliath.graphics.widgets.Controls;
-import com.webler.untitledgame.components.Level;
+import com.webler.untitledgame.level.Level;
 import com.webler.untitledgame.editor.EditorComponent;
-import com.webler.untitledgame.level.levelmap.Environment;
+import com.webler.untitledgame.level.enums.Environment;
 import com.webler.untitledgame.level.levelmap.LevelMap;
 import com.webler.untitledgame.level.levelmap.Serializable;
 import imgui.type.ImInt;
@@ -65,6 +65,10 @@ public class LevelMapEditorController extends EditorController {
         float[] intensity = {(float) levelMap.getAmbientIntensity()};
         Controls.floatControl("ambient light intensity", intensity, 0.01f, 0, 100);
         levelMap.setAmbientIntensity(intensity[0]);
+
+        float[] soundVolume = {(float) levelMap.getSoundVolume()};
+        Controls.floatControl("sound volume", soundVolume, 0.01f, 0, 1);
+        levelMap.setSoundVolume(soundVolume[0]);
     }
 
     /**

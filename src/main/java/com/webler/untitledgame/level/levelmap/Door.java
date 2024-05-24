@@ -1,5 +1,6 @@
 package com.webler.untitledgame.level.levelmap;
 
+import com.webler.untitledgame.level.enums.Direction;
 import lombok.Getter;
 import lombok.Setter;
 import org.w3c.dom.Element;

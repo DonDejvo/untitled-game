@@ -7,7 +7,7 @@ import com.webler.goliath.graphics.widgets.Controls;
 import com.webler.untitledgame.editor.EditorComponent;
 import com.webler.untitledgame.level.levelmap.Light;
 import com.webler.untitledgame.level.levelmap.Serializable;
-import com.webler.untitledgame.prefabs.editor.LightPrefab;
+import com.webler.untitledgame.editor.prefabs.LightPrefab;
 import org.joml.Vector2d;
 
 import java.util.Locale;

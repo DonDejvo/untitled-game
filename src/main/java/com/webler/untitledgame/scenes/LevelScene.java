@@ -10,7 +10,8 @@ import com.webler.goliath.prefabs.PerspectiveCameraPrefab;
 import com.webler.goliath.core.GameObject;
 import com.webler.goliath.core.Scene;
 import com.webler.goliath.utils.FPSCounter;
-import com.webler.untitledgame.components.*;
+import com.webler.untitledgame.level.Level;
+import com.webler.untitledgame.level.graphics.LevelRenderer;
 
 public class LevelScene extends Scene {
     public LevelScene(Game game) {
